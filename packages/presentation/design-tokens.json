@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "token_set": "jacaranda-brand",
+  "version": "0.1.0",
+  "status": "v1 — calibrated against the official Jacaranda Society logo (purple shield, white jacaranda tree); pending final calibration against legacy report decks",
+  "color": {
+    "brand": {
+      "primary": { "value": "#563F7C", "usage": "titles, section headers, chart primary series, table header fill" },
+      "dark": { "value": "#34234F", "usage": "cover background, footer text, chart axis labels, emphasis" },
+      "light": { "value": "#B7A3CB", "usage": "secondary chart series, dividers, table zebra rows, chips" },
+      "tint": { "value": "#EDE8F3", "usage": "card fills, callout backgrounds, table alternate rows" },
+      "background": { "value": "#F7F5FA", "usage": "default slide background" },
+      "surface": { "value": "#FFFFFF", "usage": "cards, tables, chart plot area" }
+    },
+    "text": {
+      "body": { "value": "#25232A", "usage": "all body copy" },
+      "muted": { "value": "#6E6879", "usage": "footnotes, source lines, data dates, page numbers" },
+      "inverse": { "value": "#FFFFFF", "usage": "text on primary/dark purple fills" }
+    },
+    "signal": {
+      "positive": { "value": "#1E7F4F", "usage": "positive financial change ONLY (growth, beat, upside)" },
+      "negative": { "value": "#C0392B", "usage": "negative financial change ONLY (decline, miss, downside)" },
+      "neutral": { "value": "#8A8494", "usage": "flat/unchanged values" }
+    },
+    "chart_series": {
+      "order": ["#563F7C", "#B7A3CB", "#34234F", "#8D77AB", "#D5C8E2", "#6E6879"],
+      "note": "Use in order; never use signal green/red as a generic series colour."
+    },
+    "rules": [
+      "Green/red are reserved for positive/negative financial signals; never decorative.",
+      "Never place body text (#25232A) on primary or dark purple; use inverse white.",
+      "Minimum contrast: 4.5:1 for body text, 3:1 for large display numbers."
+    ]
+  },
+  "typography": {
+    "note": "Logo lockup uses a serif smallcaps emblem and a rounded sans wordmark; decks use system-safe fonts that echo that pairing and must survive PowerPoint editing on machines without custom fonts.",
+    "font_family": {
+      "latin_heading": { "value": "Georgia", "fallback": ["Times New Roman", "serif"] },
+      "latin_body": { "value": "Calibri", "fallback": ["Arial", "sans-serif"] },
+      "cjk_heading": { "value": "Source Han Serif SC / 思源宋体", "fallback": ["SimSun", "serif"] },
+      "cjk_body": { "value": "Source Han Sans SC / 思源黑体", "fallback": ["Microsoft YaHei", "sans-serif"] },
+      "numeric": { "value": "Calibri", "note": "All figures/tables use lining tabular numerals in the sans face for both editions." }
+    },
+    "scale_pt": {
+      "cover_title": { "zh": 40, "en": 44 },
+      "cover_subtitle": { "zh": 20, "en": 22 },
+      "slide_title": { "zh": 24, "en": 26 },
+      "section_header": { "zh": 18, "en": 20 },
+      "body": { "zh": 14, "en": 14 },
+      "table_body": { "zh": 11, "en": 11 },
+      "kpi_number": { "zh": 30, "en": 32 },
+      "footnote": { "zh": 9, "en": 9 }
+    },
+    "line_height": { "zh_body": 1.35, "en_body": 1.2 },
+    "rules": [
+      "Chinese editions never justify text; English editions use left alignment only.",
+      "Chinese punctuation is full-width; no line may start with 。，、；：）or end with （.",
+      "English titles use sentence case, not ALL CAPS (caps are reserved for the logo emblem)."
+    ]
+  },
+  "layout": {
+    "slide": { "width_in": 13.333, "height_in": 7.5, "aspect": "16:9" },
+    "margin_in": { "top": 0.6, "bottom": 0.55, "left": 0.7, "right": 0.7 },
+    "grid": { "columns": 12, "gutter_in": 0.2 },
+    "footer_band_in": { "height": 0.4, "contents": ["page_number", "data_as_of", "source_line", "disclaimer_short"] },
+    "logo": {
+      "asset": "assets/brand/jacaranda-logo.png (transparent master, to be committed in the brand-assets PR)",
+      "description": "Purple shield with white jacaranda tree and 'THE JACARANDA SOCIETY' emblem text; 'Jacaranda Stock Market Society' wordmark below.",
+      "cover": { "variant": "full lockup (shield + wordmark)", "position": "horizontally centred, upper-middle", "max_height_in": 2.4, "clear_space": "0.5x shield width on all sides" },
+      "content_slides": { "variant": "shield only (no wordmark)", "position": "top-right inside margin", "height_in": 0.45 },
+      "rules": [
+        "Never stretch, recolour, outline, or add effects to the logo.",
+        "On purple/dark backgrounds use the white-on-purple master as-is; never invert colours manually.",
+        "Emblem text inside the shield must remain legible; if rendered height < 0.4in, it is acceptable because the shield reads as a mark."
+      ]
+    }
+  },
+  "table": {
+    "header": { "fill": "#563F7C", "text": "#FFFFFF", "weight": "bold" },
+    "zebra": { "odd": "#FFFFFF", "even": "#EDE8F3" },
+    "border": { "color": "#B7A3CB", "weight_pt": 0.75, "style": "horizontal rules only, no vertical grid" },
+    "numeric_alignment": "right",
+    "unit_row": "Units/currency stated once in the column header or a caption line, never repeated per cell."
+  },
+  "chart": {
+    "background": "#FFFFFF",
+    "gridlines": { "color": "#E4DFEC", "horizontal_only": true },
+    "axis_text": { "color": "#6E6879", "size_pt": 9 },
+    "title": { "color": "#34234F", "size_pt": 12, "weight": "bold" },
+    "data_labels": "Only on <=8 data points; otherwise axis only.",
+    "source_caption": "Every chart carries its own '来源/Source: SRC-xxx' caption plus data date.",
+    "allowed_types": ["line", "bar", "stacked_bar", "grouped_bar", "waterfall", "area", "scatter", "football_field", "donut"],
+    "forbidden": ["3d effects", "shadows", "gradient fills", "pie with >5 slices", "dual axis without explicit labelling"]
+  },
+  "iconography": { "style": "thin-line monochrome (#563F7C), no emoji, no clip art" },
+  "spacing_in": { "block_gap": 0.25, "card_padding": 0.18, "title_to_content": 0.3 }
+}
