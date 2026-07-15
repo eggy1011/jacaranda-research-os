@@ -2,15 +2,24 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "token_set": "jacaranda-brand",
   "version": "0.1.0",
-  "status": "v1 — calibrated against the official Jacaranda Society logo (purple shield, white jacaranda tree); pending final calibration against legacy report decks",
+  "status": "v1.1 — calibrated against the official logo and legacy report slide screenshots (2025 Meituan-era deck). Owner direction: keep the logo and the purple/white system; do NOT replicate legacy layouts exactly.",
+  "legacy_calibration_notes": [
+    "Legacy slides use a pure white page background with a dark-purple slide title top-left and a thin purple rule under the header — adopted.",
+    "Legacy content slides use a horizontal logo lockup (shield + wordmark + chapter tag 'Sydney') at top right — adopted as the default content-slide brand mark.",
+    "Legacy tables: purple header/label cells with white text, lavender body cells — adopted with lighter body fill for readability.",
+    "Legacy diagrams: dark-purple circles, light-purple rounded cards, chunky purple block arrows, and a left-edge vertical spine with node dots — adopted as the diagram vocabulary.",
+    "Legacy body text is purple-tinted and dense; we deliberately switch body copy to near-black #25232A and enforce per-layout word caps for readability."
+  ],
   "color": {
     "brand": {
       "primary": { "value": "#563F7C", "usage": "titles, section headers, chart primary series, table header fill" },
       "dark": { "value": "#34234F", "usage": "cover background, footer text, chart axis labels, emphasis" },
       "light": { "value": "#B7A3CB", "usage": "secondary chart series, dividers, table zebra rows, chips" },
       "tint": { "value": "#EDE8F3", "usage": "card fills, callout backgrounds, table alternate rows" },
-      "background": { "value": "#F7F5FA", "usage": "default slide background" },
-      "surface": { "value": "#FFFFFF", "usage": "cards, tables, chart plot area" }
+      "background": { "value": "#FFFFFF", "usage": "default slide background (legacy decks use white pages)" },
+      "background_alt": { "value": "#F7F5FA", "usage": "optional tinted background for divider/appendix slides" },
+      "surface": { "value": "#FFFFFF", "usage": "cards, tables, chart plot area" },
+      "mid": { "value": "#7B639B", "usage": "table label cells, secondary emphasis fills (legacy mid-purple)" }
     },
     "text": {
       "body": { "value": "#25232A", "usage": "all body copy" },
@@ -63,11 +72,16 @@
     "margin_in": { "top": 0.6, "bottom": 0.55, "left": 0.7, "right": 0.7 },
     "grid": { "columns": 12, "gutter_in": 0.2 },
     "footer_band_in": { "height": 0.4, "contents": ["page_number", "data_as_of", "source_line", "disclaimer_short"] },
+    "header": {
+      "title": { "color": "#34234F", "position": "top-left", "weight": "bold" },
+      "rule": { "color": "#563F7C", "weight_pt": 1.5, "span": "full content width, 0.12in below the title baseline" },
+      "note": "Every content slide: dark-purple title top-left + thin purple rule, brand lockup top-right (legacy pattern)."
+    },
     "logo": {
       "asset": "assets/brand/jacaranda-logo.png (transparent master, to be committed in the brand-assets PR)",
       "description": "Purple shield with white jacaranda tree and 'THE JACARANDA SOCIETY' emblem text; 'Jacaranda Stock Market Society' wordmark below.",
       "cover": { "variant": "full lockup (shield + wordmark)", "position": "horizontally centred, upper-middle", "max_height_in": 2.4, "clear_space": "0.5x shield width on all sides" },
-      "content_slides": { "variant": "shield only (no wordmark)", "position": "top-right inside margin", "height_in": 0.45 },
+      "content_slides": { "variant": "horizontal lockup: shield left + 'Jacaranda / Stock Market Society' wordmark, optional light divider + chapter tag (e.g. 'Sydney')", "position": "top-right inside margin, aligned with header rule", "height_in": 0.45, "fallback": "shield only when horizontal space is constrained" },
       "rules": [
         "Never stretch, recolour, outline, or add effects to the logo.",
         "On purple/dark backgrounds use the white-on-purple master as-is; never invert colours manually.",
@@ -77,6 +91,7 @@
   },
   "table": {
     "header": { "fill": "#563F7C", "text": "#FFFFFF", "weight": "bold" },
+    "label_column": { "fill": "#7B639B", "text": "#FFFFFF", "usage": "optional first-column row labels, per legacy matrix tables" },
     "zebra": { "odd": "#FFFFFF", "even": "#EDE8F3" },
     "border": { "color": "#B7A3CB", "weight_pt": 0.75, "style": "horizontal rules only, no vertical grid" },
     "numeric_alignment": "right",
@@ -92,6 +107,12 @@
     "allowed_types": ["line", "bar", "stacked_bar", "grouped_bar", "waterfall", "area", "scatter", "football_field", "donut"],
     "forbidden": ["3d effects", "shadows", "gradient fills", "pie with >5 slices", "dual axis without explicit labelling"]
   },
-  "iconography": { "style": "thin-line monochrome (#563F7C), no emoji, no clip art" },
+  "diagram": {
+    "node_circle": { "fill": "#34234F", "text": "#FFFFFF", "usage": "primary entities in competition/relationship diagrams (legacy style)" },
+    "node_card": { "fill": "#B7A3CB", "corner_radius_in": 0.08, "text": "#25232A", "usage": "secondary entities, value-chain stages, bargaining-power boxes" },
+    "block_arrow": { "fill": "#563F7C", "usage": "directional relationships; solid block arrows, no thin connectors between major entities" },
+    "spine": { "color": "#563F7C", "dot_fill": "#34234F", "usage": "left-edge vertical spine with node dots for upstream/midstream/downstream and timeline layouts (legacy pattern)" }
+  },
+  "iconography": { "style": "thin-line monochrome (#563F7C), no emoji, no clip art; third-party product logos only inside evidence exhibits, never as decoration" },
   "spacing_in": { "block_gap": 0.25, "card_padding": 0.18, "title_to_content": 0.3 }
 }

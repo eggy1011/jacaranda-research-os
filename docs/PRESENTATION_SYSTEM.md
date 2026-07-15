@@ -18,7 +18,11 @@ Design tokens (colours, typography scale, spacing, table/chart styles, logo sizi
 The official logo is a purple shield containing a white jacaranda tree and the emblem text "THE JACARANDA SOCIETY", with the "Jacaranda Stock Market Society" wordmark beneath.
 
 - Cover: full lockup (shield + wordmark) centred upper-middle on the dark-purple cover, max height 2.4in, clear space of 0.5× shield width.
-- Content slides: shield only (no wordmark), top right, 0.45in high.
+- Content slides: horizontal lockup (shield + wordmark, optional chapter tag such as "Sydney") top right, 0.45in high, matching the legacy deck header; shield-only as a space-constrained fallback.
+- Content-slide header: dark-purple title top-left with a thin purple rule underneath (legacy pattern, kept).
+- Page background is white; `#F7F5FA` is reserved for divider/appendix slides.
+
+Calibration status: v1.1, based on the official logo plus legacy report screenshots. Owner decision (2026-07-15): keep the logo and the purple/white system; legacy layouts are reference only and are not replicated exactly.
 - Never stretch, recolour, outline or distort the logo; use the supplied white-on-purple master as-is.
 - Store the approved transparent asset under `assets/brand/` in a later brand-assets PR.
 
