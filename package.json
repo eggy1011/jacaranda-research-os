@@ -1,0 +1,13 @@
+{
+  "name": "jacaranda-research-os",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.17.1",
+  "scripts": {
+    "dev": "pnpm --filter @jacaranda/web dev",
+    "build": "pnpm --filter @jacaranda/web build",
+    "lint": "pnpm --filter @jacaranda/web lint",
+    "typecheck": "pnpm --filter @jacaranda/web typecheck",
+    "test": "pnpm --filter @jacaranda/web test"
+  }
+}
