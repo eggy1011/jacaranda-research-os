@@ -11,11 +11,15 @@
 - Body: `#25232A`.
 - Green/red are reserved for positive/negative financial signals.
 
+Design tokens (colours, typography scale, spacing, table/chart styles, logo sizing) are codified in `packages/presentation/design-tokens.json`. Renderers must consume tokens, not restyle per slide.
+
 ## Brand usage
 
-- Cover: logo centred with generous safe area.
-- Content slides: small logo at the top right.
-- Never stretch, recolour or distort the logo.
+The official logo is a purple shield containing a white jacaranda tree and the emblem text "THE JACARANDA SOCIETY", with the "Jacaranda Stock Market Society" wordmark beneath.
+
+- Cover: full lockup (shield + wordmark) centred upper-middle on the dark-purple cover, max height 2.4in, clear space of 0.5× shield width.
+- Content slides: shield only (no wordmark), top right, 0.45in high.
+- Never stretch, recolour, outline or distort the logo; use the supplied white-on-purple master as-is.
 - Store the approved transparent asset under `assets/brand/` in a later brand-assets PR.
 
 ## Slide rules
@@ -50,4 +54,6 @@ The two complete editions must use identical data, charts and source IDs. Layout
 11. Conclusion and sources.
 
 Each layout definition must specify inputs, title/body limits, overflow behaviour, source position and language-specific typography.
+
+Full per-layout specifications (L01–L11), the mapping from the 12 report sections to layouts, per-language character/word caps, missing-data rendering and the three-step overflow policy (drop by priority → appendix → fail, never shrink below token sizes) are defined in `packages/presentation/layouts.md`. The renderer consumes decks validating against `packages/research-schema/slide-deck.schema.json`.
 

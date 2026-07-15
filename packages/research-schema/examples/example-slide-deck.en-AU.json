@@ -1,0 +1,177 @@
+{
+  "schema_version": "0.1.0",
+  "deck_id": "DCK-600XXX-2026-001-EN",
+  "package_id": "RPK-600XXX-2026-001",
+  "edition": "en-AU",
+  "as_of_date": "2026-07-10",
+  "theme": "jacaranda-brand",
+  "slides": [
+    {
+      "slide_no": 1,
+      "layout": "L01_cover",
+      "section_id": "cover",
+      "title": "Example Intelligent Manufacturing (600XXX) equity research",
+      "kicker": "An automation-equipment supplier in the domestic-substitution cycle",
+      "blocks": [
+        {
+          "block_type": "cover_meta",
+          "priority": 1,
+          "cover_meta": {
+            "company_line": "Example Intelligent Manufacturing Co., Ltd. · 600XXX · fictional example",
+            "rating_line": "Rating: Accumulate · Target price: CNY 34.00",
+            "date_line": "15 Jul 2026",
+            "edition_line": "Full English edition",
+            "prepared_by": "Jacaranda Stock Market Society"
+          }
+        }
+      ],
+      "footer": { "show_page_number": false, "data_as_of": "2026-07-10", "source_ids": [], "show_disclaimer_ref": true }
+    },
+    {
+      "slide_no": 2,
+      "layout": "L03_kpi_snapshot",
+      "section_id": "investment_thesis",
+      "title": "Investment thesis",
+      "blocks": [
+        {
+          "block_type": "kpi_cards",
+          "priority": 1,
+          "kpi_cards": [
+            { "label": "Revenue", "number": { "metric_id": "MET-001", "display_transform": "billion", "decimals": 2 }, "period_caption": "FY2025" },
+            { "label": "Revenue growth", "number": { "metric_id": "MET-003", "display_transform": "raw", "decimals": 1, "show_sign_colour": true }, "period_caption": "FY2025, YoY" },
+            { "label": "Current price", "number": { "metric_id": "MET-005", "display_transform": "raw", "decimals": 2 }, "period_caption": "Close, 10 Jul 2026" },
+            { "label": "Target price", "number": { "metric_id": "MET-006", "display_transform": "raw", "decimals": 2 }, "period_caption": "Base case" }
+          ]
+        },
+        {
+          "block_type": "bullets",
+          "priority": 2,
+          "bullets": [
+            { "text": "Policy support and strong revenue growth position the company to keep gaining domestic share.", "refs": [{ "claim_id": "CLM-003" }], "claim_type": "inference" },
+            { "text": "We view the company as a key beneficiary of domestic substitution and assign an Accumulate rating.", "refs": [{ "claim_id": "CLM-004" }], "claim_type": "opinion" },
+            { "text": "Counterargument: growth could fall well short of forecast if downstream capex slows.", "refs": [{ "claim_id": "CLM-005" }], "claim_type": "inference" }
+          ]
+        }
+      ],
+      "footer": { "show_page_number": true, "data_as_of": "2026-07-10", "source_ids": ["SRC-001", "SRC-002", "SRC-004"], "show_disclaimer_ref": true }
+    },
+    {
+      "slide_no": 3,
+      "layout": "L04_chart_commentary",
+      "section_id": "historical_financials",
+      "title": "Revenue growth remains in double digits",
+      "blocks": [
+        {
+          "block_type": "chart",
+          "priority": 1,
+          "chart": {
+            "chart_type": "bar",
+            "title": "Revenue (FY2024-FY2025)",
+            "x_labels": ["FY2024", "FY2025"],
+            "series": [
+              { "name": "Revenue", "metric_ids": ["MET-002", "MET-001"], "display_transform": "billion" }
+            ],
+            "unit_caption": "CNY bn",
+            "source_ids": ["SRC-001"]
+          }
+        },
+        {
+          "block_type": "bullets",
+          "priority": 2,
+          "bullets": [
+            { "text": "FY2025 revenue reached CNY 4.52 billion, up 20.2% year on year.", "refs": [{ "claim_id": "CLM-001" }, { "metric_id": "MET-003" }], "claim_type": "fact", "inline_numbers": [{ "metric_id": "MET-001", "display_transform": "billion", "decimals": 2 }, { "metric_id": "MET-003", "display_transform": "raw", "decimals": 1 }] }
+          ]
+        }
+      ],
+      "footer": { "show_page_number": true, "data_as_of": "2026-07-10", "source_ids": ["SRC-001"], "show_disclaimer_ref": true }
+    },
+    {
+      "slide_no": 4,
+      "layout": "L09_football_field",
+      "section_id": "valuation",
+      "title": "Valuation range and target price",
+      "blocks": [
+        {
+          "block_type": "football_field",
+          "priority": 1,
+          "football_field": {
+            "bars": [
+              { "label": "Discounted cash flow", "low": { "metric_id": "MET-007", "display_transform": "raw", "decimals": 1 }, "high": { "metric_id": "MET-008", "display_transform": "raw", "decimals": 1 } },
+              { "label": "Peer PE multiples", "low": { "metric_id": "MET-009", "display_transform": "raw", "decimals": 1 }, "high": { "metric_id": "MET-010", "display_transform": "raw", "decimals": 1 } }
+            ],
+            "current_price": { "metric_id": "MET-005", "display_transform": "raw", "decimals": 2 },
+            "target_price": { "metric_id": "MET-006", "display_transform": "raw", "decimals": 2 },
+            "assumption_lines": [
+              { "text": "9.5% WACC, reflecting sector equity costs and the company's low leverage.", "refs": [{ "assumption_id": "ASM-001" }, { "claim_id": "CLM-010" }] },
+              { "text": "Base case: 15% revenue CAGR over 2026-2028.", "refs": [{ "claim_id": "CLM-009" }] }
+            ],
+            "source_ids": ["SRC-001", "SRC-004"]
+          }
+        }
+      ],
+      "footer": { "show_page_number": true, "data_as_of": "2026-07-10", "source_ids": ["SRC-001", "SRC-004"], "show_disclaimer_ref": true }
+    },
+    {
+      "slide_no": 5,
+      "layout": "L10_catalysts_risks",
+      "section_id": "risks",
+      "title": "Catalysts and risks",
+      "blocks": [
+        {
+          "block_type": "paired_columns",
+          "priority": 1,
+          "paired_columns": {
+            "left_title": "Catalysts",
+            "right_title": "Risks",
+            "left_items": [
+              { "title": "Next-generation control system launch", "description": "Planned for Q4 2026; an on-time launch could drive new orders.", "chip": "3-12m", "refs": [{ "claim_id": "CLM-011" }] }
+            ],
+            "right_items": [
+              { "title": "Slowing downstream capital expenditure", "chip": "Severity: high", "refs": [{ "claim_id": "CLM-005" }] },
+              { "title": "Price competition compressing margins", "chip": "Severity: medium", "refs": [{ "claim_id": "CLM-006" }] },
+              { "title": "Industrial policy shifts", "chip": "Severity: medium", "refs": [{ "claim_id": "CLM-007" }] }
+            ]
+          }
+        }
+      ],
+      "footer": { "show_page_number": true, "data_as_of": "2026-07-10", "source_ids": ["SRC-001", "SRC-003", "SRC-004"], "show_disclaimer_ref": true }
+    },
+    {
+      "slide_no": 6,
+      "layout": "L11_conclusion_sources",
+      "section_id": "conclusion_sources_disclaimer",
+      "title": "Conclusion, sources and disclaimer",
+      "blocks": [
+        {
+          "block_type": "text_panel",
+          "priority": 1,
+          "text_panel": {
+            "text": "We assign an Accumulate rating with a CNY 34.00 target price. Counterevidence: industry capacity is expanding quickly, and growth could fall well short of forecast if downstream capex slows.",
+            "refs": [{ "claim_id": "CLM-004" }, { "claim_id": "CLM-005" }, { "metric_id": "MET-006" }],
+            "style": "conclusion"
+          }
+        },
+        {
+          "block_type": "source_table",
+          "priority": 1,
+          "source_table": [
+            { "source_id": "SRC-001", "title": "Example Intelligent Manufacturing FY2025 annual report (fictional)", "publisher": "Example Intelligent Manufacturing", "published_date": "2026-04-20", "retrieved_at": "2026-07-10" },
+            { "source_id": "SRC-002", "title": "Mock market data provider — daily close", "publisher": "MockData", "published_date": "2026-07-10", "retrieved_at": "2026-07-10" },
+            { "source_id": "SRC-003", "title": "Intelligent manufacturing equipment industry guidance (fictional)", "publisher": "Example ministry", "published_date": "2026-03-01", "retrieved_at": "2026-07-09" },
+            { "source_id": "SRC-004", "title": "Mock industry outlook 2026-2030", "publisher": "Example Research Institute", "published_date": "2026-05-15", "retrieved_at": "2026-07-09" }
+          ]
+        },
+        {
+          "block_type": "text_panel",
+          "priority": 1,
+          "text_panel": {
+            "text": "This report was produced by the Jacaranda Stock Market Society using public information and an AI-assisted workflow. It is for educational and research purposes only and does not constitute investment advice. Data as of 10 July 2026. This example uses fictional company data.",
+            "refs": [{ "claim_id": "CLM-004" }],
+            "style": "disclaimer"
+          }
+        }
+      ],
+      "footer": { "show_page_number": true, "data_as_of": "2026-07-10", "source_ids": ["SRC-001", "SRC-002", "SRC-003", "SRC-004"], "show_disclaimer_ref": false }
+    }
+  ]
+}

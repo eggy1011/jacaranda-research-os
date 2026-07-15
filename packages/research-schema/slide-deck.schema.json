@@ -1,0 +1,313 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jacaranda.example/schemas/slide-deck.schema.json",
+  "title": "Jacaranda Slide Deck Specification",
+  "description": "Validated slide specification consumed by the PPT renderer. All displayed numbers are references into the research package — no literal numeric strings. Version 0.1.0 (Phase 0 draft). Layout IDs and limits are defined in packages/presentation/layouts.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "deck_id", "package_id", "edition", "as_of_date", "slides"],
+  "properties": {
+    "schema_version": { "const": "0.1.0" },
+    "deck_id": { "type": "string", "pattern": "^DCK-[A-Z0-9-]+$" },
+    "package_id": { "type": "string", "description": "The research package this deck was compiled from." },
+    "edition": { "enum": ["zh-CN", "en-AU", "bilingual-summary"] },
+    "as_of_date": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+    "theme": { "type": "string", "default": "jacaranda-brand", "description": "Design-token set name; renderer resolves all styling from tokens." },
+    "slides": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 24,
+      "items": { "$ref": "#/$defs/slide" }
+    }
+  },
+
+  "$defs": {
+    "idRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": { "type": "string", "pattern": "^CLM-[0-9]{3}$" },
+        "metric_id": { "type": "string", "pattern": "^MET-[0-9]{3}$" },
+        "assumption_id": { "type": "string", "pattern": "^ASM-[0-9]{3}$" }
+      },
+      "minProperties": 1
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Already resolved to the deck's edition language(s) by the compiler; for bilingual-summary blocks contain zh then en."
+    },
+    "displayNumber": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metric_id", "display_transform"],
+      "properties": {
+        "metric_id": { "type": "string", "pattern": "^MET-[0-9]{3}$" },
+        "display_transform": { "enum": ["raw", "percent", "wan", "yi", "thousand", "million", "billion", "multiple"], "description": "Render-time unit conversion; underlying value is never edited." },
+        "decimals": { "type": "integer", "minimum": 0, "maximum": 4, "default": 1 },
+        "show_sign_colour": { "type": "boolean", "default": false, "description": "Apply green/red signal colour by value sign." }
+      }
+    },
+    "sourceLine": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "pattern": "^SRC-[0-9]{3}$" }
+    },
+    "slide": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slide_no", "layout", "title", "blocks", "footer"],
+      "properties": {
+        "slide_no": { "type": "integer", "minimum": 1 },
+        "layout": { "enum": ["L01_cover", "L02_section_divider", "L03_kpi_snapshot", "L04_chart_commentary", "L05_financial_table", "L06_comparison_cards", "L07_value_chain", "L08_timeline", "L09_football_field", "L10_catalysts_risks", "L11_conclusion_sources"] },
+        "section_id": { "type": "string", "description": "Which of the 12 report sections this slide belongs to." },
+        "title": { "$ref": "#/$defs/text" },
+        "kicker": { "$ref": "#/$defs/text" },
+        "blocks": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/block" } },
+        "footer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["show_page_number", "data_as_of", "source_ids"],
+          "properties": {
+            "show_page_number": { "type": "boolean" },
+            "data_as_of": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+            "source_ids": { "type": "array", "items": { "type": "string", "pattern": "^SRC-[0-9]{3}$" }, "description": "May be empty only on cover/divider slides." },
+            "show_disclaimer_ref": { "type": "boolean", "default": true }
+          }
+        }
+      }
+    },
+    "block": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["block_type", "priority"],
+      "properties": {
+        "block_type": { "enum": ["bullets", "kpi_cards", "chart", "table", "comparison_cards", "flow", "timeline", "football_field", "paired_columns", "source_table", "text_panel", "cover_meta"] },
+        "priority": { "type": "integer", "minimum": 1, "maximum": 9, "description": "1 = never drop; higher numbers dropped first on overflow." },
+        "bullets": {
+          "type": "array", "maxItems": 6,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["text", "refs", "claim_type"],
+            "properties": {
+              "text": { "$ref": "#/$defs/text" },
+              "refs": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/idRef" } },
+              "claim_type": { "enum": ["fact", "inference", "opinion"] },
+              "inline_numbers": { "type": "array", "items": { "$ref": "#/$defs/displayNumber" } }
+            }
+          }
+        },
+        "kpi_cards": {
+          "type": "array", "minItems": 4, "maxItems": 6,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "number"],
+            "properties": {
+              "label": { "$ref": "#/$defs/text" },
+              "number": { "$ref": "#/$defs/displayNumber" },
+              "delta": { "$ref": "#/$defs/displayNumber" },
+              "period_caption": { "type": "string" }
+            }
+          }
+        },
+        "chart": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["chart_type", "title", "series", "source_ids"],
+          "properties": {
+            "chart_type": { "enum": ["line", "bar", "stacked_bar", "grouped_bar", "waterfall", "area", "scatter", "donut"] },
+            "title": { "$ref": "#/$defs/text" },
+            "x_labels": { "type": "array", "items": { "type": "string" } },
+            "series": {
+              "type": "array", "minItems": 1, "maxItems": 6,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["name", "metric_ids"],
+                "properties": {
+                  "name": { "$ref": "#/$defs/text" },
+                  "metric_ids": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^MET-[0-9]{3}$" } },
+                  "display_transform": { "enum": ["raw", "percent", "wan", "yi", "thousand", "million", "billion", "multiple"] }
+                }
+              }
+            },
+            "unit_caption": { "type": "string" },
+            "source_ids": { "$ref": "#/$defs/sourceLine" }
+          }
+        },
+        "table": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["columns", "rows", "unit_caption", "source_ids"],
+          "properties": {
+            "columns": { "type": "array", "minItems": 2, "maxItems": 7, "items": { "type": "string" } },
+            "rows": {
+              "type": "array", "minItems": 1, "maxItems": 10,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["label", "cells"],
+                "properties": {
+                  "label": { "$ref": "#/$defs/text" },
+                  "cells": {
+                    "type": "array",
+                    "items": {
+                      "oneOf": [
+                        { "$ref": "#/$defs/displayNumber" },
+                        { "const": null, "description": "Renders as N/A / 暂无数据." }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "unit_caption": { "type": "string" },
+            "source_ids": { "$ref": "#/$defs/sourceLine" }
+          }
+        },
+        "comparison_cards": {
+          "type": "array", "minItems": 2, "maxItems": 4,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["entity_name", "bullets"],
+            "properties": {
+              "entity_name": { "$ref": "#/$defs/text" },
+              "numbers": { "type": "array", "maxItems": 4, "items": { "type": "object", "additionalProperties": false, "required": ["label", "number"], "properties": { "label": { "$ref": "#/$defs/text" }, "number": { "$ref": "#/$defs/displayNumber" } } } },
+              "bullets": { "type": "array", "minItems": 1, "maxItems": 3, "items": { "type": "object", "additionalProperties": false, "required": ["text", "refs"], "properties": { "text": { "$ref": "#/$defs/text" }, "refs": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/idRef" } } } } },
+              "limited_data": { "type": "boolean", "default": false }
+            }
+          }
+        },
+        "flow": {
+          "type": "array", "minItems": 3, "maxItems": 6,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["node_name"],
+            "properties": {
+              "node_name": { "$ref": "#/$defs/text" },
+              "description": { "$ref": "#/$defs/text" },
+              "number": { "$ref": "#/$defs/displayNumber" },
+              "highlight": { "type": "boolean", "default": false }
+            }
+          }
+        },
+        "timeline": {
+          "type": "array", "minItems": 3, "maxItems": 7,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["date", "label", "refs"],
+            "properties": {
+              "date": { "type": "string", "pattern": "^[0-9]{4}(-[0-9]{2})?(-[0-9]{2})?$" },
+              "label": { "$ref": "#/$defs/text" },
+              "description": { "$ref": "#/$defs/text" },
+              "refs": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/idRef" } },
+              "is_future": { "type": "boolean", "default": false }
+            }
+          }
+        },
+        "football_field": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["bars", "current_price", "source_ids"],
+          "properties": {
+            "bars": {
+              "type": "array", "minItems": 2, "maxItems": 5,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["label", "low", "high"],
+                "properties": {
+                  "label": { "$ref": "#/$defs/text" },
+                  "low": { "$ref": "#/$defs/displayNumber" },
+                  "high": { "$ref": "#/$defs/displayNumber" }
+                }
+              }
+            },
+            "current_price": { "$ref": "#/$defs/displayNumber" },
+            "target_price": { "$ref": "#/$defs/displayNumber" },
+            "assumption_lines": { "type": "array", "maxItems": 4, "items": { "type": "object", "additionalProperties": false, "required": ["text", "refs"], "properties": { "text": { "$ref": "#/$defs/text" }, "refs": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/idRef" } } } } },
+            "source_ids": { "$ref": "#/$defs/sourceLine" }
+          }
+        },
+        "paired_columns": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["left_title", "right_title", "left_items", "right_items"],
+          "properties": {
+            "left_title": { "$ref": "#/$defs/text" },
+            "right_title": { "$ref": "#/$defs/text" },
+            "left_items": { "type": "array", "minItems": 1, "maxItems": 6, "items": { "$ref": "#/$defs/pairedItem" } },
+            "right_items": { "type": "array", "minItems": 1, "maxItems": 6, "items": { "$ref": "#/$defs/pairedItem" } }
+          }
+        },
+        "source_table": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["source_id", "title", "retrieved_at"],
+            "properties": {
+              "source_id": { "type": "string", "pattern": "^SRC-[0-9]{3}$" },
+              "title": { "type": "string" },
+              "publisher": { "type": "string" },
+              "published_date": { "type": "string" },
+              "retrieved_at": { "type": "string" }
+            }
+          }
+        },
+        "text_panel": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["text", "refs"],
+          "properties": {
+            "text": { "$ref": "#/$defs/text" },
+            "refs": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/idRef" } },
+            "style": { "enum": ["conclusion", "disclaimer", "note"] }
+          }
+        },
+        "cover_meta": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["company_line", "date_line", "edition_line"],
+          "properties": {
+            "company_line": { "$ref": "#/$defs/text" },
+            "rating_line": { "$ref": "#/$defs/text" },
+            "date_line": { "type": "string" },
+            "edition_line": { "type": "string" },
+            "prepared_by": { "type": "string" }
+          }
+        }
+      },
+      "allOf": [
+        { "if": { "properties": { "block_type": { "const": "bullets" } } }, "then": { "required": ["bullets"] } },
+        { "if": { "properties": { "block_type": { "const": "kpi_cards" } } }, "then": { "required": ["kpi_cards"] } },
+        { "if": { "properties": { "block_type": { "const": "chart" } } }, "then": { "required": ["chart"] } },
+        { "if": { "properties": { "block_type": { "const": "table" } } }, "then": { "required": ["table"] } },
+        { "if": { "properties": { "block_type": { "const": "comparison_cards" } } }, "then": { "required": ["comparison_cards"] } },
+        { "if": { "properties": { "block_type": { "const": "flow" } } }, "then": { "required": ["flow"] } },
+        { "if": { "properties": { "block_type": { "const": "timeline" } } }, "then": { "required": ["timeline"] } },
+        { "if": { "properties": { "block_type": { "const": "football_field" } } }, "then": { "required": ["football_field"] } },
+        { "if": { "properties": { "block_type": { "const": "paired_columns" } } }, "then": { "required": ["paired_columns"] } },
+        { "if": { "properties": { "block_type": { "const": "source_table" } } }, "then": { "required": ["source_table"] } },
+        { "if": { "properties": { "block_type": { "const": "text_panel" } } }, "then": { "required": ["text_panel"] } },
+        { "if": { "properties": { "block_type": { "const": "cover_meta" } } }, "then": { "required": ["cover_meta"] } }
+      ]
+    },
+    "pairedItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "refs"],
+      "properties": {
+        "title": { "$ref": "#/$defs/text" },
+        "description": { "$ref": "#/$defs/text" },
+        "chip": { "type": "string", "description": "Timeframe or severity chip text, e.g. '3-12m', '高/High'." },
+        "refs": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/idRef" } }
+      }
+    }
+  }
+}

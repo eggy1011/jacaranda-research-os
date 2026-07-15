@@ -1,0 +1,373 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jacaranda.example/schemas/research-package.schema.json",
+  "title": "Jacaranda Research Package",
+  "description": "Single source of truth for one equity research report. Both language editions and all slide decks are generated from this object. Version 0.1.0 (Phase 0 draft).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "package_id", "company", "as_of_date", "status",
+    "sources", "metrics", "claims", "sections", "valuation",
+    "catalysts", "risks", "quality", "disclaimer", "generation_metadata"
+  ],
+  "properties": {
+    "schema_version": { "const": "0.1.0" },
+    "package_id": { "type": "string", "pattern": "^RPK-[A-Z0-9]{2,12}-[0-9]{4}-[0-9]{3}$", "description": "e.g. RPK-600XXX-2026-001" },
+    "status": { "enum": ["draft", "verified", "approved", "rejected"], "description": "Only 'approved' packages may be rendered for publication; 'verified' allows preview rendering." },
+    "as_of_date": { "$ref": "#/$defs/isoDate", "description": "Data cutoff date shown on every slide." },
+    "created_at": { "$ref": "#/$defs/isoDateTime" },
+
+    "company": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "ticker", "exchange", "market", "reporting_currency", "is_mock"],
+      "properties": {
+        "name": { "$ref": "#/$defs/localizedText" },
+        "ticker": { "type": "string", "minLength": 1 },
+        "exchange": { "enum": ["SSE", "SZSE", "BSE", "NYSE", "NASDAQ", "AMEX", "HKEX", "MOCK"] },
+        "market": { "enum": ["CN-A", "US", "HK"] },
+        "reporting_currency": { "$ref": "#/$defs/currency" },
+        "listing_date": { "$ref": "#/$defs/isoDate" },
+        "sector": { "$ref": "#/$defs/localizedText" },
+        "is_mock": { "type": "boolean", "description": "True for fixtures/examples; mock packages must never be published." },
+        "market_specific": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "cn": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "industry_classification_csrc": { "type": "string", "description": "证监会行业分类" },
+                "industry_classification_sw": { "type": "string", "description": "申万行业分类" },
+                "share_classes": { "type": "array", "items": { "enum": ["A", "B", "H"] } },
+                "state_owned": { "type": "boolean" },
+                "actual_controller": { "$ref": "#/$defs/localizedText" },
+                "policy_context_claim_ids": { "type": "array", "items": { "$ref": "#/$defs/claimId" } },
+                "display_unit_convention": { "enum": ["万元", "亿元", "百万元"], "description": "Preferred CNY display unit for zh edition tables." }
+              }
+            },
+            "us": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "cik": { "type": "string", "pattern": "^[0-9]{1,10}$" },
+                "fiscal_year_end": { "type": "string", "pattern": "^[0-9]{2}-[0-9]{2}$", "description": "MM-DD" },
+                "gaap_basis": { "enum": ["US-GAAP", "IFRS"] },
+                "non_gaap_metrics_used": { "type": "array", "items": { "type": "string" } },
+                "latest_filings": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["form", "accession_no", "filed_date", "source_id"],
+                    "properties": {
+                      "form": { "enum": ["10-K", "10-Q", "8-K", "20-F", "6-K", "DEF 14A", "S-1", "OTHER"] },
+                      "accession_no": { "type": "string" },
+                      "filed_date": { "$ref": "#/$defs/isoDate" },
+                      "source_id": { "$ref": "#/$defs/sourceId" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_id", "type", "title", "url_or_document", "retrieved_at", "reliability_tier"],
+        "properties": {
+          "source_id": { "$ref": "#/$defs/sourceId" },
+          "type": { "enum": ["filing", "annual_report", "interim_report", "announcement", "market_data_api", "company_ir", "regulator", "news", "third_party_research", "user_upload", "other"] },
+          "title": { "type": "string", "minLength": 1 },
+          "publisher": { "type": "string" },
+          "url_or_document": { "type": "string", "minLength": 1, "description": "URL, or document reference like 'upload://{file_id}'." },
+          "locator": { "type": "string", "description": "Page, section, table or API endpoint locating the cited content." },
+          "published_date": { "$ref": "#/$defs/isoDate" },
+          "retrieved_at": { "$ref": "#/$defs/isoDateTime" },
+          "reliability_tier": { "enum": ["primary", "secondary", "caution"], "description": "primary = filings/regulator/company IR/market data API; secondary = reputable press & research; caution = everything else (may not support facts alone)." },
+          "language": { "enum": ["zh", "en", "other"] }
+        }
+      }
+    },
+
+    "metrics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["metric_id", "name", "value", "unit", "currency", "period", "as_of_date", "source_id", "source_url_or_document", "retrieved_at", "computed_by"],
+        "properties": {
+          "metric_id": { "$ref": "#/$defs/metricId" },
+          "name": { "$ref": "#/$defs/localizedText" },
+          "value": { "type": "number" },
+          "unit": { "type": "string", "minLength": 1, "description": "Canonical storage unit, e.g. 'CNY', 'USD', '%', 'x', 'shares'. Display conversion (万/亿/m/bn) happens at render time only." },
+          "currency": {
+            "oneOf": [{ "$ref": "#/$defs/currency" }, { "type": "null" }],
+            "description": "null ONLY for non-monetary quantities (%, x, counts); monetary values must state currency."
+          },
+          "period": { "type": "string", "pattern": "^(FY[0-9]{4}|[0-9]{4}(H1|H2|Q[1-4])|TTM[0-9]{4}Q[1-4]|PIT)$", "description": "FY2025, 2025Q3, 2025H1, TTM2025Q3, or PIT (point-in-time, dated by as_of_date)." },
+          "as_of_date": { "$ref": "#/$defs/isoDate" },
+          "source_id": { "$ref": "#/$defs/sourceId" },
+          "source_url_or_document": { "type": "string", "minLength": 1, "description": "Denormalised copy of the source locator for audit exports." },
+          "retrieved_at": { "$ref": "#/$defs/isoDateTime" },
+          "computed_by": { "enum": ["provider", "deterministic_calc"], "description": "LLMs never compute metric values." },
+          "calculation": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["formula", "input_metric_ids"],
+            "properties": {
+              "formula": { "type": "string" },
+              "input_metric_ids": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/metricId" } }
+            },
+            "description": "Required when computed_by = deterministic_calc."
+          },
+          "restated": { "type": "boolean", "default": false }
+        },
+        "allOf": [
+          { "if": { "properties": { "computed_by": { "const": "deterministic_calc" } } }, "then": { "required": ["calculation"] } }
+        ]
+      }
+    },
+
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["claim_id", "type", "text", "review_status"],
+        "properties": {
+          "claim_id": { "$ref": "#/$defs/claimId" },
+          "type": { "enum": ["fact", "inference", "opinion"] },
+          "text": { "$ref": "#/$defs/localizedText" },
+          "source_ids": { "type": "array", "items": { "$ref": "#/$defs/sourceId" } },
+          "metric_ids": { "type": "array", "items": { "$ref": "#/$defs/metricId" } },
+          "based_on_claim_ids": { "type": "array", "items": { "$ref": "#/$defs/claimId" }, "description": "For inferences/opinions: the chain of support." },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "review_status": { "enum": ["unreviewed", "needs_review", "verified", "rejected"] },
+          "is_counterevidence": { "type": "boolean", "default": false, "description": "True if this claim argues against the investment conclusion." }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "type": { "const": "fact" } } },
+            "then": { "required": ["source_ids"], "properties": { "source_ids": { "minItems": 1 } } }
+          },
+          {
+            "if": { "properties": { "type": { "const": "inference" } } },
+            "then": {
+              "anyOf": [
+                { "required": ["source_ids"], "properties": { "source_ids": { "minItems": 1 } } },
+                { "required": ["metric_ids"], "properties": { "metric_ids": { "minItems": 1 } } },
+                { "required": ["based_on_claim_ids"], "properties": { "based_on_claim_ids": { "minItems": 1 } } }
+              ]
+            }
+          }
+        ]
+      }
+    },
+
+    "sections": {
+      "type": "array",
+      "minItems": 12,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["section_id", "title", "claim_ids"],
+        "properties": {
+          "section_id": { "enum": ["cover", "investment_thesis", "company_snapshot", "industry_value_chain", "business_model_segments", "competition_moat", "historical_financials", "forecast_drivers", "valuation", "catalysts", "risks", "conclusion_sources_disclaimer"] },
+          "title": { "$ref": "#/$defs/localizedText" },
+          "claim_ids": { "type": "array", "items": { "$ref": "#/$defs/claimId" } },
+          "key_metric_ids": { "type": "array", "items": { "$ref": "#/$defs/metricId" } },
+          "notes": { "type": "string" }
+        }
+      },
+      "description": "All 12 standard sections must be present (cover and conclusion included) even if some carry few claims."
+    },
+
+    "valuation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["methods", "assumptions", "scenarios", "rating", "counterevidence_claim_ids"],
+      "properties": {
+        "methods": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["method", "low", "high"],
+            "properties": {
+              "method": { "enum": ["dcf", "pe_comps", "ev_ebitda_comps", "ps_comps", "pb_comps", "sotp", "ddm", "other"] },
+              "label": { "$ref": "#/$defs/localizedText" },
+              "low": { "$ref": "#/$defs/metricId" },
+              "high": { "$ref": "#/$defs/metricId" },
+              "assumption_ids": { "type": "array", "items": { "$ref": "#/$defs/assumptionId" } }
+            }
+          }
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["assumption_id", "name", "value_text", "rationale_claim_id"],
+            "properties": {
+              "assumption_id": { "$ref": "#/$defs/assumptionId" },
+              "name": { "$ref": "#/$defs/localizedText" },
+              "value_text": { "type": "string", "description": "e.g. 'WACC 9.5%', 'terminal growth 2.5%'. If numeric, also register as a metric and reference it." },
+              "metric_id": { "$ref": "#/$defs/metricId" },
+              "rationale_claim_id": { "$ref": "#/$defs/claimId" }
+            }
+          }
+        },
+        "scenarios": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["base"],
+          "properties": {
+            "bull": { "$ref": "#/$defs/scenario" },
+            "base": { "$ref": "#/$defs/scenario" },
+            "bear": { "$ref": "#/$defs/scenario" }
+          }
+        },
+        "target_price_metric_id": { "$ref": "#/$defs/metricId" },
+        "current_price_metric_id": { "$ref": "#/$defs/metricId" },
+        "rating": { "enum": ["buy", "accumulate", "hold", "reduce", "sell", "not_rated"] },
+        "counterevidence_claim_ids": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/claimId" }, "description": "At least one claim arguing against the conclusion is mandatory." }
+      }
+    },
+
+    "catalysts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["catalyst_id", "title", "claim_id", "timeframe"],
+        "properties": {
+          "catalyst_id": { "type": "string", "pattern": "^CAT-[0-9]{3}$" },
+          "title": { "$ref": "#/$defs/localizedText" },
+          "claim_id": { "$ref": "#/$defs/claimId" },
+          "timeframe": { "enum": ["0-3m", "3-12m", "12m+"] },
+          "expected_date": { "$ref": "#/$defs/isoDate" },
+          "direction": { "enum": ["positive", "negative"] }
+        }
+      }
+    },
+
+    "risks": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["risk_id", "title", "claim_id", "category", "severity", "likelihood"],
+        "properties": {
+          "risk_id": { "type": "string", "pattern": "^RSK-[0-9]{3}$" },
+          "title": { "$ref": "#/$defs/localizedText" },
+          "claim_id": { "$ref": "#/$defs/claimId" },
+          "category": { "enum": ["macro", "policy_regulation", "industry", "competition", "operations", "financial", "governance", "valuation", "other"] },
+          "severity": { "enum": ["low", "medium", "high"] },
+          "likelihood": { "enum": ["low", "medium", "high"] },
+          "mitigation": { "$ref": "#/$defs/localizedText" }
+        }
+      }
+    },
+
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rubric_version", "checks"],
+      "properties": {
+        "rubric_version": { "type": "string" },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["check_id", "result"],
+            "properties": {
+              "check_id": { "type": "string", "pattern": "^QC-[0-9]{2}$" },
+              "result": { "enum": ["pass", "fail", "warning", "not_run", "needs_human"] },
+              "details": { "type": "string" }
+            }
+          }
+        },
+        "overall": { "enum": ["excellent", "acceptable", "fail"] }
+      }
+    },
+
+    "disclaimer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text"],
+      "properties": {
+        "text": { "$ref": "#/$defs/localizedText" },
+        "version": { "type": "string" }
+      }
+    },
+
+    "generation_metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pipeline_version"],
+      "properties": {
+        "pipeline_version": { "type": "string" },
+        "prompt_versions": { "type": "object", "additionalProperties": { "type": "string" } },
+        "llm_calls": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["task", "requested_model", "returned_model"],
+            "properties": {
+              "task": { "type": "string" },
+              "requested_model": { "type": "string", "description": "e.g. 'openrouter/free' during development." },
+              "returned_model": { "type": "string", "description": "Actual model reported by the API." },
+              "latency_ms": { "type": "number" },
+              "input_tokens": { "type": "number" },
+              "output_tokens": { "type": "number" }
+            }
+          }
+        },
+        "notes": { "type": "string", "description": "Never store API keys or secrets here." }
+      }
+    }
+  },
+
+  "$defs": {
+    "isoDate": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+    "isoDateTime": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}(:[0-9]{2})?(Z|[+-][0-9]{2}:[0-9]{2})$" },
+    "currency": { "enum": ["CNY", "USD", "HKD", "AUD", "EUR", "JPY", "GBP"] },
+    "sourceId": { "type": "string", "pattern": "^SRC-[0-9]{3}$" },
+    "metricId": { "type": "string", "pattern": "^MET-[0-9]{3}$" },
+    "claimId": { "type": "string", "pattern": "^CLM-[0-9]{3}$" },
+    "assumptionId": { "type": "string", "pattern": "^ASM-[0-9]{3}$" },
+    "localizedText": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["zh_CN", "en_AU"],
+      "properties": {
+        "zh_CN": { "type": "string", "minLength": 1 },
+        "en_AU": { "type": "string", "minLength": 1 }
+      },
+      "description": "Both languages always present; the consistency checker compares them. en_AU uses Australian English spelling."
+    },
+    "scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["narrative_claim_id", "target_price_metric_id"],
+      "properties": {
+        "narrative_claim_id": { "$ref": "#/$defs/claimId" },
+        "target_price_metric_id": { "$ref": "#/$defs/metricId" },
+        "probability": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    }
+  }
+}
