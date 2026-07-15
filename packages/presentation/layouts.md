@@ -6,7 +6,7 @@ Status: Phase 0 draft. All values reference `design-tokens.json`. The renderer m
 
 - Page size 16:9 (13.333in × 7.5in), margins per tokens.
 - Footer band on every non-cover slide: `第 N 页 / Page N` · `数据截至 / Data as of {as_of_date}` · `来源 / Source: {source_ids}` · short disclaimer reference.
-- Logo: shield-only, top-right, 0.45in high on all content slides; full lockup centred on cover.
+- Logo: horizontal lockup (shield + wordmark, optional chapter tag), top-right, 0.45in high on all content slides; full lockup centred on cover. Content slides carry the legacy header pattern: dark-purple title top-left + thin purple rule.
 - Every number shown on a slide must resolve to a `metric_id` or a `metric_ref` inside a claim; the renderer never accepts literal numbers without provenance.
 - Missing data renders as `暂无数据` (zh) / `N/A` (en) in muted colour — never blank, never guessed.
 - Overflow: the exporter runs a text-fit check per placeholder. Resolution order: (1) drop lowest-priority block (each block carries `priority`), (2) move overflow to an appendix slide of the same family, (3) fail the export with a validation error. Never auto-shrink below token minimum sizes.
@@ -94,7 +94,7 @@ Chinese and English consume different space. Limits below are **hard caps** per 
 - **Purpose**: upstream–midstream–downstream or process flow.
 - **Inputs**: 3–6 nodes; each node: name, 1-line description, optional metric ref; company position highlighted in primary purple.
 - **Limits**: node name zh ≤ 8 字 / en ≤ 18 chars; node description zh ≤ 24 字 / en ≤ 12 words.
-- **Chart**: horizontal chevron flow, thin-line style.
+- **Chart**: horizontal chevron flow, or the legacy left-edge vertical spine with node dots (upstream/midstream/downstream stacked vertically, per `diagram.spine` tokens). Entity diagrams use dark-purple circles / light-purple cards / block arrows per `diagram` tokens.
 - **Missing data**: nodes without sources render as structure-only (no numbers).
 - **Source footnote**: standard footer.
 - **Overflow**: >6 nodes → group into stages.
