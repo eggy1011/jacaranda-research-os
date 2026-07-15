@@ -9,7 +9,15 @@ tmp/
 .DS_Store
 node_modules/
 .next/
+coverage/
+*.tsbuildinfo
+pnpm-debug.log*
 __pycache__/
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.eggs/
+*.egg-info/
 .venv/
-
