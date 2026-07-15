@@ -51,11 +51,32 @@ jobs:
       - run: pytest
 
   compose:
-    name: Compose validation
+    name: Compose runtime smoke test
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - run: docker compose config --quiet
+      - name: Configure ephemeral database password
+        shell: bash
+        run: |
+          password="$(openssl rand -hex 24)"
+          echo "::add-mask::$password"
+          printf 'POSTGRES_PASSWORD=%s\n' "$password" >> "$GITHUB_ENV"
+      - name: Validate Compose model
+        run: docker compose config --quiet
+      - name: Build and start development stack
+        run: docker compose up -d --build --wait --wait-timeout 180
+      - name: Verify runtime endpoints
+        run: |
+          curl --fail --silent --show-error http://127.0.0.1:8000/health
+          curl --fail --silent --show-error http://127.0.0.1:3000/api/health
+          curl --fail --silent --show-error http://127.0.0.1:3000/
+      - name: Print container logs after failure
+        if: failure()
+        run: docker compose logs --no-color
+      - name: Stop development stack
+        if: always()
+        run: docker compose down --volumes --remove-orphans
 
   secrets:
     name: Secret scan

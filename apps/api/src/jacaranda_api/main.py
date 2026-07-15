@@ -1,3 +1,4 @@
+import os
 from typing import Literal
 
 from fastapi import FastAPI
@@ -12,15 +13,6 @@ class HealthResponse(BaseModel):
     environment: str
 
 
-app = FastAPI(
-    title="Jacaranda Research OS API",
-    version="0.1.0",
-    docs_url=None,
-    redoc_url=None,
-)
-
-
-@app.get("/health", response_model=HealthResponse, tags=["system"])
 def health() -> HealthResponse:
     settings = get_settings()
     return HealthResponse(
@@ -28,3 +20,25 @@ def health() -> HealthResponse:
         service="jacaranda-api",
         environment=settings.app_env,
     )
+
+
+def create_app(app_env: str | None = None) -> FastAPI:
+    environment = app_env or os.getenv("APP_ENV", "development")
+    docs_enabled = environment == "development"
+    api = FastAPI(
+        title="Jacaranda Research OS API",
+        version="0.1.0",
+        docs_url="/docs" if docs_enabled else None,
+        redoc_url="/redoc" if docs_enabled else None,
+    )
+    api.add_api_route(
+        "/health",
+        health,
+        response_model=HealthResponse,
+        tags=["system"],
+        methods=["GET"],
+    )
+    return api
+
+
+app = create_app()

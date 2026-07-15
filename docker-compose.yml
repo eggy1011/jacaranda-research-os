@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-jacaranda}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-jacaranda_local}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in the ignored .env file}
     ports:
       - "127.0.0.1:5432:5432"
     volumes:
@@ -37,7 +37,7 @@ services:
       dockerfile: apps/api/Dockerfile
     environment:
       APP_ENV: ${APP_ENV:-development}
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-jacaranda_local}@postgres:5432/${POSTGRES_DB:-jacaranda}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in the ignored .env file}@postgres:5432/${POSTGRES_DB:-jacaranda}
       REDIS_URL: redis://redis:6379/0
     ports:
       - "127.0.0.1:8000:8000"
@@ -71,6 +71,18 @@ services:
     depends_on:
       api:
         condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://localhost:3000/api/health').then((response) => { if (!response.ok) process.exit(1) }).catch(() => process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
     restart: unless-stopped
 
 volumes:

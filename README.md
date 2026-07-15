@@ -35,13 +35,20 @@ the committed `.env.example` intentionally contains empty values only.
 From the repository root, run the single documented startup command:
 
 ```bash
-docker compose up --build
+(test -f .env || (umask 077 && printf 'POSTGRES_PASSWORD=%s\n' "$(openssl rand -hex 24)" > .env)) && docker compose up --build
 ```
+
+On first run, this creates an ignored, owner-readable `.env` with a random local PostgreSQL
+password. Later runs reuse the same password so it continues to match the existing PostgreSQL data
+volume. Do not commit `.env`. To rotate the local password, first remove the development volume with
+`docker compose down --volumes`, then replace the password in `.env` before starting again.
 
 Then open:
 
 - Web status page: <http://localhost:3000>
 - API liveness endpoint: <http://localhost:8000/health>
+- API Swagger UI (development only): <http://localhost:8000/docs>
+- API ReDoc (development only): <http://localhost:8000/redoc>
 
 PostgreSQL and Redis listen on localhost only. The web container reaches the API over the private
 Compose network, and provider credentials are never exposed through `NEXT_PUBLIC_` variables.
@@ -76,8 +83,9 @@ apps/api/.venv/bin/mypy apps/api/src apps/api/tests
 apps/api/.venv/bin/pytest apps/api
 ```
 
-CI repeats these checks, validates the Compose file, and scans the Git history for secrets. Tests
-must use mocks or fixtures and must not call live providers.
+CI repeats these checks, builds and starts all four Compose services, verifies the runtime health
+endpoints, and scans the Git history for secrets. Tests must use mocks or fixtures and must not call
+live providers.
 
 ## Service boundaries
 
