@@ -1,0 +1,36 @@
+{
+  "_comment": "S1 input — fictional parsed evidence for 示例智能制造 (mock company, is_mock=true downstream).",
+  "company_context": { "name": "示例智能制造股份有限公司", "ticker": "600XXX", "market": "CN-A" },
+  "evidence_chunks": [
+    {
+      "source_id": "SRC-001",
+      "type": "annual_report",
+      "locator": "p.102, 合并利润表",
+      "published_date": "2026-04-20",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "url_or_document": "upload://mock-annual-report-2025.pdf",
+      "language": "zh",
+      "text": "公司2025年度实现营业收入45.20亿元，较上年同期的37.60亿元增长20.2%。归属于上市公司股东的净利润为5.12亿元。报告期内，公司前五大客户收入占比约42%。公司计划于2026年第四季度发布新一代控制系统。"
+    },
+    {
+      "source_id": "SRC-003",
+      "type": "regulator",
+      "locator": "第三节",
+      "published_date": "2026-03-01",
+      "retrieved_at": "2026-07-09T14:30:00+08:00",
+      "url_or_document": "https://example.gov.mock/policy/2026-guidance",
+      "language": "zh",
+      "text": "《智能制造装备产业发展指导意见》（虚构）提出，支持智能制造装备领域的国产替代，鼓励下游制造企业采用国产自动化设备。"
+    },
+    {
+      "source_id": "SRC-004",
+      "type": "third_party_research",
+      "locator": "Exhibit 4",
+      "published_date": "2026-05-15",
+      "retrieved_at": "2026-07-09T15:00:00+08:00",
+      "url_or_document": "https://example-research.mock/factory-automation-2026",
+      "language": "en",
+      "text": "Capacity across Chinese factory-automation equipment makers is expanding rapidly (fictional). Should downstream capital expenditure slow, order growth for mid-stream equipment suppliers could fall materially. Price competition among peers may compress gross margins."
+    }
+  ]
+}

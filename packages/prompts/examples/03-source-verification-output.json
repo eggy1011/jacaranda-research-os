@@ -1,0 +1,31 @@
+{
+  "_comment": "S2 output. CMET-090 is rejected: value computed by the model, quote does not contain it.",
+  "verdicts": [
+    { "candidate_id": "CMET-001", "verdict": "verified",
+      "checks": { "quote_found": true, "value_matches_quote": true, "source_tier_sufficient": true, "date_fresh": true, "entity_known": true },
+      "reasons": [] },
+    { "candidate_id": "CMET-002", "verdict": "verified",
+      "checks": { "quote_found": true, "value_matches_quote": true, "source_tier_sufficient": true, "date_fresh": true, "entity_known": true },
+      "reasons": [] },
+    { "candidate_id": "CMET-003", "verdict": "verified",
+      "checks": { "quote_found": true, "value_matches_quote": true, "source_tier_sufficient": true, "date_fresh": true, "entity_known": true },
+      "reasons": [] },
+    { "candidate_id": "CMET-004", "verdict": "verified",
+      "checks": { "quote_found": true, "value_matches_quote": true, "source_tier_sufficient": true, "date_fresh": true, "entity_known": true },
+      "reasons": [] },
+    { "candidate_id": "CMET-090", "verdict": "rejected",
+      "checks": { "quote_found": true, "value_matches_quote": false, "source_tier_sufficient": true, "date_fresh": true, "entity_known": true },
+      "reasons": ["value 11.3% does not appear in the quoted text; unit_conversion_note admits computation (5.12亿/45.2亿) — ratios must come from the deterministic calc service"] },
+    { "candidate_id": "CCLM-001", "verdict": "verified",
+      "checks": { "quote_found": true, "value_matches_quote": true, "source_tier_sufficient": true, "date_fresh": true, "entity_known": true },
+      "reasons": [] },
+    { "candidate_id": "CCLM-002", "verdict": "verified",
+      "checks": { "quote_found": true, "value_matches_quote": true, "source_tier_sufficient": true, "date_fresh": true, "entity_known": true },
+      "reasons": [] },
+    { "candidate_id": "CCLM-003", "verdict": "verified",
+      "checks": { "quote_found": true, "value_matches_quote": true, "source_tier_sufficient": true, "date_fresh": true, "entity_known": true },
+      "reasons": [] }
+  ],
+  "unverifiable_entities": [],
+  "_id_mapping_note": "Assembler mapping after S2: CMET-001→MET-001, CMET-002→MET-002, CMET-003→MET-003, CMET-004→MET-004, CCLM-001→CLM-008, CCLM-002→CLM-002, CCLM-003→CLM-011. CMET-090 dropped."
+}

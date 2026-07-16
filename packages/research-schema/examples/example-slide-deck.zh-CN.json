@@ -25,7 +25,12 @@
           }
         }
       ],
-      "footer": { "show_page_number": false, "data_as_of": "2026-07-10", "source_ids": [], "show_disclaimer_ref": true }
+      "footer": {
+        "show_page_number": false,
+        "data_as_of": "2026-07-10",
+        "source_ids": [],
+        "show_disclaimer_ref": true
+      }
     },
     {
       "slide_no": 2,
@@ -37,23 +42,89 @@
           "block_type": "kpi_cards",
           "priority": 1,
           "kpi_cards": [
-            { "label": "营业收入", "number": { "metric_id": "MET-001", "display_transform": "yi", "decimals": 1 }, "period_caption": "2025财年" },
-            { "label": "收入增速", "number": { "metric_id": "MET-003", "display_transform": "raw", "decimals": 1, "show_sign_colour": true }, "period_caption": "2025财年，同比" },
-            { "label": "现价", "number": { "metric_id": "MET-005", "display_transform": "raw", "decimals": 2 }, "period_caption": "2026-07-10收盘" },
-            { "label": "目标价", "number": { "metric_id": "MET-006", "display_transform": "raw", "decimals": 2 }, "period_caption": "基准情景" }
+            {
+              "label": "营业收入",
+              "number": {
+                "metric_id": "MET-001",
+                "display_transform": "yi",
+                "decimals": 1
+              },
+              "period_caption": "2025财年"
+            },
+            {
+              "label": "收入增速",
+              "number": {
+                "metric_id": "MET-003",
+                "display_transform": "raw",
+                "decimals": 1,
+                "show_sign_colour": true
+              },
+              "period_caption": "2025财年，同比"
+            },
+            {
+              "label": "现价",
+              "number": {
+                "metric_id": "MET-005",
+                "display_transform": "raw",
+                "decimals": 2
+              },
+              "period_caption": "2026-07-10收盘"
+            },
+            {
+              "label": "目标价",
+              "number": {
+                "metric_id": "MET-006",
+                "display_transform": "raw",
+                "decimals": 2
+              },
+              "period_caption": "基准情景"
+            }
           ]
         },
         {
           "block_type": "bullets",
           "priority": 2,
           "bullets": [
-            { "text": "政策支持叠加收入高增长，公司有望继续扩大国内市场份额。", "refs": [{ "claim_id": "CLM-003" }], "claim_type": "inference" },
-            { "text": "我们认为公司是国产替代的主要受益者之一，给予“增持”评级。", "refs": [{ "claim_id": "CLM-004" }], "claim_type": "opinion" },
-            { "text": "反方观点：若下游资本开支放缓，增速可能明显低于预测。", "refs": [{ "claim_id": "CLM-005" }], "claim_type": "inference" }
+            {
+              "text": "政策支持叠加收入高增长，公司有望继续扩大国内市场份额。",
+              "refs": [
+                {
+                  "claim_id": "CLM-003"
+                }
+              ],
+              "claim_type": "inference"
+            },
+            {
+              "text": "我们认为公司是国产替代的主要受益者之一，给予“增持”评级。",
+              "refs": [
+                {
+                  "claim_id": "CLM-004"
+                }
+              ],
+              "claim_type": "opinion"
+            },
+            {
+              "text": "反方观点：若下游资本开支放缓，增速可能明显低于预测。",
+              "refs": [
+                {
+                  "claim_id": "CLM-005"
+                }
+              ],
+              "claim_type": "inference"
+            }
           ]
         }
       ],
-      "footer": { "show_page_number": true, "data_as_of": "2026-07-10", "source_ids": ["SRC-001", "SRC-002", "SRC-004"], "show_disclaimer_ref": true }
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-001",
+          "SRC-002",
+          "SRC-004"
+        ],
+        "show_disclaimer_ref": true
+      }
     },
     {
       "slide_no": 3,
@@ -67,23 +138,65 @@
           "chart": {
             "chart_type": "bar",
             "title": "营业收入（2024-2025财年）",
-            "x_labels": ["FY2024", "FY2025"],
+            "x_labels": [
+              "FY2024",
+              "FY2025"
+            ],
             "series": [
-              { "name": "营业收入", "metric_ids": ["MET-002", "MET-001"], "display_transform": "yi" }
+              {
+                "name": "营业收入",
+                "metric_ids": [
+                  "MET-002",
+                  "MET-001"
+                ],
+                "display_transform": "yi"
+              }
             ],
             "unit_caption": "单位：亿元人民币",
-            "source_ids": ["SRC-001"]
+            "source_ids": [
+              "SRC-001"
+            ]
           }
         },
         {
           "block_type": "bullets",
           "priority": 2,
           "bullets": [
-            { "text": "2025财年营业收入45.2亿元，同比增长20.2%。", "refs": [{ "claim_id": "CLM-001" }, { "metric_id": "MET-003" }], "claim_type": "fact", "inline_numbers": [{ "metric_id": "MET-001", "display_transform": "yi", "decimals": 1 }, { "metric_id": "MET-003", "display_transform": "raw", "decimals": 1 }] }
+            {
+              "text": "2025财年营业收入45.2亿元，同比增长20.2%。",
+              "refs": [
+                {
+                  "claim_id": "CLM-001"
+                },
+                {
+                  "metric_id": "MET-003"
+                }
+              ],
+              "claim_type": "fact",
+              "inline_numbers": [
+                {
+                  "metric_id": "MET-001",
+                  "display_transform": "yi",
+                  "decimals": 1
+                },
+                {
+                  "metric_id": "MET-003",
+                  "display_transform": "raw",
+                  "decimals": 1
+                }
+              ]
+            }
           ]
         }
       ],
-      "footer": { "show_page_number": true, "data_as_of": "2026-07-10", "source_ids": ["SRC-001"], "show_disclaimer_ref": true }
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-001"
+        ],
+        "show_disclaimer_ref": true
+      }
     },
     {
       "slide_no": 4,
@@ -96,20 +209,83 @@
           "priority": 1,
           "football_field": {
             "bars": [
-              { "label": "现金流折现", "low": { "metric_id": "MET-007", "display_transform": "raw", "decimals": 1 }, "high": { "metric_id": "MET-008", "display_transform": "raw", "decimals": 1 } },
-              { "label": "可比公司PE", "low": { "metric_id": "MET-009", "display_transform": "raw", "decimals": 1 }, "high": { "metric_id": "MET-010", "display_transform": "raw", "decimals": 1 } }
+              {
+                "label": "现金流折现",
+                "low": {
+                  "metric_id": "MET-007",
+                  "display_transform": "raw",
+                  "decimals": 1
+                },
+                "high": {
+                  "metric_id": "MET-008",
+                  "display_transform": "raw",
+                  "decimals": 1
+                }
+              },
+              {
+                "label": "可比公司PE",
+                "low": {
+                  "metric_id": "MET-009",
+                  "display_transform": "raw",
+                  "decimals": 1
+                },
+                "high": {
+                  "metric_id": "MET-010",
+                  "display_transform": "raw",
+                  "decimals": 1
+                }
+              }
             ],
-            "current_price": { "metric_id": "MET-005", "display_transform": "raw", "decimals": 2 },
-            "target_price": { "metric_id": "MET-006", "display_transform": "raw", "decimals": 2 },
+            "current_price": {
+              "metric_id": "MET-005",
+              "display_transform": "raw",
+              "decimals": 2
+            },
+            "target_price": {
+              "metric_id": "MET-006",
+              "display_transform": "raw",
+              "decimals": 2
+            },
             "assumption_lines": [
-              { "text": "WACC取9.5%，反映板块股权成本与公司低杠杆。", "refs": [{ "assumption_id": "ASM-001" }, { "claim_id": "CLM-010" }] },
-              { "text": "基准情景：2026-2028年收入复合增速15%。", "refs": [{ "claim_id": "CLM-009" }] }
+              {
+                "text": "WACC取9.5%，反映板块股权成本与公司低杠杆。",
+                "refs": [
+                  {
+                    "assumption_id": "ASM-001"
+                  },
+                  {
+                    "claim_id": "CLM-010"
+                  }
+                ]
+              },
+              {
+                "text": "基准情景：2026-2028年收入复合增速15%。",
+                "refs": [
+                  {
+                    "claim_id": "CLM-009"
+                  },
+                  {
+                    "assumption_id": "ASM-002"
+                  }
+                ]
+              }
             ],
-            "source_ids": ["SRC-001", "SRC-004"]
+            "source_ids": [
+              "SRC-001",
+              "SRC-004"
+            ]
           }
         }
       ],
-      "footer": { "show_page_number": true, "data_as_of": "2026-07-10", "source_ids": ["SRC-001", "SRC-004"], "show_disclaimer_ref": true }
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-001",
+          "SRC-004"
+        ],
+        "show_disclaimer_ref": true
+      }
     },
     {
       "slide_no": 5,
@@ -124,17 +300,59 @@
             "left_title": "催化剂",
             "right_title": "风险",
             "left_items": [
-              { "title": "新一代控制系统发布", "description": "预计2026年四季度发布，如期落地有望带来新订单。", "chip": "3-12个月", "refs": [{ "claim_id": "CLM-011" }] }
+              {
+                "title": "新一代控制系统发布",
+                "description": "预计2026年四季度发布，如期落地有望带来新订单。",
+                "chip": "3-12个月",
+                "refs": [
+                  {
+                    "claim_id": "CLM-011"
+                  }
+                ]
+              }
             ],
             "right_items": [
-              { "title": "下游资本开支放缓", "chip": "严重性：高", "refs": [{ "claim_id": "CLM-005" }] },
-              { "title": "价格竞争压缩毛利率", "chip": "严重性：中", "refs": [{ "claim_id": "CLM-006" }] },
-              { "title": "产业政策变化", "chip": "严重性：中", "refs": [{ "claim_id": "CLM-007" }] }
+              {
+                "title": "下游资本开支放缓",
+                "chip": "严重性：高",
+                "refs": [
+                  {
+                    "claim_id": "CLM-005"
+                  }
+                ]
+              },
+              {
+                "title": "价格竞争压缩毛利率",
+                "chip": "严重性：中",
+                "refs": [
+                  {
+                    "claim_id": "CLM-006"
+                  }
+                ]
+              },
+              {
+                "title": "产业政策变化",
+                "chip": "严重性：中",
+                "refs": [
+                  {
+                    "claim_id": "CLM-007"
+                  }
+                ]
+              }
             ]
           }
         }
       ],
-      "footer": { "show_page_number": true, "data_as_of": "2026-07-10", "source_ids": ["SRC-001", "SRC-003", "SRC-004"], "show_disclaimer_ref": true }
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-001",
+          "SRC-003",
+          "SRC-004"
+        ],
+        "show_disclaimer_ref": true
+      }
     },
     {
       "slide_no": 6,
@@ -147,7 +365,17 @@
           "priority": 1,
           "text_panel": {
             "text": "我们给予“增持”评级，目标价34.00元。反方证据：行业产能扩张较快，若下游资本开支放缓，公司增速可能明显低于预测。",
-            "refs": [{ "claim_id": "CLM-004" }, { "claim_id": "CLM-005" }, { "metric_id": "MET-006" }],
+            "refs": [
+              {
+                "claim_id": "CLM-004"
+              },
+              {
+                "claim_id": "CLM-005"
+              },
+              {
+                "metric_id": "MET-006"
+              }
+            ],
             "style": "conclusion"
           }
         },
@@ -155,10 +383,34 @@
           "block_type": "source_table",
           "priority": 1,
           "source_table": [
-            { "source_id": "SRC-001", "title": "示例智能制造2025年年度报告（虚构）", "publisher": "示例智能制造", "published_date": "2026-04-20", "retrieved_at": "2026-07-10" },
-            { "source_id": "SRC-002", "title": "Mock market data provider — daily close", "publisher": "MockData", "published_date": "2026-07-10", "retrieved_at": "2026-07-10" },
-            { "source_id": "SRC-003", "title": "《智能制造装备产业发展指导意见》（虚构）", "publisher": "示例部委", "published_date": "2026-03-01", "retrieved_at": "2026-07-09" },
-            { "source_id": "SRC-004", "title": "Mock industry outlook 2026-2030", "publisher": "Example Research Institute", "published_date": "2026-05-15", "retrieved_at": "2026-07-09" }
+            {
+              "source_id": "SRC-001",
+              "title": "示例智能制造2025年年度报告（虚构）",
+              "publisher": "示例智能制造",
+              "published_date": "2026-04-20",
+              "retrieved_at": "2026-07-10"
+            },
+            {
+              "source_id": "SRC-002",
+              "title": "Mock market data provider — daily close",
+              "publisher": "MockData",
+              "published_date": "2026-07-10",
+              "retrieved_at": "2026-07-10"
+            },
+            {
+              "source_id": "SRC-003",
+              "title": "《智能制造装备产业发展指导意见》（虚构）",
+              "publisher": "示例部委",
+              "published_date": "2026-03-01",
+              "retrieved_at": "2026-07-09"
+            },
+            {
+              "source_id": "SRC-004",
+              "title": "Mock industry outlook 2026-2030",
+              "publisher": "Example Research Institute",
+              "published_date": "2026-05-15",
+              "retrieved_at": "2026-07-09"
+            }
           ]
         },
         {
@@ -166,12 +418,26 @@
           "priority": 1,
           "text_panel": {
             "text": "本报告由蓝楹会基于公开信息与AI辅助流程生成，仅供学习与研究用途，不构成任何投资建议。数据截至2026年7月10日。本示例使用虚构公司数据。",
-            "refs": [{ "claim_id": "CLM-004" }],
+            "refs": [
+              {
+                "claim_id": "CLM-004"
+              }
+            ],
             "style": "disclaimer"
           }
         }
       ],
-      "footer": { "show_page_number": true, "data_as_of": "2026-07-10", "source_ids": ["SRC-001", "SRC-002", "SRC-003", "SRC-004"], "show_disclaimer_ref": false }
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-001",
+          "SRC-002",
+          "SRC-003",
+          "SRC-004"
+        ],
+        "show_disclaimer_ref": false
+      }
     }
   ]
 }

@@ -1,0 +1,144 @@
+{
+  "_comment": "S4 + S5 outputs. Valuation metrics MET-005..MET-010 and ASM-001 were produced by the deterministic calc service before S4 ran; the model only narrates them.",
+  "s4_valuation_narrative": {
+    "assumption_rationales": [
+      {
+        "assumption_id": "ASM-001",
+        "rationale_claim_id": "CLM-010"
+      },
+      {
+        "assumption_id": "ASM-002",
+        "rationale_claim_id": "CLM-009"
+      }
+    ],
+    "scenario_narratives": {
+      "base": "CLM-009"
+    },
+    "rating": "accumulate",
+    "rating_claim_id": "CLM-004",
+    "counterevidence_claim_ids": [
+      "CLM-005"
+    ],
+    "claims": [
+      {
+        "claim_id": "CLM-009",
+        "type": "inference",
+        "text": {
+          "zh_CN": "基准情景假设2026-2028年收入复合增速15%，对应DCF每股价值34.0元。",
+          "en_AU": "基准情景假设2026-2028年收入复合增速15%，对应DCF每股价值34.0元。"
+        },
+        "metric_ids": [
+          "MET-006"
+        ],
+        "confidence": 0.6,
+        "review_status": "unreviewed"
+      },
+      {
+        "claim_id": "CLM-010",
+        "type": "inference",
+        "text": {
+          "zh_CN": "WACC取9.5%，反映A股工业自动化板块的股权成本与公司较低的杠杆水平。",
+          "en_AU": "WACC取9.5%，反映A股工业自动化板块的股权成本与公司较低的杠杆水平。"
+        },
+        "source_ids": [
+          "SRC-004"
+        ],
+        "confidence": 0.6,
+        "review_status": "unreviewed"
+      },
+      {
+        "claim_id": "CLM-004",
+        "type": "opinion",
+        "text": {
+          "zh_CN": "我们认为公司是行业国产替代的主要受益者之一，给予“增持”评级。",
+          "en_AU": "我们认为公司是行业国产替代的主要受益者之一，给予“增持”评级。"
+        },
+        "based_on_claim_ids": [
+          "CLM-003"
+        ],
+        "confidence": 0.6,
+        "review_status": "unreviewed"
+      }
+    ],
+    "insufficient": [
+      "bull/bear情景未计算，情景叙述仅覆盖base"
+    ]
+  },
+  "s5_catalysts_risks": {
+    "catalysts": [
+      {
+        "catalyst_id": "CAT-001",
+        "title": {
+          "zh_CN": "新一代控制系统发布",
+          "en_AU": "新一代控制系统发布"
+        },
+        "claim_id": "CLM-011",
+        "timeframe": "3-12m",
+        "expected_date": "2026-11-30",
+        "direction": "positive"
+      }
+    ],
+    "risks": [
+      {
+        "risk_id": "RSK-001",
+        "title": {
+          "zh_CN": "下游资本开支放缓",
+          "en_AU": "下游资本开支放缓"
+        },
+        "claim_id": "CLM-005",
+        "category": "industry",
+        "severity": "high",
+        "likelihood": "medium"
+      },
+      {
+        "risk_id": "RSK-002",
+        "title": {
+          "zh_CN": "价格竞争压缩毛利率",
+          "en_AU": "价格竞争压缩毛利率"
+        },
+        "claim_id": "CLM-006",
+        "category": "competition",
+        "severity": "medium",
+        "likelihood": "high"
+      },
+      {
+        "risk_id": "RSK-003",
+        "title": {
+          "zh_CN": "产业政策变化",
+          "en_AU": "产业政策变化"
+        },
+        "claim_id": "CLM-007",
+        "category": "policy_regulation",
+        "severity": "medium",
+        "likelihood": "low"
+      },
+      {
+        "risk_id": "RSK-004",
+        "title": {
+          "zh_CN": "客户集中度较高",
+          "en_AU": "客户集中度较高"
+        },
+        "claim_id": "CLM-008",
+        "category": "operations",
+        "severity": "medium",
+        "likelihood": "medium"
+      }
+    ],
+    "supporting_claims": [
+      {
+        "claim_id": "CLM-011",
+        "type": "inference",
+        "text": {
+          "zh_CN": "公司预计于2026年四季度发布新一代控制系统，若如期落地有望带来新订单。",
+          "en_AU": "公司预计于2026年四季度发布新一代控制系统，若如期落地有望带来新订单。"
+        },
+        "source_ids": [
+          "SRC-001"
+        ],
+        "confidence": 0.55,
+        "review_status": "unreviewed"
+      }
+    ],
+    "notes": "future event (2026Q4 launch) typed inference — the plan is the sourced fact, the occurrence is not; RSK-001 chains to the S4 counterevidence claim as required."
+  }
+}

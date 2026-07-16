@@ -1,0 +1,102 @@
+{
+  "_comment": "S1 output. CMET-090 is an intentionally bad candidate (model-computed ratio) used to demonstrate the S2 rejection path.",
+  "candidate_metrics": [
+    {
+      "candidate_id": "CMET-001",
+      "name_verbatim": "营业收入（2025年度）",
+      "value": 4520000000,
+      "unit": "CNY",
+      "currency": "CNY",
+      "period": "FY2025",
+      "as_of_date": "2025-12-31",
+      "source_id": "SRC-001",
+      "source_url_or_document": "upload://mock-annual-report-2025.pdf#p102",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "quote": "公司2025年度实现营业收入45.20亿元",
+      "unit_conversion_note": "45.20亿元 → 4520000000 CNY"
+    },
+    {
+      "candidate_id": "CMET-002",
+      "name_verbatim": "营业收入（2024年度）",
+      "value": 3760000000,
+      "unit": "CNY",
+      "currency": "CNY",
+      "period": "FY2024",
+      "as_of_date": "2024-12-31",
+      "source_id": "SRC-001",
+      "source_url_or_document": "upload://mock-annual-report-2025.pdf#p102",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "quote": "较上年同期的37.60亿元增长20.2%",
+      "unit_conversion_note": "37.60亿元 → 3760000000 CNY"
+    },
+    {
+      "candidate_id": "CMET-003",
+      "name_verbatim": "营业收入同比增速",
+      "value": 20.2,
+      "unit": "%",
+      "currency": null,
+      "period": "FY2025",
+      "as_of_date": "2025-12-31",
+      "source_id": "SRC-001",
+      "source_url_or_document": "upload://mock-annual-report-2025.pdf#p102",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "quote": "较上年同期的37.60亿元增长20.2%",
+      "unit_conversion_note": "percentage stated verbatim in source, not computed"
+    },
+    {
+      "candidate_id": "CMET-004",
+      "name_verbatim": "归属于上市公司股东的净利润（2025年度）",
+      "value": 512000000,
+      "unit": "CNY",
+      "currency": "CNY",
+      "period": "FY2025",
+      "as_of_date": "2025-12-31",
+      "source_id": "SRC-001",
+      "source_url_or_document": "upload://mock-annual-report-2025.pdf#p103",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "quote": "归属于上市公司股东的净利润为5.12亿元",
+      "unit_conversion_note": "5.12亿元 → 512000000 CNY"
+    },
+    {
+      "candidate_id": "CMET-090",
+      "name_verbatim": "净利率（2025年度）",
+      "value": 11.3,
+      "unit": "%",
+      "currency": null,
+      "period": "FY2025",
+      "as_of_date": "2025-12-31",
+      "source_id": "SRC-001",
+      "source_url_or_document": "upload://mock-annual-report-2025.pdf#p102",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "quote": "公司2025年度实现营业收入45.20亿元",
+      "unit_conversion_note": "computed: 5.12亿 / 45.2亿"
+    }
+  ],
+  "candidate_claims": [
+    {
+      "candidate_id": "CCLM-001",
+      "type": "fact",
+      "text_original_language": "公司前五大客户收入占比约42%。",
+      "source_ids": ["SRC-001"],
+      "quote": "公司前五大客户收入占比约42%"
+    },
+    {
+      "candidate_id": "CCLM-002",
+      "type": "fact",
+      "text_original_language": "产业指导意见（虚构）提出支持智能制造装备国产替代。",
+      "source_ids": ["SRC-003"],
+      "quote": "支持智能制造装备领域的国产替代"
+    },
+    {
+      "candidate_id": "CCLM-003",
+      "type": "fact",
+      "text_original_language": "公司计划于2026年第四季度发布新一代控制系统。",
+      "source_ids": ["SRC-001"],
+      "quote": "公司计划于2026年第四季度发布新一代控制系统"
+    }
+  ],
+  "extraction_gaps": [
+    "分部（业务线）收入拆分未在提供的证据块中出现",
+    "毛利率与费用率未在提供的证据块中出现"
+  ]
+}
