@@ -30,16 +30,28 @@ Same envelope as S3a. `verified_metrics` includes provider metrics and determini
     "forecast_drivers": ["CLM-041"]
   },
   "requested_calculations": [
-    { "name": "gross margin FY2024/FY2025", "formula_hint": "gross profit / revenue", "needed_for": "margin trend claim" }
+    { "request_id": "CALC-001",
+      "calculation_type": "margin",
+      "input_metric_ids": ["MET-004", "MET-001"],
+      "output_expectation": { "unit": "%", "currency": null, "period": "FY2025", "as_of_date": "2025-12-31" },
+      "needed_for": "net-margin trend claim",
+      "formula_hint": "net profit as a share of revenue (non-executable description)" }
   ],
   "insufficient": []
 }
 ```
 
 `requested_calculations` is the escape hatch: when an interpretation needs a number that does not
-exist yet, request it from the deterministic calc service instead of computing it.
+exist yet, request it from the deterministic calc service instead of computing it. The request is
+structured, not free-form: `calculation_type` comes from the service's allowlisted enum
+(growth_rate, cagr, margin, ratio, difference, share_of_total, per_share, other), the inputs are
+existing `metric_id`s, and `output_expectation` states unit/currency/period/as_of_date so the
+returned metric can be validated. **`formula_hint` is a human-readable note only — the service
+selects its own implementation from `calculation_type` and must never parse or execute the hint.**
 
 ## Schema reference
+
+**Output contract (machine-readable): `schemas/stage-envelopes.schema.json#/$defs/s3_output`** — bound to `task_name: financial_analysis` in `registry.json`.
 
 `research-package.schema.json#/properties/claims`; referenced metrics must have
 `computed_by: provider | deterministic_calc` per `#/properties/metrics`. Allowed claim types here:
@@ -98,4 +110,6 @@ projection and claim nothing until it exists.
 
 Machine checks: claim types ∈ {fact, inference}; every numeric token in text matches a referenced
 metric's value (after display-scale normalisation); all IDs resolve; `requested_calculations`
-entries have name + formula_hint; no claim references a rejected candidate.
+entries validate against `stage-envelopes.schema.json#/$defs/requestedCalculation` (allowlisted
+type, resolvable input metric IDs, complete output expectation); no claim references a rejected
+candidate.

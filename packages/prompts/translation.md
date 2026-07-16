@@ -31,7 +31,15 @@ dropping hedges, re-deriving numbers, renaming IDs, summarising.
 The same `texts` array with the non-authoritative side replaced by the translation. No other field
 of the package is touched.
 
+**Batching and size limits** (free-routing models truncate long outputs): callers send at most
+**20 texts per call** (`registry.json` `batching`); the scheduler splits the package's texts into
+batches and merges results by `path` (paths are unique keys, so merge order is irrelevant). A
+response missing any input path, or truncated mid-JSON, is a retryable `missing_required_block` /
+`invalid_json` failure for that batch only — completed batches are never re-run.
+
 ## Schema reference
+
+**Output contract (machine-readable): `schemas/stage-envelopes.schema.json#/$defs/s6_output`** — bound to `task_name: translation` in `registry.json`.
 
 `research-package.schema.json#/$defs/localizedText` (both keys required, minLength 1). Terminology
 authority: `glossary.md` — rating scale, financial statement terms, valuation terms, unit display

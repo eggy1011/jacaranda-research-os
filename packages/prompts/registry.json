@@ -1,0 +1,96 @@
+{
+  "registry_version": "0.1.0",
+  "description": "Binds LLMProvider.run task_name -> prompt file -> output schema. Only tasks listed here are executable; glossary.md is a reference document and is deliberately absent. input_shape documents the envelope described in each prompt's 'Required inputs'; output_schema is the authoritative machine-readable contract passed as output_json_schema. error_codes: retryable errors re-run the stage with validator feedback appended; non_retryable errors halt for human review.",
+  "error_codes": {
+    "retryable": ["invalid_json", "schema_validation_failed", "dangling_reference", "text_over_limit", "missing_required_block", "internal_contradiction"],
+    "non_retryable": ["insufficient_evidence", "conflicting_sources_unresolved", "fabrication_repeated", "input_schema_mismatch"]
+  },
+  "tasks": [
+    {
+      "task_name": "extraction",
+      "prompt_file": "extraction.md",
+      "prompt_version": "0.1.0",
+      "stage": "S1",
+      "input_shape": "extraction.md#required-inputs (company_context + evidence_chunks)",
+      "output_schema": "schemas/stage-envelopes.schema.json#/$defs/s1_output",
+      "stage_specific_non_retryable": ["no_evidence_chunks"]
+    },
+    {
+      "task_name": "source_verification",
+      "prompt_file": "source-verification.md",
+      "prompt_version": "0.1.0",
+      "stage": "S2",
+      "input_shape": "source-verification.md#required-inputs (sources + candidates)",
+      "output_schema": "schemas/stage-envelopes.schema.json#/$defs/s2_output",
+      "stage_specific_non_retryable": ["conflicting_sources_unresolved"]
+    },
+    {
+      "task_name": "company_analysis",
+      "prompt_file": "company-analysis.md",
+      "prompt_version": "0.1.0",
+      "stage": "S3a",
+      "input_shape": "company-analysis.md#required-inputs (verified metrics/claims + next_claim_id)",
+      "output_schema": "schemas/stage-envelopes.schema.json#/$defs/s3_output"
+    },
+    {
+      "task_name": "industry_analysis",
+      "prompt_file": "industry-analysis.md",
+      "prompt_version": "0.1.0",
+      "stage": "S3b",
+      "input_shape": "industry-analysis.md#required-inputs (same envelope as S3a)",
+      "output_schema": "schemas/stage-envelopes.schema.json#/$defs/s3_output"
+    },
+    {
+      "task_name": "financial_analysis",
+      "prompt_file": "financial-analysis.md",
+      "prompt_version": "0.1.0",
+      "stage": "S3c",
+      "input_shape": "financial-analysis.md#required-inputs (same envelope as S3a)",
+      "output_schema": "schemas/stage-envelopes.schema.json#/$defs/s3_output"
+    },
+    {
+      "task_name": "competition",
+      "prompt_file": "competition.md",
+      "prompt_version": "0.1.0",
+      "stage": "S3d",
+      "input_shape": "competition.md#required-inputs (same envelope as S3a)",
+      "output_schema": "schemas/stage-envelopes.schema.json#/$defs/s3_output"
+    },
+    {
+      "task_name": "valuation_narrative",
+      "prompt_file": "valuation-narrative.md",
+      "prompt_version": "0.1.0",
+      "stage": "S4",
+      "input_shape": "valuation-narrative.md#required-inputs (valuation metrics + assumptions + prior claims)",
+      "output_schema": "schemas/stage-envelopes.schema.json#/$defs/s4_output",
+      "stage_specific_non_retryable": ["insufficient_evidence_for_rating"]
+    },
+    {
+      "task_name": "catalysts_risks",
+      "prompt_file": "catalysts-risks.md",
+      "prompt_version": "0.1.0",
+      "stage": "S5",
+      "input_shape": "catalysts-risks.md#required-inputs (prior claims + next_ids)",
+      "output_schema": "schemas/stage-envelopes.schema.json#/$defs/s5_output",
+      "stage_specific_non_retryable": ["fewer_than_3_supportable_risks"]
+    },
+    {
+      "task_name": "translation",
+      "prompt_file": "translation.md",
+      "prompt_version": "0.1.0",
+      "stage": "S6",
+      "input_shape": "translation.md#required-inputs (batched texts, see batching limits)",
+      "output_schema": "schemas/stage-envelopes.schema.json#/$defs/s6_output",
+      "batching": { "max_texts_per_call": 20, "merge": "concatenate texts arrays; paths are unique keys" }
+    },
+    {
+      "task_name": "slide_compression",
+      "prompt_file": "slide-compression.md",
+      "prompt_version": "0.1.0",
+      "stage": "S7",
+      "input_shape": "slide-compression.md#required-inputs (validated package + edition)",
+      "output_schema": "../research-schema/slide-deck.schema.json",
+      "batching": { "unit": "one slide per call after a deck-plan call", "merge": "assemble slides array in plan order; deck-level fields from the plan call" }
+    }
+  ]
+}

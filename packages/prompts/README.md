@@ -41,7 +41,19 @@ parsed evidence chunks (DocumentProvider / market-data provider)
  [code] deck validation + rendering      → slide-deck.schema.json → renderer
 ```
 
-`glossary.md` is a reference document consumed by S6 and S7, not an executable stage.
+`glossary.md` is a reference document consumed by S6 and S7, not an executable stage, and is
+deliberately absent from `registry.json`.
+
+## Task registry and machine-readable contracts
+
+`registry.json` binds every executable stage: `task_name → prompt file + version → output schema`.
+The output schemas live in `schemas/stage-envelopes.schema.json` (`$defs/s1_output` … `s6_output`);
+S7's output schema is `packages/research-schema/slide-deck.schema.json` itself. Envelope claim,
+catalyst and risk fragments `$ref` the research-package schema by `$id`, so envelope and package
+definitions cannot drift. `LLMProvider.run(task_name, input, output_json_schema)` resolves
+`output_json_schema` from the registry — never from prose in the prompt files. S6 and S7 carry
+`batching` entries (max texts per call; plan-then-per-slide protocol) that the scheduler must
+honour with free-routing models.
 
 ## Stage table
 
@@ -70,13 +82,16 @@ parsed evidence chunks (DocumentProvider / market-data provider)
 - **Missing evidence is declared, never filled.** The standard forms are `资料不足` /
   "insufficient information", or `null` cells where the schema allows them. A stage that fabricates
   a value to complete its output has failed, even if the JSON validates.
-- **Retryable errors** (LLMProvider re-runs the stage with the validator's error paths appended):
-  invalid JSON, JSON Schema validation failure, dangling `MET-/CLM-/SRC-/ASM-` references,
-  over-limit text lengths, missing mandatory sections of the output.
-- **Non-retryable errors** (halt the stage, surface to human review): insufficient evidence for a
-  mandatory element (e.g. fewer than 3 supportable risks), contradictory sources that verification
-  cannot resolve, and any hallucination-rule breach detected twice consecutively — retrying a
-  fabrication invites a different fabrication.
+- **Retryable errors** (LLMProvider re-runs the stage with the validator's error records appended):
+  `invalid_json`, `schema_validation_failed`, `dangling_reference`, `text_over_limit`,
+  `missing_required_block`, `internal_contradiction`. The validator emits structured records —
+  `{code, stage, path, retryable, detail}` (`--json` for machine consumption) — usable directly as
+  retry feedback.
+- **Non-retryable errors** (halt the stage, surface to human review): `insufficient_evidence`
+  (e.g. fewer than 3 supportable risks), `conflicting_sources_unresolved`, `fabrication_repeated`
+  (a hallucination-rule breach detected twice consecutively — retrying a fabrication invites a
+  different fabrication), `input_schema_mismatch`. Stage-specific additions are listed per task in
+  `registry.json`.
 - Stages are checkpointed: a failed stage re-runs alone; upstream verified output is never mutated
   by a downstream retry.
 

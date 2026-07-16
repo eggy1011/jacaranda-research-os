@@ -59,6 +59,8 @@ ambiguity — e.g. two primary sources conflict — never as a soft pass).
 
 ## Schema reference
 
+**Output contract (machine-readable): `schemas/stage-envelopes.schema.json#/$defs/s2_output`** — bound to `task_name: source_verification` in `registry.json`.
+
 Verdicts feed `claims[].review_status` and metric acceptance in
 `packages/research-schema/research-package.schema.json`. Tier rules follow
 `#/properties/sources` (`reliability_tier`): facts need `primary` or `secondary`; `caution`

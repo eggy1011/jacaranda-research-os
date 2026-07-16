@@ -44,6 +44,8 @@ set them), summarising the whole report.
 
 ## Schema reference
 
+**Output contract (machine-readable): `schemas/stage-envelopes.schema.json#/$defs/s4_output`** — bound to `task_name: valuation_narrative` in `registry.json`.
+
 `research-package.schema.json#/properties/valuation` — note `counterevidence_claim_ids` has
 `minItems: 1` and rating enum is {buy, accumulate, hold, reduce, sell, not_rated}. Scenario
 narratives feed `$defs/scenario.narrative_claim_id`.

@@ -33,7 +33,16 @@ A complete document conforming to `packages/research-schema/slide-deck.schema.js
 (≤6 for bilingual-summary), section order per the 12-section structure, every block carrying
 `priority`, every footer carrying `data_as_of` and consolidated `source_ids`.
 
+**Batching protocol** (a full deck in one call exceeds free-model output budgets): call 1 produces
+a *deck plan* — deck-level fields plus an ordered list of `{slide_no, layout, section_id, claim_ids,
+metric_ids}` stubs; then **one call per slide** expands a stub into a full slide object with only
+that slide's package excerpt as input. The scheduler assembles the slides array in plan order and
+validates the whole deck once assembled. A failed slide call retries alone; the plan is not
+regenerated unless slide-level failures exceed the retry budget (`registry.json` `batching`).
+
 ## Schema reference
+
+**Output contract (machine-readable): `packages/research-schema/slide-deck.schema.json`** — bound to `task_name: slide_compression` in `registry.json`.
 
 `slide-deck.schema.json` is authoritative for structure; `layouts.md` for the section→layout
 mapping, per-language character/word caps, and overflow policy. Numbers appear **only** through

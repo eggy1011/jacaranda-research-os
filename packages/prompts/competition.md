@@ -37,14 +37,18 @@ competitor entities that appear in the sources.
 
 ## Schema reference
 
+**Output contract (machine-readable): `schemas/stage-envelopes.schema.json#/$defs/s3_output`** — bound to `task_name: competition` in `registry.json`.
+
 Claims per `research-package.schema.json#/properties/claims`. Entities feed
 `slide-deck.schema.json` `comparison_cards` (2–4 cards, `limited_data` flag). `durability` ∈
 {weak, moderate, strong} and must be carried by an `opinion` claim with a support chain.
 
 ## Hard constraints
 
-- Competitors may only be named if a source names them as competitors; 2–4 entities including the
-  company itself.
+- Competitors may only be named if a source names them as competitors. Entity count rule, in
+  precedence order: (1) if the evidence names no competitive set, output exactly 1 entity (the
+  company) and record the gap in `insufficient`; (2) otherwise output 2–4 entities including the
+  company. Never pad to reach 2.
 - An entity with no sourced metrics keeps `metric_ids: []` and `limited_data: true` — qualitative
   bullets only.
 - Moat conclusions are `opinion` claims chained to the facts/inferences that support them.
@@ -89,6 +93,8 @@ with claim text 「竞争对手A收入约30亿元，市占率约15%」 — MET-0
 
 ## Acceptance notes
 
-Machine checks: 2–4 entities incl. the company; entity with empty `metric_ids` ⇒
-`limited_data: true`; all IDs resolve; durability enum valid and its claim is type `opinion` with
-a chain; no numeric token in claim text without a matching referenced metric.
+Machine checks: entity count is 1 (with a competitive-set gap recorded in `insufficient`) or 2–4,
+always including the company; entity with empty `metric_ids` ⇒ `limited_data: true`; all IDs
+resolve; if `moat_assessment` is present its durability enum is valid and its claim is type
+`opinion` with a chain (omit `moat_assessment` when evidence cannot support an opinion); no
+numeric token in claim text without a matching referenced metric.

@@ -71,6 +71,8 @@ Candidate IDs (`CMET-/CCLM-`) are temporary; the assembler assigns final `MET-/C
 
 ## Schema reference
 
+**Output contract (machine-readable): `schemas/stage-envelopes.schema.json#/$defs/s1_output`** — bound to `task_name: extraction` in `registry.json`.
+
 Field semantics follow `packages/research-schema/research-package.schema.json#/properties/metrics`
 (the 8 provenance fields) and `#/properties/claims`. Candidates add `quote` and `candidate_id`.
 

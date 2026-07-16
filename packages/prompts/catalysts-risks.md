@@ -32,6 +32,8 @@ claims (each catalyst/risk needs a `claim_id`; reuse a prior claim or author a n
 
 ## Schema reference
 
+**Output contract (machine-readable): `schemas/stage-envelopes.schema.json#/$defs/s5_output`** — bound to `task_name: catalysts_risks` in `registry.json`.
+
 `research-package.schema.json#/properties/catalysts` (timeframe ∈ {0-3m, 3-12m, 12m+}, direction,
 optional expected_date) and `#/properties/risks` (`minItems: 3`; category enum; severity and
 likelihood ∈ {low, medium, high}; optional mitigation).
