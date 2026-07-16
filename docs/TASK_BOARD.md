@@ -4,10 +4,10 @@
 
 | ID | Owner | Task | Status | Dependency |
 |---|---|---|---|---|
-| 1 | Codex | Monorepo and security baseline | Ready | Bootstrap docs |
-| 2 | Claude | Research and slide schemas | Ready | Bootstrap docs |
+| 1 | Codex | Monorepo and security baseline | Done (PR #5) | Bootstrap docs |
+| 2 | Claude | Research and slide schemas | Done (PR #2, #4) | Bootstrap docs |
 | 3 | Codex | Unified market-data provider | Pending | 1 |
-| 4 | Claude | Research prompts and quality rubric | Pending | 2 |
+| 4 | Claude | Research prompts and quality rubric | In review (Issue #13) | 2 |
 | 5 | Codex | OpenRouter free-only provider | Pending | 1, 2 |
 | 6 | Claude | Purple PPT template system | Pending | 2 |
 | 7 | Codex | End-to-end mock vertical slice | Pending | 3–6 |

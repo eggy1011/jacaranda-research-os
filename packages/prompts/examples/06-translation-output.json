@@ -1,0 +1,29 @@
+{
+  "_comment": "S6 output — en_AU sides completed from authored zh_CN per glossary.md. Final assembled artefacts: packages/research-schema/examples/example-research-package.json and the two deck examples, which this stage's output feeds.",
+  "authoritative_language": "zh_CN",
+  "texts": [
+    { "path": "claims[CLM-001].text",
+      "zh_CN": "公司2025财年营业收入45.2亿元，同比增长20.2%。",
+      "en_AU": "The company reported FY2025 revenue of CNY 4.52 billion, up 20.2% year on year." },
+    { "path": "claims[CLM-004].text",
+      "zh_CN": "我们认为公司是行业国产替代的主要受益者之一，给予“增持”评级。",
+      "en_AU": "We view the company as a key beneficiary of domestic substitution and assign an Accumulate rating." },
+    { "path": "claims[CLM-005].text",
+      "zh_CN": "行业产能扩张较快，若下游资本开支放缓，公司增速可能明显低于我们的预测。",
+      "en_AU": "Industry capacity is expanding quickly; if downstream capital expenditure slows, growth could fall well short of our forecast." },
+    { "path": "claims[CLM-009].text",
+      "zh_CN": "基准情景假设2026-2028年收入复合增速15%，对应DCF每股价值34.0元。",
+      "en_AU": "Our base case assumes a 15% revenue CAGR over 2026-2028, implying a DCF value of CNY 34.0 per share." },
+    { "path": "claims[CLM-010].text",
+      "zh_CN": "WACC取9.5%，反映A股工业自动化板块的股权成本与公司较低的杠杆水平。",
+      "en_AU": "We apply a 9.5% WACC, reflecting A-share industrial-automation equity costs and the company's low leverage." },
+    { "path": "risks[RSK-001].title",
+      "zh_CN": "下游资本开支放缓",
+      "en_AU": "Slowing downstream capital expenditure" },
+    { "path": "catalysts[CAT-001].title",
+      "zh_CN": "新一代控制系统发布",
+      "en_AU": "Next-generation control system launch" }
+  ],
+  "translation_flags": [],
+  "glossary_flags": []
+}

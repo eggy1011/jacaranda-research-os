@@ -106,6 +106,15 @@ Overall grade: `excellent` (all pass), `acceptable` (warnings only, no fails, hu
 - Dates in the future relative to `as_of_date` are only allowed in claims typed `inference`/`opinion` (e.g. catalysts).
 - If evidence is insufficient, the required wording is 资料不足 / "insufficient information" — a package stating this passes QC-07; a package papering over it fails.
 
+## Prompt pipeline
+
+The rules above are operationalised by the versioned prompt catalogue in `packages/prompts/`
+(extraction → source verification → company/industry/financial/competition analysis → valuation
+narrative → catalysts/risks → translation → slide compression, with `glossary.md` as the
+terminology authority). Stage order, input/output contracts, retryable vs non-retryable failures
+and the validator (`packages/prompts/tests/validate.py`, a QC-01/QC-03 prototype) are documented
+in `packages/prompts/README.md`.
+
 ## Human review
 
 Before publication, a human reviewer verifies major figures, valuation assumptions, source coverage, material counterarguments, risks and disclaimer. Only packages with status `approved` may be published; `is_mock` packages can never be approved for publication.
