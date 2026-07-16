@@ -1,0 +1,11 @@
+{
+  "value": 5000000,
+  "unit": "USD",
+  "currency": "USD",
+  "period": "FY2025",
+  "as_of_date": "2025-12-31",
+  "filed_date": "2026-02-15",
+  "source_url": "provider://sec/filing/TEST-2025",
+  "name_zh": "营业收入",
+  "name_en": "Revenue"
+}

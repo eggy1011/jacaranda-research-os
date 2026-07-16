@@ -30,6 +30,28 @@ company selection
 
 Normalises symbols, company profile, prices, statements, ratios and provenance across CN/US markets.
 
+The provider contract is asynchronous and capability-based (`quote`, `financials`, `filings`). A
+deterministic registry/router selects an injected AKShare, FMP, Finnhub or SEC adapter; adapters do
+not own credentials or create network clients. Provider results use immutable Pydantic records
+compatible with the research-package `sources[]` and `metrics[]` contracts. Package-local source
+registration is persistent/immutable: registering a source returns a new registry and every
+`source_id` referenced by a metric must resolve before the result is accepted.
+
+| Adapter | Market | Current capability | Credential/config gate |
+|---|---|---|---|
+| AKShare | CN-A | quote | none |
+| FMP | US | quote | `FMP_API_KEY` |
+| Finnhub | US | quote | `FINNHUB_API_KEY` |
+| SEC | US | financials, filings | `SEC_USER_AGENT` (not a secret) |
+
+This foundation contains only injected client protocols and strict response normalisation. Wiring
+real SDK/HTTP clients, caching and bounded retry execution belongs to a later integration task;
+tests use synthetic fixtures and block socket access.
+
+US ticker normalisation does not guess an exchange. The selected provider supplies and validates
+NYSE/NASDAQ/AMEX identity data when a later company-profile capability is added. A-share `.SS` /
+`.SH` and `.SZ` suffixes determine SSE/SZSE directly.
+
 ### DocumentProvider
 
 Retrieves or parses filings, annual reports, announcements and user uploads into source-addressable chunks.
@@ -49,4 +71,3 @@ Accepts a validated slide specification and produces PPTX/PDF without allowing t
 - Generation jobs are checkpointed by stage.
 - The Chinese and English reports share data and source IDs.
 - External-provider calls are cached and rate-limited.
-
