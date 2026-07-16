@@ -1,7 +1,10 @@
 version: 2
 updates:
   - package-ecosystem: npm
-    directory: /apps/web
+    # pnpm workspace: the lockfile lives at the repo root; pointing at
+    # /apps/web makes Dependabot skip pnpm-lock.yaml and every npm PR fails
+    # CI at 'pnpm install --frozen-lockfile' (see PR #17).
+    directory: /
     schedule:
       interval: monthly
     open-pull-requests-limit: 1
