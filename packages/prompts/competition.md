@@ -37,7 +37,7 @@ competitor entities that appear in the sources.
 
 ## Schema reference
 
-**Output contract (machine-readable): `schemas/stage-envelopes.schema.json#/$defs/s3_output`** — bound to `task_name: competition` in `registry.json`.
+**Output contract (machine-readable): `schemas/stage-envelopes.schema.json#/$defs/s3d_output`** — bound to `task_name: competition` in `registry.json`.
 
 Claims per `research-package.schema.json#/properties/claims`. Entities feed
 `slide-deck.schema.json` `comparison_cards` (2–4 cards, `limited_data` flag). `durability` ∈

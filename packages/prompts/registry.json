@@ -1,9 +1,21 @@
 {
   "registry_version": "0.1.0",
-  "description": "Binds LLMProvider.run task_name -> prompt file -> output schema. Only tasks listed here are executable; glossary.md is a reference document and is deliberately absent. input_shape documents the envelope described in each prompt's 'Required inputs'; output_schema is the authoritative machine-readable contract passed as output_json_schema. error_codes: retryable errors re-run the stage with validator feedback appended; non_retryable errors halt for human review.",
+  "description": "Binds LLMProvider.run task_name -> prompt file -> output schema. Only tasks listed here are executable; glossary.md is a reference document and is deliberately absent. input_shape documents the envelope described in each prompt's 'Required inputs'; output_schema is the authoritative machine-readable contract passed as output_json_schema. error_codes: retryable errors re-run the stage with validator feedback appended; non_retryable errors halt for human review. PROVIDER REQUIREMENT: output_schema values are repo-relative pointers; before an OpenRouter call the provider MUST bundle/dereference the pointed-to schema (resolving cross-file $refs by $id) into a single self-contained JSON Schema object for response_format.json_schema.schema, use strict mode, and set require_parameters: true so free routing only selects models that support structured outputs; if none is available the job enters waiting_for_model — never a paid fallback.",
   "error_codes": {
-    "retryable": ["invalid_json", "schema_validation_failed", "dangling_reference", "text_over_limit", "missing_required_block", "internal_contradiction"],
-    "non_retryable": ["insufficient_evidence", "conflicting_sources_unresolved", "fabrication_repeated", "input_schema_mismatch"]
+    "retryable": [
+      "invalid_json",
+      "schema_validation_failed",
+      "dangling_reference",
+      "text_over_limit",
+      "missing_required_block",
+      "internal_contradiction"
+    ],
+    "non_retryable": [
+      "insufficient_evidence",
+      "conflicting_sources_unresolved",
+      "fabrication_repeated",
+      "input_schema_mismatch"
+    ]
   },
   "tasks": [
     {
@@ -13,7 +25,9 @@
       "stage": "S1",
       "input_shape": "extraction.md#required-inputs (company_context + evidence_chunks)",
       "output_schema": "schemas/stage-envelopes.schema.json#/$defs/s1_output",
-      "stage_specific_non_retryable": ["no_evidence_chunks"]
+      "stage_specific_non_retryable": [
+        "no_evidence_chunks"
+      ]
     },
     {
       "task_name": "source_verification",
@@ -22,7 +36,9 @@
       "stage": "S2",
       "input_shape": "source-verification.md#required-inputs (sources + candidates)",
       "output_schema": "schemas/stage-envelopes.schema.json#/$defs/s2_output",
-      "stage_specific_non_retryable": ["conflicting_sources_unresolved"]
+      "stage_specific_non_retryable": [
+        "conflicting_sources_unresolved"
+      ]
     },
     {
       "task_name": "company_analysis",
@@ -30,7 +46,7 @@
       "prompt_version": "0.1.0",
       "stage": "S3a",
       "input_shape": "company-analysis.md#required-inputs (verified metrics/claims + next_claim_id)",
-      "output_schema": "schemas/stage-envelopes.schema.json#/$defs/s3_output"
+      "output_schema": "schemas/stage-envelopes.schema.json#/$defs/s3a_output"
     },
     {
       "task_name": "industry_analysis",
@@ -38,7 +54,7 @@
       "prompt_version": "0.1.0",
       "stage": "S3b",
       "input_shape": "industry-analysis.md#required-inputs (same envelope as S3a)",
-      "output_schema": "schemas/stage-envelopes.schema.json#/$defs/s3_output"
+      "output_schema": "schemas/stage-envelopes.schema.json#/$defs/s3b_output"
     },
     {
       "task_name": "financial_analysis",
@@ -46,7 +62,7 @@
       "prompt_version": "0.1.0",
       "stage": "S3c",
       "input_shape": "financial-analysis.md#required-inputs (same envelope as S3a)",
-      "output_schema": "schemas/stage-envelopes.schema.json#/$defs/s3_output"
+      "output_schema": "schemas/stage-envelopes.schema.json#/$defs/s3c_output"
     },
     {
       "task_name": "competition",
@@ -54,7 +70,7 @@
       "prompt_version": "0.1.0",
       "stage": "S3d",
       "input_shape": "competition.md#required-inputs (same envelope as S3a)",
-      "output_schema": "schemas/stage-envelopes.schema.json#/$defs/s3_output"
+      "output_schema": "schemas/stage-envelopes.schema.json#/$defs/s3d_output"
     },
     {
       "task_name": "valuation_narrative",
@@ -63,7 +79,9 @@
       "stage": "S4",
       "input_shape": "valuation-narrative.md#required-inputs (valuation metrics + assumptions + prior claims)",
       "output_schema": "schemas/stage-envelopes.schema.json#/$defs/s4_output",
-      "stage_specific_non_retryable": ["insufficient_evidence_for_rating"]
+      "stage_specific_non_retryable": [
+        "insufficient_evidence_for_rating"
+      ]
     },
     {
       "task_name": "catalysts_risks",
@@ -72,7 +90,9 @@
       "stage": "S5",
       "input_shape": "catalysts-risks.md#required-inputs (prior claims + next_ids)",
       "output_schema": "schemas/stage-envelopes.schema.json#/$defs/s5_output",
-      "stage_specific_non_retryable": ["fewer_than_3_supportable_risks"]
+      "stage_specific_non_retryable": [
+        "fewer_than_3_supportable_risks"
+      ]
     },
     {
       "task_name": "translation",
@@ -81,16 +101,27 @@
       "stage": "S6",
       "input_shape": "translation.md#required-inputs (batched texts, see batching limits)",
       "output_schema": "schemas/stage-envelopes.schema.json#/$defs/s6_output",
-      "batching": { "max_texts_per_call": 20, "merge": "concatenate texts arrays; paths are unique keys" }
+      "batching": {
+        "max_texts_per_call": 20,
+        "merge": "concatenate texts arrays; paths are unique keys"
+      }
     },
     {
-      "task_name": "slide_compression",
+      "task_name": "slide_compression_plan",
       "prompt_file": "slide-compression.md",
       "prompt_version": "0.1.0",
       "stage": "S7",
       "input_shape": "slide-compression.md#required-inputs (validated package + edition)",
-      "output_schema": "../research-schema/slide-deck.schema.json",
-      "batching": { "unit": "one slide per call after a deck-plan call", "merge": "assemble slides array in plan order; deck-level fields from the plan call" }
+      "output_schema": "schemas/stage-envelopes.schema.json#/$defs/s7_plan_output"
+    },
+    {
+      "task_name": "slide_compression_slide",
+      "prompt_file": "slide-compression.md",
+      "prompt_version": "0.1.0",
+      "stage": "S7",
+      "input_shape": "slide-compression.md#required-inputs (one plan stub + that slide's package excerpt)",
+      "output_schema": "../research-schema/slide-deck.schema.json#/$defs/slide",
+      "assembly": "scheduler assembles slides in plan order and validates the full deck against ../research-schema/slide-deck.schema.json before rendering"
     }
   ]
 }

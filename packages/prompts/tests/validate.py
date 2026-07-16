@@ -137,10 +137,10 @@ def check_schemas(validator_for, pkg_schema, deck_schema, env_schema) -> None:
     stage_targets = [
         ("02-extraction-output.json", None, "/$defs/s1_output", "S1"),
         ("03-source-verification-output.json", None, "/$defs/s2_output", "S2"),
-        ("04-analysis-claims.json", "s3a", "/$defs/s3_output", "S3a"),
-        ("04-analysis-claims.json", "s3b", "/$defs/s3_output", "S3b"),
-        ("04-analysis-claims.json", "s3c", "/$defs/s3_output", "S3c"),
-        ("04-analysis-claims.json", "s3d", "/$defs/s3_output", "S3d"),
+        ("04-analysis-claims.json", "s3a", "/$defs/s3a_output", "S3a"),
+        ("04-analysis-claims.json", "s3b", "/$defs/s3b_output", "S3b"),
+        ("04-analysis-claims.json", "s3c", "/$defs/s3c_output", "S3c"),
+        ("04-analysis-claims.json", "s3d", "/$defs/s3d_output", "S3d"),
         ("05-valuation-catalysts-risks.json", "s4_valuation_narrative", "/$defs/s4_output", "S4"),
         ("05-valuation-catalysts-risks.json", "s5_catalysts_risks", "/$defs/s5_output", "S5"),
         ("06-translation-output.json", None, "/$defs/s6_output", "S6"),
@@ -268,6 +268,19 @@ def check_fixtures(pkg: dict) -> None:
               f"05/s4/assumption_rationales/{ar['assumption_id']}", True, "S4")
         check(ar["rationale_claim_id"] in known_claims, "dangling_reference",
               f"05/s4/assumption_rationales/{ar['rationale_claim_id']}", True, "S4")
+    mapped = [ar["assumption_id"] for ar in s4["assumption_rationales"]]
+    check(len(mapped) == len(set(mapped)), "internal_contradiction",
+          "05/s4/assumption_rationales/duplicates", True, "S4")
+    check(set(mapped) == set(pkg_assumptions), "missing_required_block",
+          "05/s4/assumption_rationales/completeness", True, "S4",
+          f"unmapped={set(pkg_assumptions) - set(mapped)} unknown={set(mapped) - set(pkg_assumptions)}")
+    for ar in s4["assumption_rationales"]:
+        pkg_a = pkg_assumptions.get(ar["assumption_id"])
+        if pkg_a:
+            check(pkg_a["rationale_claim_id"] == ar["rationale_claim_id"],
+                  "internal_contradiction",
+                  f"05/s4/assumption_rationales/{ar['assumption_id']}/rationale-match", True, "S4",
+                  "stage mapping disagrees with the final package")
     check(s4["rating_claim_id"] in known_claims, "dangling_reference",
           "05/s4/rating_claim_id", True, "S4")
     ce = set(s4["counterevidence_claim_ids"])
@@ -323,8 +336,21 @@ def numeric_multiset(text: str, apply_scale: bool) -> Counter:
 
 def check_bilingual(pkg: dict) -> None:
     tr = load(EXAMPLES / "06-translation-output.json")
+    paths = [t["path"] for t in tr["texts"]]
+    check(len(paths) == len(set(paths)), "internal_contradiction",
+          "06/duplicate-paths", True, "S6")
+    zh_q = {"一季度": "Q1", "二季度": "Q2", "三季度": "Q3", "四季度": "Q4"}
     for t in tr["texts"]:
         path, zh, en = t["path"], t["zh_CN"], t["en_AU"]
+        # period/date protection: years, quarters and FY markers must survive translation
+        check(Counter(re.findall(r"\d{4}", zh)) == Counter(re.findall(r"\d{4}", en)),
+              "internal_contradiction", f"06/{path}/year-parity", True, "S6")
+        zq = Counter(v for k, v in zh_q.items() for _ in range(zh.count(k)))
+        zq.update(re.findall(r"Q[1-4]", zh))
+        check(zq == Counter(re.findall(r"Q[1-4]", en)), "internal_contradiction",
+              f"06/{path}/quarter-parity", True, "S6")
+        check(zh.count("财年") == len(re.findall(r"\bFY\d{4}", en)), "internal_contradiction",
+              f"06/{path}/fiscal-year-parity", True, "S6")
         zt, et = numeric_multiset(zh, True), numeric_multiset(en, True)
         check(zt == et, "internal_contradiction", f"06/{path}/numbers", True, "S6",
               f"zh={dict(zt)} en={dict(et)} (multiset compare)")
@@ -372,16 +398,34 @@ def metric_displays(metric: dict) -> set[float]:
     return out
 
 
+# Block types whose free text is checked, plus structurally-numeric types where every number is
+# already a displayNumber ref. Anything NOT listed fails closed (new blocks must be added here).
+STRUCTURED_BLOCKS = {"kpi_cards", "chart", "table", "source_table"}
+NARRATIVE_BLOCKS = {"bullets", "text_panel", "football_field", "comparison_cards",
+                    "paired_columns", "flow", "timeline", "cover_meta"}
+
+
 def check_deck_numbers(pkg: dict) -> None:
     metrics = {m["metric_id"]: m for m in pkg["metrics"]}
     claims = {c["claim_id"]: c for c in pkg["claims"]}
     assumptions = {a["assumption_id"]: a for a in pkg["valuation"]["assumptions"]}
+    ticker = pkg["company"]["ticker"]
+    cover_metric_ids = [mid for mid in (pkg["valuation"].get("target_price_metric_id"),
+                                        pkg["valuation"].get("current_price_metric_id")) if mid]
 
     for deck_name in ["example-slide-deck.zh-CN.json", "example-slide-deck.en-AU.json"]:
         deck = load(SCHEMA_EXAMPLES / deck_name)
         for slide in deck["slides"]:
             for block in slide["blocks"]:
-                for text, refs, inline in narrative_units(block):
+                bt = block["block_type"]
+                if bt in STRUCTURED_BLOCKS:
+                    continue
+                check(bt in NARRATIVE_BLOCKS, "missing_required_block",
+                      f"{deck_name}/slide{slide['slide_no']}/unknown-block/{bt}", False, "S7",
+                      "block type not covered by the unbound-number check — fail closed")
+                if bt not in NARRATIVE_BLOCKS:
+                    continue
+                for text, refs, inline in narrative_units(block, cover_metric_ids):
                     allowed: set[float] = set()
                     for dn in inline:
                         scale = TRANSFORM[dn["display_transform"]]
@@ -397,14 +441,14 @@ def check_deck_numbers(pkg: dict) -> None:
                         if "assumption_id" in ref:
                             allowed |= set(numeric_multiset(
                                 assumptions[ref["assumption_id"]]["value_text"], False))
-                    toks = numeric_multiset(text, False)
+                    toks = numeric_multiset(text.replace(ticker, " "), False)
                     unbound = {t for t in toks if not any(abs(t - a) < 1e-6 for a in allowed)}
                     check(not unbound, "dangling_reference",
                           f"{deck_name}/slide{slide['slide_no']}/unbound-numbers", True, "S7",
                           f"{sorted(unbound)} in '{text[:40]}…'")
 
 
-def narrative_units(block: dict):
+def narrative_units(block: dict, cover_metric_ids: list):
     bt = block["block_type"]
     if bt == "bullets":
         for b in block["bullets"]:
@@ -425,6 +469,22 @@ def narrative_units(block: dict):
         for item in pc["left_items"] + pc["right_items"]:
             if "description" in item:
                 yield item["description"], item["refs"], []
+    elif bt == "flow":
+        # flow nodes have no refs field; any numeral must come from the node's displayNumber
+        for node in block["flow"]:
+            inline = [node["number"]] if node.get("number") else []
+            yield node["node_name"] + " " + node.get("description", ""), [], inline
+    elif bt == "timeline":
+        for ev in block["timeline"]:
+            yield ev["label"] + " " + ev.get("description", ""), ev["refs"], []
+    elif bt == "cover_meta":
+        # cover lines carry no refs; rating/target figures are implicitly bound to the
+        # valuation target/current price metrics (see slide-compression.md cover rule)
+        cm = block["cover_meta"]
+        implicit = [{"metric_id": mid} for mid in cover_metric_ids]
+        for key in ("company_line", "rating_line", "date_line", "edition_line", "prepared_by"):
+            if cm.get(key):
+                yield cm[key], implicit, []
 
 
 # ---------- main ----------

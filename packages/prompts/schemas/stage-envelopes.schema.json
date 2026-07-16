@@ -32,8 +32,13 @@
         },
         "needed_for": { "type": "string", "minLength": 1 },
         "formula_hint": { "type": "string", "description": "Non-executable human-readable description ONLY. The deterministic calc service selects its own implementation from calculation_type + input_metric_ids and must never parse or execute this string." },
-        "status": { "type": "string" }
-      }
+        "status": { "const": "proposed", "description": "The model may only propose. All later states (accepted/computed/rejected) are scheduler-managed and never round-trip through a prompt." },
+        "needs_human_review": { "const": true }
+      },
+      "allOf": [
+        { "if": { "properties": { "calculation_type": { "const": "other" } }, "required": ["calculation_type"] },
+          "then": { "required": ["needs_human_review"], "description": "'other' has no deterministic implementation; it must be flagged for human review, never auto-executed." } }
+      ]
     },
 
     "s1_output": {
@@ -186,6 +191,80 @@
         },
         "requested_calculations": { "type": "array", "items": { "$ref": "#/$defs/requestedCalculation" } },
         "insufficient": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+
+    "s3a_output": {
+      "description": "Company analysis: base S3 envelope; industry/competition structures are other stages' outputs and are forbidden here.",
+      "allOf": [{ "$ref": "#/$defs/s3_output" }],
+      "properties": {
+        "value_chain_nodes": false,
+        "market_specific_claims": false,
+        "comparison_entities": false,
+        "moat_assessment": false
+      }
+    },
+
+    "s3b_output": {
+      "description": "Industry analysis: value-chain nodes and market-specific context are mandatory; competition structures forbidden.",
+      "allOf": [{ "$ref": "#/$defs/s3_output" }],
+      "required": ["value_chain_nodes", "market_specific_claims"],
+      "properties": {
+        "comparison_entities": false,
+        "moat_assessment": false
+      }
+    },
+
+    "s3c_output": {
+      "description": "Financial analysis: requested_calculations must be present (may be empty); structural outputs of other stages forbidden.",
+      "allOf": [{ "$ref": "#/$defs/s3_output" }],
+      "required": ["requested_calculations"],
+      "properties": {
+        "value_chain_nodes": false,
+        "market_specific_claims": false,
+        "comparison_entities": false,
+        "moat_assessment": false
+      }
+    },
+
+    "s3d_output": {
+      "description": "Competition analysis: comparison entities are mandatory (1 = company-only fallback with an insufficiency note); industry structures forbidden.",
+      "allOf": [{ "$ref": "#/$defs/s3_output" }],
+      "required": ["comparison_entities"],
+      "properties": {
+        "value_chain_nodes": false,
+        "market_specific_claims": false,
+        "requested_calculations": false
+      }
+    },
+
+    "s7_plan_output": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "allOf": [{ "$ref": "#/$defs/annotations" }],
+      "required": ["deck_id", "package_id", "edition", "as_of_date", "slide_stubs"],
+      "description": "Deck plan for the S7 plan-then-per-slide protocol. Each stub is expanded by one slide_compression_slide call whose output is a single slide object (slide-deck.schema.json#/$defs/slide). The scheduler assembles and validates the full deck.",
+      "properties": {
+        "deck_id": { "type": "string", "pattern": "^DCK-[A-Z0-9-]+$" },
+        "package_id": { "type": "string" },
+        "edition": { "enum": ["zh-CN", "en-AU", "bilingual-summary"] },
+        "as_of_date": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+        "theme": { "type": "string" },
+        "slide_stubs": {
+          "type": "array", "minItems": 5, "maxItems": 24,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["slide_no", "layout", "section_id", "claim_ids", "metric_ids"],
+            "properties": {
+              "slide_no": { "type": "integer", "minimum": 1 },
+              "layout": { "$ref": "https://jacaranda.example/schemas/slide-deck.schema.json#/$defs/slide/properties/layout" },
+              "section_id": { "type": "string" },
+              "claim_ids": { "type": "array", "items": { "$ref": "#/$defs/claimId" } },
+              "metric_ids": { "type": "array", "items": { "$ref": "#/$defs/metricId" } }
+            }
+          }
+        }
       }
     },
 

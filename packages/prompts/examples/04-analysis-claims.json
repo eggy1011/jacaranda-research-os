@@ -1,73 +1,195 @@
 {
-  "_comment": "S3a-S3d outputs, one envelope per stage, each validating against schemas/stage-envelopes.schema.json#/$defs/s3_output. Claims are pure research-package claim fragments (no extra fields). Authored zh; en_AU holds the authored text pending S6. IDs align with the final package in packages/research-schema/examples/. CLM-002 and CLM-008 are S1-promoted facts and appear in section_assignment only.",
+  "_comment": "S3a-S3d outputs, one envelope per stage, each validating against its per-stage schema (schemas/stage-envelopes.schema.json#/$defs/s3a_output…s3d_output). Claims are pure research-package claim fragments (no extra fields). Authored zh; en_AU holds the authored text pending S6. IDs align with the final package in packages/research-schema/examples/. CLM-002 and CLM-008 are S1-promoted facts and appear in section_assignment only.",
   "s3a": {
     "claims": [
-      { "claim_id": "CLM-003", "type": "inference",
-        "text": { "zh_CN": "在政策支持和收入高增长的背景下，公司有望继续扩大国内市场份额。", "en_AU": "在政策支持和收入高增长的背景下，公司有望继续扩大国内市场份额。" },
-        "based_on_claim_ids": ["CLM-001", "CLM-002"],
-        "confidence": 0.7, "review_status": "unreviewed" }
+      {
+        "claim_id": "CLM-003",
+        "type": "inference",
+        "text": {
+          "zh_CN": "在政策支持和收入高增长的背景下，公司有望继续扩大国内市场份额。",
+          "en_AU": "在政策支持和收入高增长的背景下，公司有望继续扩大国内市场份额。"
+        },
+        "based_on_claim_ids": [
+          "CLM-001",
+          "CLM-002"
+        ],
+        "confidence": 0.7,
+        "review_status": "unreviewed"
+      }
     ],
     "section_assignment": {
-      "company_snapshot": ["CLM-003"],
-      "business_model_segments": ["CLM-008"]
+      "company_snapshot": [
+        "CLM-003"
+      ],
+      "business_model_segments": [
+        "CLM-008"
+      ]
     },
-    "insufficient": ["分部（业务线）收入拆分：资料不足 / insufficient information"]
+    "insufficient": [
+      "分部（业务线）收入拆分：资料不足 / insufficient information"
+    ]
   },
   "s3b": {
     "claims": [
-      { "claim_id": "CLM-007", "type": "inference",
-        "text": { "zh_CN": "产业政策方向若调整，相关补贴和订单支持可能减弱。", "en_AU": "产业政策方向若调整，相关补贴和订单支持可能减弱。" },
-        "based_on_claim_ids": ["CLM-002"], "confidence": 0.5, "review_status": "unreviewed" }
+      {
+        "claim_id": "CLM-007",
+        "type": "inference",
+        "text": {
+          "zh_CN": "产业政策方向若调整，相关补贴和订单支持可能减弱。",
+          "en_AU": "产业政策方向若调整，相关补贴和订单支持可能减弱。"
+        },
+        "based_on_claim_ids": [
+          "CLM-002"
+        ],
+        "confidence": 0.5,
+        "review_status": "unreviewed"
+      }
     ],
     "section_assignment": {
-      "industry_value_chain": ["CLM-002", "CLM-007"]
+      "industry_value_chain": [
+        "CLM-002",
+        "CLM-007"
+      ]
     },
     "value_chain_nodes": [
-      { "position": "upstream", "name_authored": "核心零部件", "claim_id": null, "metric_id": null },
-      { "position": "midstream", "name_authored": "自动化设备制造（公司所处）", "claim_id": "CLM-002", "metric_id": null, "highlight": true },
-      { "position": "downstream", "name_authored": "下游制造业客户", "claim_id": null, "metric_id": null }
+      {
+        "position": "upstream",
+        "name_authored": "核心零部件",
+        "claim_id": null,
+        "metric_id": null
+      },
+      {
+        "position": "midstream",
+        "name_authored": "自动化设备制造（公司所处）",
+        "claim_id": "CLM-002",
+        "metric_id": null,
+        "highlight": true
+      },
+      {
+        "position": "downstream",
+        "name_authored": "下游制造业客户",
+        "claim_id": null,
+        "metric_id": null
+      }
     ],
-    "market_specific_claims": { "cn_policy_context": ["CLM-002"], "us_filing_context": [] },
+    "market_specific_claims": {
+      "cn_policy_context": [
+        "CLM-002"
+      ],
+      "us_filing_context": []
+    },
     "insufficient": []
   },
   "s3c": {
     "claims": [
-      { "claim_id": "CLM-001", "type": "fact",
-        "text": { "zh_CN": "公司2025财年营业收入45.2亿元，同比增长20.2%。", "en_AU": "公司2025财年营业收入45.2亿元，同比增长20.2%。" },
-        "source_ids": ["SRC-001"], "metric_ids": ["MET-001", "MET-002", "MET-003"],
-        "confidence": 0.98, "review_status": "unreviewed" }
+      {
+        "claim_id": "CLM-001",
+        "type": "fact",
+        "text": {
+          "zh_CN": "公司2025财年营业收入45.2亿元，同比增长20.2%。",
+          "en_AU": "公司2025财年营业收入45.2亿元，同比增长20.2%。"
+        },
+        "source_ids": [
+          "SRC-001"
+        ],
+        "metric_ids": [
+          "MET-001",
+          "MET-002",
+          "MET-003"
+        ],
+        "confidence": 0.98,
+        "review_status": "unreviewed"
+      }
     ],
     "section_assignment": {
-      "historical_financials": ["CLM-001"],
+      "historical_financials": [
+        "CLM-001"
+      ],
       "forecast_drivers": []
     },
     "requested_calculations": [
-      { "request_id": "CALC-001",
+      {
+        "request_id": "CALC-001",
         "calculation_type": "margin",
-        "input_metric_ids": ["MET-004", "MET-001"],
-        "output_expectation": { "unit": "%", "currency": null, "period": "FY2025", "as_of_date": "2025-12-31" },
+        "input_metric_ids": [
+          "MET-004",
+          "MET-001"
+        ],
+        "output_expectation": {
+          "unit": "%",
+          "currency": null,
+          "period": "FY2025",
+          "as_of_date": "2025-12-31"
+        },
         "needed_for": "net-margin trend commentary in historical_financials",
         "formula_hint": "net profit as a share of revenue (non-executable description; the calc service chooses the implementation)",
-        "status": "pending" }
+        "status": "proposed"
+      }
     ],
-    "insufficient": ["毛利率与费用率：资料不足，已提交 CALC 请求的仅为净利率"]
+    "insufficient": [
+      "毛利率与费用率：资料不足，已提交 CALC 请求的仅为净利率"
+    ]
   },
   "s3d": {
     "claims": [
-      { "claim_id": "CLM-005", "type": "inference", "is_counterevidence": true,
-        "text": { "zh_CN": "行业产能扩张较快，若下游资本开支放缓，公司增速可能明显低于我们的预测。", "en_AU": "行业产能扩张较快，若下游资本开支放缓，公司增速可能明显低于我们的预测。" },
-        "source_ids": ["SRC-004"], "confidence": 0.6, "review_status": "unreviewed" },
-      { "claim_id": "CLM-006", "type": "inference",
-        "text": { "zh_CN": "同业价格竞争加剧可能压缩毛利率。", "en_AU": "同业价格竞争加剧可能压缩毛利率。" },
-        "source_ids": ["SRC-004"], "confidence": 0.65, "review_status": "unreviewed" }
+      {
+        "claim_id": "CLM-005",
+        "type": "inference",
+        "is_counterevidence": true,
+        "text": {
+          "zh_CN": "行业产能扩张较快，若下游资本开支放缓，公司增速可能明显低于我们的预测。",
+          "en_AU": "行业产能扩张较快，若下游资本开支放缓，公司增速可能明显低于我们的预测。"
+        },
+        "source_ids": [
+          "SRC-004"
+        ],
+        "confidence": 0.6,
+        "review_status": "unreviewed"
+      },
+      {
+        "claim_id": "CLM-006",
+        "type": "inference",
+        "text": {
+          "zh_CN": "同业价格竞争加剧可能压缩毛利率。",
+          "en_AU": "同业价格竞争加剧可能压缩毛利率。"
+        },
+        "source_ids": [
+          "SRC-004"
+        ],
+        "confidence": 0.65,
+        "review_status": "unreviewed"
+      }
     ],
     "section_assignment": {
-      "competition_moat": ["CLM-005", "CLM-006"]
+      "competition_moat": [
+        "CLM-005",
+        "CLM-006"
+      ]
     },
     "comparison_entities": [
-      { "entity_authored": "公司", "metric_ids": ["MET-001", "MET-003"], "claim_ids": ["CLM-001"], "limited_data": false },
-      { "entity_authored": "同业厂商（汇总，虚构）", "metric_ids": [], "claim_ids": ["CLM-006"], "limited_data": true }
+      {
+        "entity_authored": "公司",
+        "metric_ids": [
+          "MET-001",
+          "MET-003"
+        ],
+        "claim_ids": [
+          "CLM-001"
+        ],
+        "limited_data": false
+      },
+      {
+        "entity_authored": "同业厂商（汇总，虚构）",
+        "metric_ids": [],
+        "claim_ids": [
+          "CLM-006"
+        ],
+        "limited_data": true
+      }
     ],
-    "insufficient": ["同业可比财务数据：资料不足，comparison entity 标记 limited_data", "护城河评估：证据不足以支撑 opinion 级 moat_assessment，本轮省略"]
+    "insufficient": [
+      "同业可比财务数据：资料不足，comparison entity 标记 limited_data",
+      "护城河评估：证据不足以支撑 opinion 级 moat_assessment，本轮省略"
+    ]
   }
 }

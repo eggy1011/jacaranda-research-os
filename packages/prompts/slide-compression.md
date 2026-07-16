@@ -33,16 +33,28 @@ A complete document conforming to `packages/research-schema/slide-deck.schema.js
 (≤6 for bilingual-summary), section order per the 12-section structure, every block carrying
 `priority`, every footer carrying `data_as_of` and consolidated `source_ids`.
 
-**Batching protocol** (a full deck in one call exceeds free-model output budgets): call 1 produces
-a *deck plan* — deck-level fields plus an ordered list of `{slide_no, layout, section_id, claim_ids,
-metric_ids}` stubs; then **one call per slide** expands a stub into a full slide object with only
-that slide's package excerpt as input. The scheduler assembles the slides array in plan order and
-validates the whole deck once assembled. A failed slide call retries alone; the plan is not
-regenerated unless slide-level failures exceed the retry budget (`registry.json` `batching`).
+**Batching protocol** (a full deck in one call exceeds free-model output budgets): the
+`slide_compression_plan` call produces a *deck plan* — deck-level fields plus an ordered list of
+`{slide_no, layout, section_id, claim_ids, metric_ids}` stubs (schema: `s7_plan_output`); then
+**one `slide_compression_slide` call per stub** expands it into a single slide object (schema:
+`slide-deck.schema.json#/$defs/slide`) with only that slide's package excerpt as input. The
+scheduler assembles the slides array in plan order and validates the whole deck once assembled. A
+failed slide call retries alone; the plan is not regenerated unless slide-level failures exceed
+the retry budget.
+
+**Cover numbers rule**: `cover_meta` fields have no `refs` mechanism, so they may contain at most
+the rating and target-price figures, which the compiler takes verbatim from
+`valuation.target_price_metric_id` / `current_price_metric_id` displays — no other numeral is
+permitted on the cover (the ticker is exempt). The validator enforces this binding.
 
 ## Schema reference
 
-**Output contract (machine-readable): `packages/research-schema/slide-deck.schema.json`** — bound to `task_name: slide_compression` in `registry.json`.
+**Output contracts (machine-readable), two bound tasks in `registry.json`:**
+`task_name: slide_compression_plan` → `schemas/stage-envelopes.schema.json#/$defs/s7_plan_output`
+(deck-level fields + slide stubs); `task_name: slide_compression_slide` →
+`packages/research-schema/slide-deck.schema.json#/$defs/slide` (one slide object per call). The
+assembled deck is validated by the scheduler against the full `slide-deck.schema.json` — assembly
+is code, not a model call.
 
 `slide-deck.schema.json` is authoritative for structure; `layouts.md` for the section→layout
 mapping, per-language character/word caps, and overflow policy. Numbers appear **only** through

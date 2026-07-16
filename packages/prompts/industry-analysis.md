@@ -38,7 +38,7 @@ where evidence includes industry/policy sources.
 
 ## Schema reference
 
-**Output contract (machine-readable): `schemas/stage-envelopes.schema.json#/$defs/s3_output`** — bound to `task_name: industry_analysis` in `registry.json`.
+**Output contract (machine-readable): `schemas/stage-envelopes.schema.json#/$defs/s3b_output`** — bound to `task_name: industry_analysis` in `registry.json`.
 
 Claims per `research-package.schema.json#/properties/claims`. `cn_policy_context` IDs feed
 `company.market_specific.cn.policy_context_claim_ids`. Nodes feed the `flow` block of

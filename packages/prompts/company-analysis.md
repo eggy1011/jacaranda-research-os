@@ -41,7 +41,7 @@ views (S4), translation (S6).
 
 ## Schema reference
 
-**Output contract (machine-readable): `schemas/stage-envelopes.schema.json#/$defs/s3_output`** — bound to `task_name: company_analysis` in `registry.json`.
+**Output contract (machine-readable): `schemas/stage-envelopes.schema.json#/$defs/s3a_output`** — bound to `task_name: company_analysis` in `registry.json`.
 
 `packages/research-schema/research-package.schema.json#/properties/claims` — including the
 conditional requirements: fact ⇒ `source_ids` non-empty; inference ⇒ ≥1 of `source_ids`,

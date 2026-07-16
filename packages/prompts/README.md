@@ -68,7 +68,7 @@ honour with free-routing models.
 | S4 | `valuation-narrative.md` | code-computed valuation metrics + assumptions | rationale/scenario claims, rating, counterevidence | inference, opinion |
 | S5 | `catalysts-risks.md` | all prior claims | catalysts[], risks[] | inference, opinion (facts by reference) |
 | S6 | `translation.md` | assembled package, one language filled | both `zh_CN` and `en_AU` sides | none (no new claims) |
-| S7 | `slide-compression.md` | validated research package | slide-deck JSON per edition | none (no new claims) |
+| S7 | `slide-compression.md` | validated research package | deck plan (`slide_compression_plan`), then one slide per call (`slide_compression_slide`); scheduler assembles and validates the full deck | none (no new claims) |
 
 ## Versioning
 

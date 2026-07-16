@@ -48,10 +48,14 @@ structured, not free-form: `calculation_type` comes from the service's allowlist
 existing `metric_id`s, and `output_expectation` states unit/currency/period/as_of_date so the
 returned metric can be validated. **`formula_hint` is a human-readable note only — the service
 selects its own implementation from `calculation_type` and must never parse or execute the hint.**
+`calculation_type: "other"` has no deterministic implementation: it must carry
+`needs_human_review: true` and is routed to human review, never auto-executed. `status` may only
+be `"proposed"` — all later lifecycle states are scheduler-managed and never round-trip through a
+prompt.
 
 ## Schema reference
 
-**Output contract (machine-readable): `schemas/stage-envelopes.schema.json#/$defs/s3_output`** — bound to `task_name: financial_analysis` in `registry.json`.
+**Output contract (machine-readable): `schemas/stage-envelopes.schema.json#/$defs/s3c_output`** — bound to `task_name: financial_analysis` in `registry.json`.
 
 `research-package.schema.json#/properties/claims`; referenced metrics must have
 `computed_by: provider | deterministic_calc` per `#/properties/metrics`. Allowed claim types here:
