@@ -87,6 +87,30 @@ def check_catalogue() -> None:
 
     registry = load(PROMPTS / "registry.json")
     tasks = {t["task_name"]: t for t in registry.get("tasks", [])}
+    # every schema pointer in the registry must resolve to a real definition
+    for t in registry.get("tasks", []):
+        for field in ("output_schema", "input_schema"):
+            if field not in t:
+                continue
+            ptr = t[field]
+            fpath, _, frag = ptr.partition("#")
+            target = (PROMPTS / fpath).resolve()
+            if not target.exists():
+                check(False, "dangling_reference", f"registry.json#{t['task_name']}/{field}",
+                      False, "catalogue", f"file not found: {fpath}")
+                continue
+            doc = load(target)
+            node = doc
+            ok = True
+            for part in [p for p in frag.split("/") if p]:
+                part = part.replace("~1", "/").replace("~0", "~")
+                if isinstance(node, dict) and part in node:
+                    node = node[part]
+                else:
+                    ok = False
+                    break
+            check(ok, "dangling_reference", f"registry.json#{t['task_name']}/{field}",
+                  False, "catalogue", f"pointer does not resolve: {ptr}")
     check("glossary" not in {t.get("prompt_file") for t in tasks.values()} and
           "glossary.md" not in {t.get("prompt_file") for t in tasks.values()},
           "internal_contradiction", "registry.json#glossary-excluded", False, "catalogue")
@@ -144,6 +168,8 @@ def check_schemas(validator_for, pkg_schema, deck_schema, env_schema) -> None:
         ("05-valuation-catalysts-risks.json", "s4_valuation_narrative", "/$defs/s4_output", "S4"),
         ("05-valuation-catalysts-risks.json", "s5_catalysts_risks", "/$defs/s5_output", "S5"),
         ("06-translation-output.json", None, "/$defs/s6_output", "S6"),
+        ("07-slide-plan.json", None, "/$defs/s7_plan_output", "S7"),
+        ("08-slide-call.json", "input", "/$defs/s7_slide_input", "S7"),
     ]
     for fname, key, pointer, stage in stage_targets:
         doc = load(EXAMPLES / fname)
@@ -154,6 +180,51 @@ def check_schemas(validator_for, pkg_schema, deck_schema, env_schema) -> None:
                   f"{fname}{'/' + key if key else ''}/{e.json_path}", True, stage, e.message[:120])
         check(not errs, "schema_validation_failed", f"{fname}{'/' + key if key else ''}",
               True, stage)
+
+    # slide-call output is a single deck slide
+    slide_out = load(EXAMPLES / "08-slide-call.json").get("output", {})
+    errs = list(validator_for(deck_schema, "/$defs/slide").iter_errors(slide_out))
+    for e in errs[:5]:
+        check(False, "schema_validation_failed", f"08-slide-call.json/output/{e.json_path}",
+              True, "S7", e.message[:120])
+    check(not errs, "schema_validation_failed", "08-slide-call.json/output", True, "S7")
+
+
+def check_slide_plan(pkg: dict) -> None:
+    """Semantic S7 plan rules that JSON Schema cannot express."""
+    plan = load(EXAMPLES / "07-slide-plan.json")
+    call = load(EXAMPLES / "08-slide-call.json")
+    stubs = plan["slide_stubs"]
+    nos = [s["slide_no"] for s in stubs]
+    check(nos == list(range(1, len(nos) + 1)), "internal_contradiction",
+          "07/slide_no-contiguous-unique", True, "S7", f"got {nos}")
+    check(stubs[0]["layout"] == "L01_cover", "internal_contradiction", "07/first-is-cover",
+          True, "S7")
+    check(stubs[-1]["layout"] == "L11_conclusion_sources", "internal_contradiction",
+          "07/last-is-conclusion", True, "S7")
+    sections = {s["section_id"] for s in stubs}
+    mandatory = {"cover", "investment_thesis", "risks", "conclusion_sources_disclaimer"}
+    check(mandatory <= sections, "missing_required_block", "07/mandatory-sections", False,
+          "S7", f"missing {mandatory - sections}")
+    known_c = {c["claim_id"] for c in pkg["claims"]}
+    known_m = {m["metric_id"] for m in pkg["metrics"]}
+    for s in stubs:
+        for cid in s["claim_ids"]:
+            check(cid in known_c, "dangling_reference", f"07/slide{s['slide_no']}/{cid}", True, "S7")
+        for mid in s["metric_ids"]:
+            check(mid in known_m, "dangling_reference", f"07/slide{s['slide_no']}/{mid}", True, "S7")
+
+    stub, out = call["input"]["slide_stub"], call["output"]
+    check(out["slide_no"] == stub["slide_no"] and out["layout"] == stub["layout"],
+          "internal_contradiction", "08/output-matches-stub", True, "S7")
+    excerpt = call["input"]["package_excerpt"]
+    given_ids = {m["metric_id"] for m in excerpt["metrics"]} | \
+                {c["claim_id"] for c in excerpt["claims"]} | \
+                {s["source_id"] for s in excerpt["sources"]} | \
+                {a["assumption_id"] for a in excerpt.get("assumptions", [])}
+    used = set(re.findall(r"(?:MET|CLM|SRC|ASM)-\d{3}", json.dumps(out)))
+    check(used <= given_ids, "dangling_reference", "08/output-cites-only-excerpt", True, "S7",
+          f"cited outside excerpt: {used - given_ids}")
 
 
 # ---------- 3. Fixture pipeline consistency and full cross-reference audit ----------
@@ -319,6 +390,14 @@ DATE_RE = re.compile(
     r"|\d{4}-\d{4}|\d{4}(?=[财年])|\b\d{4}\b|Q[1-4]|H[12]"
 )
 RATING_MAP = {"买入": "Buy", "增持": "Accumulate", "持有": "Hold", "减持": "Reduce", "卖出": "Sell"}
+# unit words that must correspond 1:1 across editions (counted per text pair)
+UNIT_PAIRS = [
+    (["元/股", "每股"], [r"per share"]),
+    (["亿"], [r"billion", r"\bbn\b"]),
+    (["万"], [r"ten[- ]thousand", r"\bwan\b"]),
+    (["倍"], [r"\btimes\b", r"\d+(?:\.\d+)?x\b"]),
+    (["吨"], [r"tonne", r"\btons?\b"]),
+]
 ZH_HEDGES = ["可能", "或将", "有望", "预计", "若", "大概率"]
 EN_HEDGES = ["may", "could", "likely", "expected", "if ", "should", "potential"]
 
@@ -365,10 +444,23 @@ def check_bilingual(pkg: dict) -> None:
             check(any(h in en.lower() for h in EN_HEDGES), "internal_contradiction",
                   f"06/{path}/hedge-preserved", True, "S6",
                   "zh hedged but en reads unconditional")
+        # unit terms must correspond 1:1 (a unit swapped, dropped or invented fails)
+        for zh_units, en_pats in UNIT_PAIRS:
+            zc = sum(zh.count(u) for u in zh_units)
+            ec = sum(len(re.findall(p, en, re.I)) for p in en_pats)
+            check(zc == ec, "internal_contradiction", f"06/{path}/unit-parity", True, "S6",
+                  f"zh {zh_units}×{zc} vs en {en_pats}×{ec}")
+        # rating strength: the multiset of rating terms must match exactly — adding a
+        # stronger rating alongside the correct one ("Accumulate / Buy") is a breach
+        zh_ratings = Counter()
         for zh_term, en_term in RATING_MAP.items():
-            if zh_term in zh and ("评级" in zh or "维持" in zh):
-                check(en_term in en, "internal_contradiction",
-                      f"06/{path}/rating-term", False, "S6", f"{zh_term}→{en_term}")
+            zh_ratings[en_term] += zh.count(zh_term)
+        en_ratings = Counter(m.capitalize() for m in re.findall(
+            r"\b(Buy|Accumulate|Hold|Reduce|Sell)\b", en))
+        zh_ratings, en_ratings = +zh_ratings, +en_ratings  # drop zero counts
+        check(zh_ratings == en_ratings, "internal_contradiction",
+              f"06/{path}/rating-strength", False, "S6",
+              f"zh implies {dict(zh_ratings)} but en carries {dict(en_ratings)}")
 
     def walk(obj):
         if isinstance(obj, dict):
@@ -497,6 +589,7 @@ def main() -> int:
         check_catalogue()
         check_schemas(validator_for, pkg_schema, deck_schema, env_schema)
         check_fixtures(pkg)
+        check_slide_plan(pkg)
         check_bilingual(pkg)
         check_deck_numbers(pkg)
     except Exception as e:  # surface as structured error, never a bare traceback

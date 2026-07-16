@@ -1,0 +1,22 @@
+{
+  "_comment": "slide_compression_plan output for the zh-CN full edition, validating against schemas/stage-envelopes.schema.json#/$defs/s7_plan_output. 12 stubs, slide_no contiguous, L01 first, L11 last, mandatory sections covered. Stub 9 is expanded by examples/08-slide-call.json.",
+  "deck_id": "DCK-600XXX-2026-001-ZH-FULL",
+  "package_id": "RPK-600XXX-2026-001",
+  "edition": "zh-CN",
+  "as_of_date": "2026-07-10",
+  "theme": "jacaranda-brand",
+  "slide_stubs": [
+    { "slide_no": 1, "layout": "L01_cover", "section_id": "cover", "claim_ids": [], "metric_ids": ["MET-005", "MET-006"] },
+    { "slide_no": 2, "layout": "L03_kpi_snapshot", "section_id": "investment_thesis", "claim_ids": ["CLM-003", "CLM-004", "CLM-005"], "metric_ids": ["MET-001", "MET-003", "MET-005", "MET-006"] },
+    { "slide_no": 3, "layout": "L03_kpi_snapshot", "section_id": "company_snapshot", "claim_ids": ["CLM-001"], "metric_ids": ["MET-001", "MET-004"] },
+    { "slide_no": 4, "layout": "L07_value_chain", "section_id": "industry_value_chain", "claim_ids": ["CLM-002", "CLM-007"], "metric_ids": [] },
+    { "slide_no": 5, "layout": "L04_chart_commentary", "section_id": "business_model_segments", "claim_ids": ["CLM-008"], "metric_ids": ["MET-001"] },
+    { "slide_no": 6, "layout": "L06_comparison_cards", "section_id": "competition_moat", "claim_ids": ["CLM-005", "CLM-006"], "metric_ids": ["MET-001", "MET-003"] },
+    { "slide_no": 7, "layout": "L04_chart_commentary", "section_id": "historical_financials", "claim_ids": ["CLM-001"], "metric_ids": ["MET-001", "MET-002", "MET-003", "MET-004"] },
+    { "slide_no": 8, "layout": "L04_chart_commentary", "section_id": "forecast_drivers", "claim_ids": ["CLM-009"], "metric_ids": ["MET-006"] },
+    { "slide_no": 9, "layout": "L09_football_field", "section_id": "valuation", "claim_ids": ["CLM-009", "CLM-010"], "metric_ids": ["MET-005", "MET-006", "MET-007", "MET-008", "MET-009", "MET-010"] },
+    { "slide_no": 10, "layout": "L08_timeline", "section_id": "catalysts", "claim_ids": ["CLM-011"], "metric_ids": [] },
+    { "slide_no": 11, "layout": "L10_catalysts_risks", "section_id": "risks", "claim_ids": ["CLM-005", "CLM-006", "CLM-007", "CLM-008"], "metric_ids": [] },
+    { "slide_no": 12, "layout": "L11_conclusion_sources", "section_id": "conclusion_sources_disclaimer", "claim_ids": ["CLM-004", "CLM-005"], "metric_ids": ["MET-006"] }
+  ]
+}

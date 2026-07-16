@@ -47,8 +47,11 @@ Claims per `research-package.schema.json#/properties/claims`. Entities feed
 
 - Competitors may only be named if a source names them as competitors. Entity count rule, in
   precedence order: (1) if the evidence names no competitive set, output exactly 1 entity (the
-  company) and record the gap in `insufficient`; (2) otherwise output 2–4 entities including the
-  company. Never pad to reach 2.
+  company) and record the gap in `insufficient` — the schema rejects a single-entity output with
+  an empty `insufficient`; (2) otherwise output 2–4 entities including the company. Never pad to
+  reach 2.
+- **Ordering convention: `comparison_entities[0]` is always the covered company** — schedulers and
+  renderers rely on this position; the schema documents it and reviewers enforce it.
 - An entity with no sourced metrics keeps `metric_ids: []` and `limited_data: true` — qualitative
   bullets only.
 - Moat conclusions are `opinion` claims chained to the facts/inferences that support them.

@@ -119,9 +119,10 @@
       "prompt_file": "slide-compression.md",
       "prompt_version": "0.1.0",
       "stage": "S7",
-      "input_shape": "slide-compression.md#required-inputs (one plan stub + that slide's package excerpt)",
+      "input_shape": "machine-readable: see input_schema (slide_stub + deck_context + package_excerpt)",
       "output_schema": "../research-schema/slide-deck.schema.json#/$defs/slide",
-      "assembly": "scheduler assembles slides in plan order and validates the full deck against ../research-schema/slide-deck.schema.json before rendering"
+      "assembly": "scheduler assembles slides in plan order and validates the full deck against ../research-schema/slide-deck.schema.json before rendering",
+      "input_schema": "schemas/stage-envelopes.schema.json#/$defs/s7_slide_input"
     }
   ]
 }

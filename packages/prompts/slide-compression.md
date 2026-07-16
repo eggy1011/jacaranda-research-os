@@ -18,6 +18,8 @@ text (it will reject instead).
 
 ## Required inputs
 
+**Plan call (`slide_compression_plan`)** — the full validated package:
+
 ```json
 {
   "edition": "zh-CN",
@@ -26,6 +28,29 @@ text (it will reject instead).
   "deck_id": "DCK-…"
 }
 ```
+
+**Slide call (`slide_compression_slide`)** — machine-readable input schema
+`schemas/stage-envelopes.schema.json#/$defs/s7_slide_input` (bound via `input_schema` in
+`registry.json`; the scheduler raises `input_schema_mismatch` before calling the model):
+
+```json
+{
+  "slide_stub": { "slide_no": 9, "layout": "L09_football_field", "section_id": "valuation",
+                  "claim_ids": ["CLM-009"], "metric_ids": ["MET-005", "MET-006"] },
+  "deck_context": { "deck_id": "DCK-…", "package_id": "RPK-…", "edition": "zh-CN",
+                    "as_of_date": "2026-07-10", "theme": "jacaranda-brand" },
+  "package_excerpt": {
+    "metrics": [ …full metric objects for the stub's metric_ids… ],
+    "claims": [ …claim fragments for the stub's claim_ids… ],
+    "sources": [ …source records those claims/metrics cite… ],
+    "assumptions": [ …when the layout renders assumption lines… ],
+    "valuation_refs": { "target_price_metric_id": "MET-006", "current_price_metric_id": "MET-005", "rating": "accumulate" }
+  }
+}
+```
+
+The excerpt contains ONLY the fragments the stub references — the model never sees IDs it is not
+allowed to cite. End-to-end example: `examples/07-slide-plan.json` + `examples/08-slide-call.json`.
 
 ## Required output
 

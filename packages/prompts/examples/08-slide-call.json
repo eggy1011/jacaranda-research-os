@@ -1,0 +1,342 @@
+{
+  "_comment": "One slide_compression_slide call: input validates against schemas/stage-envelopes.schema.json#/$defs/s7_slide_input, output against research-schema/slide-deck.schema.json#/$defs/slide. Expands stub 9 of examples/07-slide-plan.json.",
+  "input": {
+    "slide_stub": {
+      "slide_no": 9,
+      "layout": "L09_football_field",
+      "section_id": "valuation",
+      "claim_ids": [
+        "CLM-009",
+        "CLM-010"
+      ],
+      "metric_ids": [
+        "MET-005",
+        "MET-006",
+        "MET-007",
+        "MET-008",
+        "MET-009",
+        "MET-010"
+      ]
+    },
+    "deck_context": {
+      "deck_id": "DCK-600XXX-2026-001-ZH-FULL",
+      "package_id": "RPK-600XXX-2026-001",
+      "edition": "zh-CN",
+      "as_of_date": "2026-07-10",
+      "theme": "jacaranda-brand"
+    },
+    "package_excerpt": {
+      "metrics": [
+        {
+          "metric_id": "MET-005",
+          "name": {
+            "zh_CN": "收盘价",
+            "en_AU": "Closing price"
+          },
+          "value": 28.4,
+          "unit": "CNY/share",
+          "currency": "CNY",
+          "period": "PIT",
+          "as_of_date": "2026-07-10",
+          "source_id": "SRC-002",
+          "source_url_or_document": "provider://mockdata/quote/600XXX",
+          "retrieved_at": "2026-07-10T16:05:00+08:00",
+          "computed_by": "provider"
+        },
+        {
+          "metric_id": "MET-006",
+          "name": {
+            "zh_CN": "目标价（基准情景）",
+            "en_AU": "Target price (base case)"
+          },
+          "value": 34.0,
+          "unit": "CNY/share",
+          "currency": "CNY",
+          "period": "PIT",
+          "as_of_date": "2026-07-10",
+          "source_id": "SRC-001",
+          "source_url_or_document": "internal://valuation-model/dcf-base",
+          "retrieved_at": "2026-07-10T18:00:00+08:00",
+          "computed_by": "deterministic_calc",
+          "calculation": {
+            "formula": "DCF base case per-share equity value (WACC per ASM-001)",
+            "input_metric_ids": [
+              "MET-001",
+              "MET-004"
+            ]
+          }
+        },
+        {
+          "metric_id": "MET-007",
+          "name": {
+            "zh_CN": "DCF估值下限",
+            "en_AU": "DCF valuation low"
+          },
+          "value": 29.5,
+          "unit": "CNY/share",
+          "currency": "CNY",
+          "period": "PIT",
+          "as_of_date": "2026-07-10",
+          "source_id": "SRC-001",
+          "source_url_or_document": "internal://valuation-model/dcf-range",
+          "retrieved_at": "2026-07-10T18:00:00+08:00",
+          "computed_by": "deterministic_calc",
+          "calculation": {
+            "formula": "DCF bear-input sensitivity lower bound",
+            "input_metric_ids": [
+              "MET-001",
+              "MET-004"
+            ]
+          }
+        },
+        {
+          "metric_id": "MET-008",
+          "name": {
+            "zh_CN": "DCF估值上限",
+            "en_AU": "DCF valuation high"
+          },
+          "value": 38.0,
+          "unit": "CNY/share",
+          "currency": "CNY",
+          "period": "PIT",
+          "as_of_date": "2026-07-10",
+          "source_id": "SRC-001",
+          "source_url_or_document": "internal://valuation-model/dcf-range",
+          "retrieved_at": "2026-07-10T18:00:00+08:00",
+          "computed_by": "deterministic_calc",
+          "calculation": {
+            "formula": "DCF bull-input sensitivity upper bound",
+            "input_metric_ids": [
+              "MET-001",
+              "MET-004"
+            ]
+          }
+        },
+        {
+          "metric_id": "MET-009",
+          "name": {
+            "zh_CN": "可比公司PE估值下限",
+            "en_AU": "Peer PE valuation low"
+          },
+          "value": 27.0,
+          "unit": "CNY/share",
+          "currency": "CNY",
+          "period": "PIT",
+          "as_of_date": "2026-07-10",
+          "source_id": "SRC-004",
+          "source_url_or_document": "internal://valuation-model/pe-comps",
+          "retrieved_at": "2026-07-10T18:00:00+08:00",
+          "computed_by": "deterministic_calc",
+          "calculation": {
+            "formula": "Peer PE 25th percentile x FY2025 EPS",
+            "input_metric_ids": [
+              "MET-004"
+            ]
+          }
+        },
+        {
+          "metric_id": "MET-010",
+          "name": {
+            "zh_CN": "可比公司PE估值上限",
+            "en_AU": "Peer PE valuation high"
+          },
+          "value": 35.5,
+          "unit": "CNY/share",
+          "currency": "CNY",
+          "period": "PIT",
+          "as_of_date": "2026-07-10",
+          "source_id": "SRC-004",
+          "source_url_or_document": "internal://valuation-model/pe-comps",
+          "retrieved_at": "2026-07-10T18:00:00+08:00",
+          "computed_by": "deterministic_calc",
+          "calculation": {
+            "formula": "Peer PE 75th percentile x FY2025 EPS",
+            "input_metric_ids": [
+              "MET-004"
+            ]
+          }
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "CLM-009",
+          "type": "inference",
+          "text": {
+            "zh_CN": "基准情景假设2026-2028年收入复合增速15%，对应DCF每股价值34.0元。",
+            "en_AU": "Our base case assumes a 15% revenue CAGR over 2026-2028, implying a DCF value of CNY 34.0 per share."
+          },
+          "metric_ids": [
+            "MET-006"
+          ],
+          "confidence": 0.6,
+          "review_status": "verified"
+        },
+        {
+          "claim_id": "CLM-010",
+          "type": "inference",
+          "text": {
+            "zh_CN": "WACC取9.5%，反映A股工业自动化板块的股权成本与公司较低的杠杆水平。",
+            "en_AU": "We apply a 9.5% WACC, reflecting A-share industrial-automation equity costs and the company's low leverage."
+          },
+          "source_ids": [
+            "SRC-004"
+          ],
+          "confidence": 0.6,
+          "review_status": "verified"
+        }
+      ],
+      "sources": [
+        {
+          "source_id": "SRC-001",
+          "type": "annual_report",
+          "title": "示例智能制造2025年年度报告（虚构测试文件）",
+          "publisher": "示例智能制造股份有限公司",
+          "url_or_document": "upload://mock-annual-report-2025.pdf",
+          "locator": "合并利润表，第102页",
+          "published_date": "2026-04-20",
+          "retrieved_at": "2026-07-10T09:00:00+08:00",
+          "reliability_tier": "primary",
+          "language": "zh"
+        },
+        {
+          "source_id": "SRC-002",
+          "type": "market_data_api",
+          "title": "Mock market data provider — daily close",
+          "publisher": "MockData",
+          "url_or_document": "provider://mockdata/quote/600XXX",
+          "locator": "close price 2026-07-10",
+          "published_date": "2026-07-10",
+          "retrieved_at": "2026-07-10T16:05:00+08:00",
+          "reliability_tier": "primary",
+          "language": "en"
+        },
+        {
+          "source_id": "SRC-004",
+          "type": "third_party_research",
+          "title": "Mock industry outlook: China factory automation 2026-2030",
+          "publisher": "Example Research Institute",
+          "url_or_document": "https://example-research.mock/factory-automation-2026",
+          "locator": "Exhibit 4",
+          "published_date": "2026-05-15",
+          "retrieved_at": "2026-07-09T15:00:00+08:00",
+          "reliability_tier": "secondary",
+          "language": "en"
+        }
+      ],
+      "assumptions": [
+        {
+          "assumption_id": "ASM-001",
+          "name": {
+            "zh_CN": "加权平均资本成本",
+            "en_AU": "Weighted average cost of capital"
+          },
+          "value_text": "WACC 9.5%",
+          "rationale_claim_id": "CLM-010"
+        },
+        {
+          "assumption_id": "ASM-002",
+          "name": {
+            "zh_CN": "收入复合增速（2026-2028）",
+            "en_AU": "Revenue CAGR (2026-2028)"
+          },
+          "value_text": "revenue CAGR 15% (2026-2028)",
+          "rationale_claim_id": "CLM-009"
+        }
+      ],
+      "valuation_refs": {
+        "target_price_metric_id": "MET-006",
+        "current_price_metric_id": "MET-005",
+        "rating": "accumulate"
+      }
+    }
+  },
+  "output": {
+    "slide_no": 9,
+    "layout": "L09_football_field",
+    "section_id": "valuation",
+    "title": "估值区间与目标价",
+    "blocks": [
+      {
+        "block_type": "football_field",
+        "priority": 1,
+        "football_field": {
+          "bars": [
+            {
+              "label": "现金流折现",
+              "low": {
+                "metric_id": "MET-007",
+                "display_transform": "raw",
+                "decimals": 1
+              },
+              "high": {
+                "metric_id": "MET-008",
+                "display_transform": "raw",
+                "decimals": 1
+              }
+            },
+            {
+              "label": "可比公司PE",
+              "low": {
+                "metric_id": "MET-009",
+                "display_transform": "raw",
+                "decimals": 1
+              },
+              "high": {
+                "metric_id": "MET-010",
+                "display_transform": "raw",
+                "decimals": 1
+              }
+            }
+          ],
+          "current_price": {
+            "metric_id": "MET-005",
+            "display_transform": "raw",
+            "decimals": 2
+          },
+          "target_price": {
+            "metric_id": "MET-006",
+            "display_transform": "raw",
+            "decimals": 2
+          },
+          "assumption_lines": [
+            {
+              "text": "WACC取9.5%，反映板块股权成本与公司低杠杆。",
+              "refs": [
+                {
+                  "assumption_id": "ASM-001"
+                },
+                {
+                  "claim_id": "CLM-010"
+                }
+              ]
+            },
+            {
+              "text": "基准情景：2026-2028年收入复合增速15%。",
+              "refs": [
+                {
+                  "claim_id": "CLM-009"
+                },
+                {
+                  "assumption_id": "ASM-002"
+                }
+              ]
+            }
+          ],
+          "source_ids": [
+            "SRC-001",
+            "SRC-004"
+          ]
+        }
+      }
+    ],
+    "footer": {
+      "show_page_number": true,
+      "data_as_of": "2026-07-10",
+      "source_ids": [
+        "SRC-001",
+        "SRC-004"
+      ],
+      "show_disclaimer_ref": true
+    }
+  }
+}
