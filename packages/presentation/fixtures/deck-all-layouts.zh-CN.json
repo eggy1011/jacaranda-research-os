@@ -1,0 +1,1226 @@
+{
+  "schema_version": "0.1.0",
+  "deck_id": "DCK-600XXX-2026-002-TEMPLATE",
+  "package_id": "RPK-600XXX-2026-002",
+  "edition": "zh-CN",
+  "as_of_date": "2026-07-10",
+  "theme": "jacaranda-brand",
+  "slides": [
+    {
+      "slide_no": 1,
+      "layout": "L01_cover",
+      "section_id": "cover",
+      "title": "示例智能制造（600XXX）研究报告",
+      "kicker": "国产替代进程中的自动化设备供应商",
+      "blocks": [
+        {
+          "block_type": "cover_meta",
+          "priority": 1,
+          "cover_meta": {
+            "company_line": "示例智能制造股份有限公司 · 600XXX · 虚构示例",
+            "rating_line": "评级：增持 · 目标价：34.00元",
+            "date_line": "2026年7月17日",
+            "edition_line": "中文完整版",
+            "prepared_by": "Jacaranda Stock Market Society"
+          }
+        }
+      ],
+      "footer": {
+        "show_page_number": false,
+        "data_as_of": "2026-07-10",
+        "source_ids": [],
+        "show_disclaimer_ref": true
+      }
+    },
+    {
+      "slide_no": 2,
+      "layout": "L02_section_divider",
+      "section_id": "investment_thesis",
+      "title": "投资摘要",
+      "kicker": "评级、目标价与核心逻辑",
+      "blocks": [
+        {
+          "block_type": "text_panel",
+          "priority": 9,
+          "text_panel": {
+            "text": "本节展示投资结论与关键指标。",
+            "refs": [
+              {
+                "claim_id": "CLM-004"
+              }
+            ],
+            "style": "note"
+          }
+        }
+      ],
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [],
+        "show_disclaimer_ref": true
+      }
+    },
+    {
+      "slide_no": 3,
+      "layout": "L04_chart_commentary",
+      "section_id": "business_model_segments",
+      "title": "收入构成（2025财年）",
+      "blocks": [
+        {
+          "block_type": "chart",
+          "priority": 1,
+          "chart": {
+            "chart_type": "donut",
+            "title": "分部收入构成（2025财年）",
+            "x_labels": [
+              "智能装备",
+              "自动化部件",
+              "服务"
+            ],
+            "series": [
+              {
+                "name": "收入构成",
+                "metric_ids": [
+                  "MET-011",
+                  "MET-012",
+                  "MET-013"
+                ],
+                "display_transform": "yi"
+              }
+            ],
+            "unit_caption": "单位：亿元人民币",
+            "source_ids": [
+              "SRC-001"
+            ]
+          }
+        },
+        {
+          "block_type": "bullets",
+          "priority": 2,
+          "bullets": [
+            {
+              "text": "智能装备是最大收入分部，服务收入占比仍然较低。",
+              "refs": [
+                {
+                  "claim_id": "CLM-012"
+                }
+              ],
+              "claim_type": "fact"
+            }
+          ]
+        }
+      ],
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-001"
+        ],
+        "show_disclaimer_ref": true
+      }
+    },
+    {
+      "slide_no": 4,
+      "layout": "L03_kpi_snapshot",
+      "section_id": "investment_thesis",
+      "title": "投资摘要",
+      "blocks": [
+        {
+          "block_type": "kpi_cards",
+          "priority": 1,
+          "kpi_cards": [
+            {
+              "label": "营业收入（亿元）",
+              "number": {
+                "metric_id": "MET-004",
+                "display_transform": "yi",
+                "decimals": 1
+              },
+              "period_caption": "2025财年"
+            },
+            {
+              "label": "收入增速",
+              "number": {
+                "metric_id": "MET-009",
+                "display_transform": "percent",
+                "decimals": 1,
+                "show_sign_colour": true
+              },
+              "period_caption": "2025财年，同比"
+            },
+            {
+              "label": "现价（元）",
+              "number": {
+                "metric_id": "MET-014",
+                "display_transform": "raw",
+                "decimals": 2
+              },
+              "period_caption": "2026-07-10收盘"
+            },
+            {
+              "label": "目标价（元）",
+              "number": {
+                "metric_id": "MET-015",
+                "display_transform": "raw",
+                "decimals": 2
+              },
+              "period_caption": "基准情景"
+            }
+          ]
+        },
+        {
+          "block_type": "bullets",
+          "priority": 2,
+          "bullets": [
+            {
+              "text": "政策支持叠加收入高增长，公司有望继续扩大国内市场份额。",
+              "refs": [
+                {
+                  "claim_id": "CLM-003"
+                }
+              ],
+              "claim_type": "inference"
+            },
+            {
+              "text": "我们认为公司是国产替代的主要受益者之一，给予“增持”评级。",
+              "refs": [
+                {
+                  "claim_id": "CLM-004"
+                }
+              ],
+              "claim_type": "opinion"
+            },
+            {
+              "text": "反方观点：若下游资本开支放缓，增速可能明显低于预测。",
+              "refs": [
+                {
+                  "claim_id": "CLM-005"
+                }
+              ],
+              "claim_type": "inference"
+            }
+          ]
+        }
+      ],
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-001",
+          "SRC-002",
+          "SRC-004"
+        ],
+        "show_disclaimer_ref": true
+      }
+    },
+    {
+      "slide_no": 5,
+      "layout": "L03_kpi_snapshot",
+      "section_id": "company_snapshot",
+      "title": "公司概览",
+      "blocks": [
+        {
+          "block_type": "kpi_cards",
+          "priority": 1,
+          "kpi_cards": [
+            {
+              "label": "营业收入（亿元）",
+              "number": {
+                "metric_id": "MET-004",
+                "display_transform": "yi",
+                "decimals": 1
+              },
+              "period_caption": "2025财年"
+            },
+            {
+              "label": "归母净利润（亿元）",
+              "number": {
+                "metric_id": "MET-008",
+                "display_transform": "yi",
+                "decimals": 1
+              },
+              "period_caption": "2025财年"
+            },
+            {
+              "label": "净利率",
+              "number": {
+                "metric_id": "MET-010",
+                "display_transform": "percent",
+                "decimals": 1
+              },
+              "period_caption": "2025财年"
+            },
+            {
+              "label": "最大分部收入（亿元）",
+              "number": {
+                "metric_id": "MET-011",
+                "display_transform": "yi",
+                "decimals": 1
+              },
+              "period_caption": "智能装备，2025财年"
+            }
+          ]
+        },
+        {
+          "block_type": "bullets",
+          "priority": 2,
+          "bullets": [
+            {
+              "text": "收入与利润均实现两位数增长，收入创历史新高。",
+              "refs": [
+                {
+                  "claim_id": "CLM-001"
+                }
+              ],
+              "claim_type": "fact"
+            },
+            {
+              "text": "公司位于产业链中游的自动化设备制造环节。",
+              "refs": [
+                {
+                  "claim_id": "CLM-016"
+                }
+              ],
+              "claim_type": "fact"
+            }
+          ]
+        }
+      ],
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-001"
+        ],
+        "show_disclaimer_ref": true
+      }
+    },
+    {
+      "slide_no": 6,
+      "layout": "L08_timeline",
+      "section_id": "company_snapshot",
+      "title": "公司沿革",
+      "blocks": [
+        {
+          "block_type": "timeline",
+          "priority": 1,
+          "timeline": [
+            {
+              "date": "2016",
+              "label": "公司成立",
+              "description": "聚焦工业自动化设备",
+              "refs": [
+                {
+                  "claim_id": "CLM-015"
+                }
+              ]
+            },
+            {
+              "date": "2021",
+              "label": "上市",
+              "description": "登陆虚构交易所",
+              "refs": [
+                {
+                  "claim_id": "CLM-015"
+                }
+              ]
+            },
+            {
+              "date": "2024",
+              "label": "海外基地",
+              "description": "设立海外制造基地",
+              "refs": [
+                {
+                  "claim_id": "CLM-015"
+                }
+              ]
+            },
+            {
+              "date": "2026-11",
+              "label": "新控制系统",
+              "description": "计划发布新一代控制系统",
+              "refs": [
+                {
+                  "claim_id": "CLM-011"
+                }
+              ],
+              "is_future": true
+            }
+          ]
+        }
+      ],
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-001"
+        ],
+        "show_disclaimer_ref": true
+      }
+    },
+    {
+      "slide_no": 7,
+      "layout": "L07_value_chain",
+      "section_id": "industry_value_chain",
+      "title": "产业链定位",
+      "blocks": [
+        {
+          "block_type": "flow",
+          "priority": 1,
+          "flow": [
+            {
+              "node_name": "上游",
+              "description": "核心零部件与材料"
+            },
+            {
+              "node_name": "中游（公司）",
+              "description": "自动化设备制造",
+              "highlight": true
+            },
+            {
+              "node_name": "下游",
+              "description": "制造业客户"
+            }
+          ]
+        },
+        {
+          "block_type": "bullets",
+          "priority": 2,
+          "bullets": [
+            {
+              "text": "产业指导意见支持智能制造装备国产替代。",
+              "refs": [
+                {
+                  "claim_id": "CLM-002"
+                }
+              ],
+              "claim_type": "fact"
+            },
+            {
+              "text": "政策若落地执行，有望改善公司所处中游环节的订单环境。",
+              "refs": [
+                {
+                  "claim_id": "CLM-003"
+                }
+              ],
+              "claim_type": "inference"
+            }
+          ]
+        }
+      ],
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-001",
+          "SRC-003"
+        ],
+        "show_disclaimer_ref": true
+      }
+    },
+    {
+      "slide_no": 8,
+      "layout": "L04_chart_commentary",
+      "section_id": "business_model_segments",
+      "title": "业务分部结构",
+      "blocks": [
+        {
+          "block_type": "chart",
+          "priority": 1,
+          "chart": {
+            "chart_type": "stacked_bar",
+            "title": "分部收入（2024-2025财年）",
+            "x_labels": [
+              "FY2024",
+              "FY2025"
+            ],
+            "series": [
+              {
+                "name": "智能装备",
+                "metric_ids": [
+                  "MET-032",
+                  "MET-011"
+                ],
+                "display_transform": "yi"
+              },
+              {
+                "name": "自动化部件",
+                "metric_ids": [
+                  "MET-033",
+                  "MET-012"
+                ],
+                "display_transform": "yi"
+              },
+              {
+                "name": "服务",
+                "metric_ids": [
+                  "MET-034",
+                  "MET-013"
+                ],
+                "display_transform": "yi"
+              }
+            ],
+            "unit_caption": "单位：亿元人民币",
+            "source_ids": [
+              "SRC-001"
+            ]
+          }
+        },
+        {
+          "block_type": "bullets",
+          "priority": 2,
+          "bullets": [
+            {
+              "text": "智能装备是最大收入分部，服务收入占比仍然较低。",
+              "refs": [
+                {
+                  "claim_id": "CLM-012"
+                }
+              ],
+              "claim_type": "fact"
+            }
+          ]
+        }
+      ],
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-001"
+        ],
+        "show_disclaimer_ref": true
+      }
+    },
+    {
+      "slide_no": 9,
+      "layout": "L06_comparison_cards",
+      "section_id": "competition_moat",
+      "title": "竞争格局",
+      "blocks": [
+        {
+          "block_type": "comparison_cards",
+          "priority": 1,
+          "comparison_cards": [
+            {
+              "entity_name": "公司",
+              "numbers": [
+                {
+                  "label": "PE",
+                  "number": {
+                    "metric_id": "MET-024",
+                    "display_transform": "multiple",
+                    "decimals": 1
+                  }
+                },
+                {
+                  "label": "收入增速",
+                  "number": {
+                    "metric_id": "MET-009",
+                    "display_transform": "percent",
+                    "decimals": 1
+                  }
+                }
+              ],
+              "bullets": [
+                {
+                  "text": "增长快于同业，双位数收入增速。",
+                  "refs": [
+                    {
+                      "claim_id": "CLM-001"
+                    }
+                  ]
+                }
+              ],
+              "limited_data": false
+            },
+            {
+              "entity_name": "同业A（虚构）",
+              "numbers": [
+                {
+                  "label": "PE",
+                  "number": {
+                    "metric_id": "MET-025",
+                    "display_transform": "multiple",
+                    "decimals": 1
+                  }
+                },
+                {
+                  "label": "收入增速",
+                  "number": {
+                    "metric_id": "MET-030",
+                    "display_transform": "percent",
+                    "decimals": 1
+                  }
+                }
+              ],
+              "bullets": [
+                {
+                  "text": "估值溢价较高。",
+                  "refs": [
+                    {
+                      "claim_id": "CLM-014"
+                    }
+                  ]
+                }
+              ],
+              "limited_data": false
+            },
+            {
+              "entity_name": "同业B（虚构）",
+              "numbers": [
+                {
+                  "label": "PE",
+                  "number": {
+                    "metric_id": "MET-026",
+                    "display_transform": "multiple",
+                    "decimals": 1
+                  }
+                },
+                {
+                  "label": "收入增速",
+                  "number": {
+                    "metric_id": "MET-031",
+                    "display_transform": "percent",
+                    "decimals": 1
+                  }
+                }
+              ],
+              "bullets": [
+                {
+                  "text": "增速与估值均低于公司。",
+                  "refs": [
+                    {
+                      "claim_id": "CLM-014"
+                    }
+                  ]
+                }
+              ],
+              "limited_data": false
+            }
+          ]
+        }
+      ],
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-005"
+        ],
+        "show_disclaimer_ref": true
+      }
+    },
+    {
+      "slide_no": 10,
+      "layout": "L05_financial_table",
+      "section_id": "historical_financials",
+      "title": "历史财务",
+      "blocks": [
+        {
+          "block_type": "table",
+          "priority": 1,
+          "table": {
+            "columns": [
+              "指标",
+              "FY2022",
+              "FY2023",
+              "FY2024",
+              "FY2025"
+            ],
+            "rows": [
+              {
+                "label": "营业收入",
+                "cells": [
+                  {
+                    "metric_id": "MET-001",
+                    "display_transform": "yi",
+                    "decimals": 1
+                  },
+                  {
+                    "metric_id": "MET-002",
+                    "display_transform": "yi",
+                    "decimals": 1
+                  },
+                  {
+                    "metric_id": "MET-003",
+                    "display_transform": "yi",
+                    "decimals": 1
+                  },
+                  {
+                    "metric_id": "MET-004",
+                    "display_transform": "yi",
+                    "decimals": 1
+                  }
+                ]
+              },
+              {
+                "label": "归母净利润",
+                "cells": [
+                  {
+                    "metric_id": "MET-005",
+                    "display_transform": "yi",
+                    "decimals": 1
+                  },
+                  {
+                    "metric_id": "MET-006",
+                    "display_transform": "yi",
+                    "decimals": 1
+                  },
+                  {
+                    "metric_id": "MET-007",
+                    "display_transform": "yi",
+                    "decimals": 1
+                  },
+                  {
+                    "metric_id": "MET-008",
+                    "display_transform": "yi",
+                    "decimals": 1
+                  }
+                ]
+              },
+              {
+                "label": "收入同比增速",
+                "cells": [
+                  null,
+                  null,
+                  null,
+                  {
+                    "metric_id": "MET-009",
+                    "display_transform": "percent",
+                    "decimals": 1,
+                    "show_sign_colour": true
+                  }
+                ]
+              },
+              {
+                "label": "净利率",
+                "cells": [
+                  null,
+                  null,
+                  null,
+                  {
+                    "metric_id": "MET-010",
+                    "display_transform": "percent",
+                    "decimals": 1
+                  }
+                ]
+              }
+            ],
+            "unit_caption": "单位：亿元人民币",
+            "source_ids": [
+              "SRC-001"
+            ]
+          }
+        }
+      ],
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-001"
+        ],
+        "show_disclaimer_ref": true
+      }
+    },
+    {
+      "slide_no": 11,
+      "layout": "L04_chart_commentary",
+      "section_id": "historical_financials",
+      "title": "收入与利润趋势",
+      "blocks": [
+        {
+          "block_type": "chart",
+          "priority": 1,
+          "chart": {
+            "chart_type": "line",
+            "title": "营业收入与归母净利润（2022-2025财年）",
+            "x_labels": [
+              "FY2022",
+              "FY2023",
+              "FY2024",
+              "FY2025"
+            ],
+            "series": [
+              {
+                "name": "营业收入",
+                "metric_ids": [
+                  "MET-001",
+                  "MET-002",
+                  "MET-003",
+                  "MET-004"
+                ],
+                "display_transform": "yi"
+              },
+              {
+                "name": "归母净利润",
+                "metric_ids": [
+                  "MET-005",
+                  "MET-006",
+                  "MET-007",
+                  "MET-008"
+                ],
+                "display_transform": "yi"
+              }
+            ],
+            "unit_caption": "单位：亿元人民币",
+            "source_ids": [
+              "SRC-001"
+            ]
+          }
+        },
+        {
+          "block_type": "bullets",
+          "priority": 2,
+          "bullets": [
+            {
+              "text": "收入与利润均保持逐年增长，增速在2025财年有所加快。",
+              "refs": [
+                {
+                  "claim_id": "CLM-001"
+                }
+              ],
+              "claim_type": "fact"
+            }
+          ]
+        }
+      ],
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-001"
+        ],
+        "show_disclaimer_ref": true
+      }
+    },
+    {
+      "slide_no": 12,
+      "layout": "L04_chart_commentary",
+      "section_id": "forecast_drivers",
+      "title": "预测收入桥（2026财年）",
+      "blocks": [
+        {
+          "block_type": "chart",
+          "priority": 1,
+          "chart": {
+            "chart_type": "waterfall",
+            "title": "2026财年预测收入桥",
+            "x_labels": [
+              "2025收入",
+              "销量",
+              "价格",
+              "流失",
+              "2026E收入"
+            ],
+            "series": [
+              {
+                "name": "收入桥",
+                "metric_ids": [
+                  "MET-004",
+                  "MET-020",
+                  "MET-021",
+                  "MET-022",
+                  "MET-023"
+                ],
+                "display_transform": "yi"
+              }
+            ],
+            "unit_caption": "单位：亿元人民币",
+            "source_ids": [
+              "SRC-001"
+            ]
+          }
+        },
+        {
+          "block_type": "bullets",
+          "priority": 2,
+          "bullets": [
+            {
+              "text": "销量扩张是预测增长的主要驱动，价格贡献为正但幅度有限。",
+              "refs": [
+                {
+                  "claim_id": "CLM-013"
+                }
+              ],
+              "claim_type": "inference"
+            }
+          ]
+        }
+      ],
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-001"
+        ],
+        "show_disclaimer_ref": true
+      }
+    },
+    {
+      "slide_no": 13,
+      "layout": "L05_financial_table",
+      "section_id": "valuation",
+      "title": "可比公司",
+      "blocks": [
+        {
+          "block_type": "table",
+          "priority": 1,
+          "table": {
+            "columns": [
+              "指标",
+              "公司",
+              "同业A",
+              "同业B"
+            ],
+            "rows": [
+              {
+                "label": "PE",
+                "cells": [
+                  {
+                    "metric_id": "MET-024",
+                    "display_transform": "multiple",
+                    "decimals": 1
+                  },
+                  {
+                    "metric_id": "MET-025",
+                    "display_transform": "multiple",
+                    "decimals": 1
+                  },
+                  {
+                    "metric_id": "MET-026",
+                    "display_transform": "multiple",
+                    "decimals": 1
+                  }
+                ]
+              },
+              {
+                "label": "PS",
+                "cells": [
+                  {
+                    "metric_id": "MET-027",
+                    "display_transform": "multiple",
+                    "decimals": 1
+                  },
+                  {
+                    "metric_id": "MET-028",
+                    "display_transform": "multiple",
+                    "decimals": 1
+                  },
+                  {
+                    "metric_id": "MET-029",
+                    "display_transform": "multiple",
+                    "decimals": 1
+                  }
+                ]
+              },
+              {
+                "label": "收入增速",
+                "cells": [
+                  {
+                    "metric_id": "MET-009",
+                    "display_transform": "percent",
+                    "decimals": 1
+                  },
+                  {
+                    "metric_id": "MET-030",
+                    "display_transform": "percent",
+                    "decimals": 1
+                  },
+                  {
+                    "metric_id": "MET-031",
+                    "display_transform": "percent",
+                    "decimals": 1
+                  }
+                ]
+              }
+            ],
+            "unit_caption": "倍数为虚构数据",
+            "source_ids": [
+              "SRC-005"
+            ]
+          }
+        },
+        {
+          "block_type": "bullets",
+          "priority": 2,
+          "bullets": [
+            {
+              "text": "公司估值低于同业A、高于同业B，增速溢价尚未完全反映。",
+              "refs": [
+                {
+                  "claim_id": "CLM-014"
+                }
+              ],
+              "claim_type": "inference"
+            }
+          ]
+        }
+      ],
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-005"
+        ],
+        "show_disclaimer_ref": true
+      }
+    },
+    {
+      "slide_no": 14,
+      "layout": "L09_football_field",
+      "section_id": "valuation",
+      "title": "估值区间与目标价",
+      "blocks": [
+        {
+          "block_type": "football_field",
+          "priority": 1,
+          "football_field": {
+            "bars": [
+              {
+                "label": "现金流折现",
+                "low": {
+                  "metric_id": "MET-016",
+                  "display_transform": "raw",
+                  "decimals": 1
+                },
+                "high": {
+                  "metric_id": "MET-017",
+                  "display_transform": "raw",
+                  "decimals": 1
+                }
+              },
+              {
+                "label": "可比公司PE",
+                "low": {
+                  "metric_id": "MET-018",
+                  "display_transform": "raw",
+                  "decimals": 1
+                },
+                "high": {
+                  "metric_id": "MET-019",
+                  "display_transform": "raw",
+                  "decimals": 1
+                }
+              }
+            ],
+            "current_price": {
+              "metric_id": "MET-014",
+              "display_transform": "raw",
+              "decimals": 2
+            },
+            "target_price": {
+              "metric_id": "MET-015",
+              "display_transform": "raw",
+              "decimals": 2
+            },
+            "assumption_lines": [
+              {
+                "text": "WACC取9.5%，反映板块股权成本与公司低杠杆。",
+                "refs": [
+                  {
+                    "assumption_id": "ASM-001"
+                  },
+                  {
+                    "claim_id": "CLM-010"
+                  }
+                ]
+              },
+              {
+                "text": "基准情景：2026-2028年收入复合增速15%。",
+                "refs": [
+                  {
+                    "claim_id": "CLM-009"
+                  },
+                  {
+                    "assumption_id": "ASM-002"
+                  }
+                ]
+              }
+            ],
+            "source_ids": [
+              "SRC-001",
+              "SRC-005"
+            ]
+          }
+        }
+      ],
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-001",
+          "SRC-005"
+        ],
+        "show_disclaimer_ref": true
+      }
+    },
+    {
+      "slide_no": 15,
+      "layout": "L10_catalysts_risks",
+      "section_id": "risks",
+      "title": "催化剂与风险",
+      "blocks": [
+        {
+          "block_type": "paired_columns",
+          "priority": 1,
+          "paired_columns": {
+            "left_title": "催化剂",
+            "right_title": "风险",
+            "left_items": [
+              {
+                "title": "新一代控制系统发布",
+                "description": "预计四季度发布，如期落地有望带来新订单。",
+                "chip": "3-12m",
+                "refs": [
+                  {
+                    "claim_id": "CLM-011"
+                  }
+                ]
+              }
+            ],
+            "right_items": [
+              {
+                "title": "下游资本开支放缓",
+                "chip": "S:high L:medium",
+                "refs": [
+                  {
+                    "claim_id": "CLM-005"
+                  }
+                ]
+              },
+              {
+                "title": "价格竞争压缩毛利率",
+                "chip": "S:medium L:high",
+                "refs": [
+                  {
+                    "claim_id": "CLM-006"
+                  }
+                ]
+              },
+              {
+                "title": "产业政策变化",
+                "chip": "S:medium L:low",
+                "refs": [
+                  {
+                    "claim_id": "CLM-007"
+                  }
+                ]
+              },
+              {
+                "title": "客户集中度较高",
+                "chip": "S:medium L:medium",
+                "refs": [
+                  {
+                    "claim_id": "CLM-008"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-001",
+          "SRC-003",
+          "SRC-004"
+        ],
+        "show_disclaimer_ref": true
+      }
+    },
+    {
+      "slide_no": 16,
+      "layout": "L11_conclusion_sources",
+      "section_id": "conclusion_sources_disclaimer",
+      "title": "结论、来源与免责声明",
+      "blocks": [
+        {
+          "block_type": "text_panel",
+          "priority": 1,
+          "text_panel": {
+            "text": "我们给予“增持”评级，目标价34.00元。反方证据：行业产能扩张较快，若下游资本开支放缓，公司增速可能明显低于预测。",
+            "refs": [
+              {
+                "claim_id": "CLM-004"
+              },
+              {
+                "claim_id": "CLM-005"
+              },
+              {
+                "metric_id": "MET-015"
+              }
+            ],
+            "style": "conclusion"
+          }
+        },
+        {
+          "block_type": "source_table",
+          "priority": 1,
+          "source_table": [
+            {
+              "source_id": "SRC-001",
+              "title": "示例智能制造2025年年度报告（虚构测试文件）",
+              "publisher": "示例智能制造股份有限公司",
+              "published_date": "2026-04-20",
+              "retrieved_at": "2026-07-10"
+            },
+            {
+              "source_id": "SRC-002",
+              "title": "Mock market data provider — daily close",
+              "publisher": "MockData",
+              "published_date": "2026-07-10",
+              "retrieved_at": "2026-07-10"
+            },
+            {
+              "source_id": "SRC-003",
+              "title": "《智能制造装备产业发展指导意见》（虚构政策文件）",
+              "publisher": "示例部委",
+              "published_date": "2026-03-01",
+              "retrieved_at": "2026-07-10"
+            },
+            {
+              "source_id": "SRC-004",
+              "title": "Mock industry outlook: factory automation 2026-2030",
+              "publisher": "Example Research Institute",
+              "published_date": "2026-05-15",
+              "retrieved_at": "2026-07-10"
+            },
+            {
+              "source_id": "SRC-005",
+              "title": "Mock comparable-company dataset (fictional peers)",
+              "publisher": "Example Research Institute",
+              "published_date": "2026-06-30",
+              "retrieved_at": "2026-07-10"
+            }
+          ]
+        },
+        {
+          "block_type": "text_panel",
+          "priority": 1,
+          "text_panel": {
+            "text": "本报告由蓝楹会基于公开信息与AI辅助流程生成，仅供学习与研究用途，不构成任何投资建议。数据截至2026年7月10日。本样例使用虚构公司数据。",
+            "refs": [
+              {
+                "claim_id": "CLM-004"
+              }
+            ],
+            "style": "disclaimer"
+          }
+        }
+      ],
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-001",
+          "SRC-002",
+          "SRC-003",
+          "SRC-004",
+          "SRC-005"
+        ],
+        "show_disclaimer_ref": false
+      }
+    }
+  ]
+}

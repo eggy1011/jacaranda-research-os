@@ -1,0 +1,1139 @@
+{
+  "schema_version": "0.1.0",
+  "deck_id": "DCK-600XXX-2026-002-EN",
+  "package_id": "RPK-600XXX-2026-002",
+  "edition": "en-AU",
+  "as_of_date": "2026-07-10",
+  "theme": "jacaranda-brand",
+  "slides": [
+    {
+      "slide_no": 1,
+      "layout": "L01_cover",
+      "section_id": "cover",
+      "title": "Example Intelligent Manufacturing (600XXX) equity research",
+      "kicker": "An automation-equipment supplier in the domestic-substitution cycle",
+      "blocks": [
+        {
+          "block_type": "cover_meta",
+          "priority": 1,
+          "cover_meta": {
+            "company_line": "Example Intelligent Manufacturing Co., Ltd. · 600XXX · fictional example",
+            "rating_line": "Rating: Accumulate · Target price: CNY 34.00",
+            "date_line": "17 Jul 2026",
+            "edition_line": "Full English edition",
+            "prepared_by": "Jacaranda Stock Market Society"
+          }
+        }
+      ],
+      "footer": {
+        "show_page_number": false,
+        "data_as_of": "2026-07-10",
+        "source_ids": [],
+        "show_disclaimer_ref": true
+      }
+    },
+    {
+      "slide_no": 2,
+      "layout": "L03_kpi_snapshot",
+      "section_id": "investment_thesis",
+      "title": "Investment thesis",
+      "blocks": [
+        {
+          "block_type": "kpi_cards",
+          "priority": 1,
+          "kpi_cards": [
+            {
+              "label": "Revenue (CNY bn)",
+              "number": {
+                "metric_id": "MET-004",
+                "display_transform": "billion",
+                "decimals": 2
+              },
+              "period_caption": "FY2025"
+            },
+            {
+              "label": "Revenue growth",
+              "number": {
+                "metric_id": "MET-009",
+                "display_transform": "percent",
+                "decimals": 1,
+                "show_sign_colour": true
+              },
+              "period_caption": "FY2025, YoY"
+            },
+            {
+              "label": "Current price (CNY)",
+              "number": {
+                "metric_id": "MET-014",
+                "display_transform": "raw",
+                "decimals": 2
+              },
+              "period_caption": "Close, 10 Jul 2026"
+            },
+            {
+              "label": "Target price (CNY)",
+              "number": {
+                "metric_id": "MET-015",
+                "display_transform": "raw",
+                "decimals": 2
+              },
+              "period_caption": "Base case"
+            }
+          ]
+        },
+        {
+          "block_type": "bullets",
+          "priority": 2,
+          "bullets": [
+            {
+              "text": "Policy support and strong revenue growth position the company to keep gaining domestic share.",
+              "refs": [
+                {
+                  "claim_id": "CLM-003"
+                }
+              ],
+              "claim_type": "inference"
+            },
+            {
+              "text": "We view the company as a key beneficiary of domestic substitution and assign an Accumulate rating.",
+              "refs": [
+                {
+                  "claim_id": "CLM-004"
+                }
+              ],
+              "claim_type": "opinion"
+            },
+            {
+              "text": "Counterargument: growth could fall well short of forecast if downstream capex slows.",
+              "refs": [
+                {
+                  "claim_id": "CLM-005"
+                }
+              ],
+              "claim_type": "inference"
+            }
+          ]
+        }
+      ],
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-001",
+          "SRC-002",
+          "SRC-004"
+        ],
+        "show_disclaimer_ref": true
+      }
+    },
+    {
+      "slide_no": 3,
+      "layout": "L03_kpi_snapshot",
+      "section_id": "company_snapshot",
+      "title": "Company snapshot",
+      "blocks": [
+        {
+          "block_type": "kpi_cards",
+          "priority": 1,
+          "kpi_cards": [
+            {
+              "label": "Revenue (CNY bn)",
+              "number": {
+                "metric_id": "MET-004",
+                "display_transform": "billion",
+                "decimals": 2
+              },
+              "period_caption": "FY2025"
+            },
+            {
+              "label": "Net profit (CNY bn)",
+              "number": {
+                "metric_id": "MET-008",
+                "display_transform": "billion",
+                "decimals": 2
+              },
+              "period_caption": "FY2025"
+            },
+            {
+              "label": "Net margin",
+              "number": {
+                "metric_id": "MET-010",
+                "display_transform": "percent",
+                "decimals": 1
+              },
+              "period_caption": "FY2025"
+            },
+            {
+              "label": "Largest segment (CNY bn)",
+              "number": {
+                "metric_id": "MET-011",
+                "display_transform": "billion",
+                "decimals": 2
+              },
+              "period_caption": "Intelligent equipment, FY2025"
+            }
+          ]
+        },
+        {
+          "block_type": "bullets",
+          "priority": 2,
+          "bullets": [
+            {
+              "text": "Revenue and profit both grew at double-digit rates, with revenue at a record high.",
+              "refs": [
+                {
+                  "claim_id": "CLM-001"
+                }
+              ],
+              "claim_type": "fact"
+            },
+            {
+              "text": "The company operates midstream in automation-equipment manufacturing.",
+              "refs": [
+                {
+                  "claim_id": "CLM-016"
+                }
+              ],
+              "claim_type": "fact"
+            }
+          ]
+        }
+      ],
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-001"
+        ],
+        "show_disclaimer_ref": true
+      }
+    },
+    {
+      "slide_no": 4,
+      "layout": "L08_timeline",
+      "section_id": "company_snapshot",
+      "title": "Company history",
+      "blocks": [
+        {
+          "block_type": "timeline",
+          "priority": 1,
+          "timeline": [
+            {
+              "date": "2016",
+              "label": "Founded",
+              "description": "Focused on industrial automation equipment",
+              "refs": [
+                {
+                  "claim_id": "CLM-015"
+                }
+              ]
+            },
+            {
+              "date": "2021",
+              "label": "Listed",
+              "description": "Listed on a fictional exchange",
+              "refs": [
+                {
+                  "claim_id": "CLM-015"
+                }
+              ]
+            },
+            {
+              "date": "2024",
+              "label": "Overseas base",
+              "description": "Opened an overseas manufacturing base",
+              "refs": [
+                {
+                  "claim_id": "CLM-015"
+                }
+              ]
+            },
+            {
+              "date": "2026-11",
+              "label": "New control system",
+              "description": "Next-generation control system planned",
+              "refs": [
+                {
+                  "claim_id": "CLM-011"
+                }
+              ],
+              "is_future": true
+            }
+          ]
+        }
+      ],
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-001"
+        ],
+        "show_disclaimer_ref": true
+      }
+    },
+    {
+      "slide_no": 5,
+      "layout": "L07_value_chain",
+      "section_id": "industry_value_chain",
+      "title": "Value-chain position",
+      "blocks": [
+        {
+          "block_type": "flow",
+          "priority": 1,
+          "flow": [
+            {
+              "node_name": "Upstream",
+              "description": "Core components and materials"
+            },
+            {
+              "node_name": "Midstream (company)",
+              "description": "Automation-equipment manufacturing",
+              "highlight": true
+            },
+            {
+              "node_name": "Downstream",
+              "description": "Manufacturing customers"
+            }
+          ]
+        },
+        {
+          "block_type": "bullets",
+          "priority": 2,
+          "bullets": [
+            {
+              "text": "Industry guidance supports domestic substitution in intelligent manufacturing equipment.",
+              "refs": [
+                {
+                  "claim_id": "CLM-002"
+                }
+              ],
+              "claim_type": "fact"
+            },
+            {
+              "text": "If implemented, the policy could improve midstream order conditions.",
+              "refs": [
+                {
+                  "claim_id": "CLM-003"
+                }
+              ],
+              "claim_type": "inference"
+            }
+          ]
+        }
+      ],
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-001",
+          "SRC-003"
+        ],
+        "show_disclaimer_ref": true
+      }
+    },
+    {
+      "slide_no": 6,
+      "layout": "L04_chart_commentary",
+      "section_id": "business_model_segments",
+      "title": "Segment mix",
+      "blocks": [
+        {
+          "block_type": "chart",
+          "priority": 1,
+          "chart": {
+            "chart_type": "stacked_bar",
+            "title": "Segment revenue (FY2024-FY2025)",
+            "x_labels": [
+              "FY2024",
+              "FY2025"
+            ],
+            "series": [
+              {
+                "name": "Intelligent equipment",
+                "metric_ids": [
+                  "MET-032",
+                  "MET-011"
+                ],
+                "display_transform": "billion"
+              },
+              {
+                "name": "Automation components",
+                "metric_ids": [
+                  "MET-033",
+                  "MET-012"
+                ],
+                "display_transform": "billion"
+              },
+              {
+                "name": "Services",
+                "metric_ids": [
+                  "MET-034",
+                  "MET-013"
+                ],
+                "display_transform": "billion"
+              }
+            ],
+            "unit_caption": "CNY bn",
+            "source_ids": [
+              "SRC-001"
+            ]
+          }
+        },
+        {
+          "block_type": "bullets",
+          "priority": 2,
+          "bullets": [
+            {
+              "text": "Intelligent equipment is the largest segment; services remain a small share.",
+              "refs": [
+                {
+                  "claim_id": "CLM-012"
+                }
+              ],
+              "claim_type": "fact"
+            }
+          ]
+        }
+      ],
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-001"
+        ],
+        "show_disclaimer_ref": true
+      }
+    },
+    {
+      "slide_no": 7,
+      "layout": "L06_comparison_cards",
+      "section_id": "competition_moat",
+      "title": "Competitive landscape",
+      "blocks": [
+        {
+          "block_type": "comparison_cards",
+          "priority": 1,
+          "comparison_cards": [
+            {
+              "entity_name": "Company",
+              "numbers": [
+                {
+                  "label": "PE",
+                  "number": {
+                    "metric_id": "MET-024",
+                    "display_transform": "multiple",
+                    "decimals": 1
+                  }
+                },
+                {
+                  "label": "Revenue growth",
+                  "number": {
+                    "metric_id": "MET-009",
+                    "display_transform": "percent",
+                    "decimals": 1
+                  }
+                }
+              ],
+              "bullets": [
+                {
+                  "text": "Faster growth than peers, with double-digit revenue growth.",
+                  "refs": [
+                    {
+                      "claim_id": "CLM-001"
+                    }
+                  ]
+                }
+              ],
+              "limited_data": false
+            },
+            {
+              "entity_name": "Peer A (fictional)",
+              "numbers": [
+                {
+                  "label": "PE",
+                  "number": {
+                    "metric_id": "MET-025",
+                    "display_transform": "multiple",
+                    "decimals": 1
+                  }
+                },
+                {
+                  "label": "Revenue growth",
+                  "number": {
+                    "metric_id": "MET-030",
+                    "display_transform": "percent",
+                    "decimals": 1
+                  }
+                }
+              ],
+              "bullets": [
+                {
+                  "text": "Trades at a premium multiple.",
+                  "refs": [
+                    {
+                      "claim_id": "CLM-014"
+                    }
+                  ]
+                }
+              ],
+              "limited_data": false
+            },
+            {
+              "entity_name": "Peer B (fictional)",
+              "numbers": [
+                {
+                  "label": "PE",
+                  "number": {
+                    "metric_id": "MET-026",
+                    "display_transform": "multiple",
+                    "decimals": 1
+                  }
+                },
+                {
+                  "label": "Revenue growth",
+                  "number": {
+                    "metric_id": "MET-031",
+                    "display_transform": "percent",
+                    "decimals": 1
+                  }
+                }
+              ],
+              "bullets": [
+                {
+                  "text": "Slower growth and a lower multiple than the company.",
+                  "refs": [
+                    {
+                      "claim_id": "CLM-014"
+                    }
+                  ]
+                }
+              ],
+              "limited_data": false
+            }
+          ]
+        }
+      ],
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-005"
+        ],
+        "show_disclaimer_ref": true
+      }
+    },
+    {
+      "slide_no": 8,
+      "layout": "L05_financial_table",
+      "section_id": "historical_financials",
+      "title": "Historical financials",
+      "blocks": [
+        {
+          "block_type": "table",
+          "priority": 1,
+          "table": {
+            "columns": [
+              "Metric",
+              "FY2022",
+              "FY2023",
+              "FY2024",
+              "FY2025"
+            ],
+            "rows": [
+              {
+                "label": "Revenue",
+                "cells": [
+                  {
+                    "metric_id": "MET-001",
+                    "display_transform": "billion",
+                    "decimals": 2
+                  },
+                  {
+                    "metric_id": "MET-002",
+                    "display_transform": "billion",
+                    "decimals": 2
+                  },
+                  {
+                    "metric_id": "MET-003",
+                    "display_transform": "billion",
+                    "decimals": 2
+                  },
+                  {
+                    "metric_id": "MET-004",
+                    "display_transform": "billion",
+                    "decimals": 2
+                  }
+                ]
+              },
+              {
+                "label": "Net profit",
+                "cells": [
+                  {
+                    "metric_id": "MET-005",
+                    "display_transform": "billion",
+                    "decimals": 2
+                  },
+                  {
+                    "metric_id": "MET-006",
+                    "display_transform": "billion",
+                    "decimals": 2
+                  },
+                  {
+                    "metric_id": "MET-007",
+                    "display_transform": "billion",
+                    "decimals": 2
+                  },
+                  {
+                    "metric_id": "MET-008",
+                    "display_transform": "billion",
+                    "decimals": 2
+                  }
+                ]
+              },
+              {
+                "label": "Revenue growth",
+                "cells": [
+                  null,
+                  null,
+                  null,
+                  {
+                    "metric_id": "MET-009",
+                    "display_transform": "percent",
+                    "decimals": 1,
+                    "show_sign_colour": true
+                  }
+                ]
+              },
+              {
+                "label": "Net margin",
+                "cells": [
+                  null,
+                  null,
+                  null,
+                  {
+                    "metric_id": "MET-010",
+                    "display_transform": "percent",
+                    "decimals": 1
+                  }
+                ]
+              }
+            ],
+            "unit_caption": "CNY bn",
+            "source_ids": [
+              "SRC-001"
+            ]
+          }
+        }
+      ],
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-001"
+        ],
+        "show_disclaimer_ref": true
+      }
+    },
+    {
+      "slide_no": 9,
+      "layout": "L04_chart_commentary",
+      "section_id": "historical_financials",
+      "title": "Revenue and profit trend",
+      "blocks": [
+        {
+          "block_type": "chart",
+          "priority": 1,
+          "chart": {
+            "chart_type": "line",
+            "title": "Revenue and net profit (FY2022-FY2025)",
+            "x_labels": [
+              "FY2022",
+              "FY2023",
+              "FY2024",
+              "FY2025"
+            ],
+            "series": [
+              {
+                "name": "Revenue",
+                "metric_ids": [
+                  "MET-001",
+                  "MET-002",
+                  "MET-003",
+                  "MET-004"
+                ],
+                "display_transform": "billion"
+              },
+              {
+                "name": "Net profit",
+                "metric_ids": [
+                  "MET-005",
+                  "MET-006",
+                  "MET-007",
+                  "MET-008"
+                ],
+                "display_transform": "billion"
+              }
+            ],
+            "unit_caption": "CNY bn",
+            "source_ids": [
+              "SRC-001"
+            ]
+          }
+        },
+        {
+          "block_type": "bullets",
+          "priority": 2,
+          "bullets": [
+            {
+              "text": "Revenue and profit have grown every year, with growth accelerating in FY2025.",
+              "refs": [
+                {
+                  "claim_id": "CLM-001"
+                }
+              ],
+              "claim_type": "fact"
+            }
+          ]
+        }
+      ],
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-001"
+        ],
+        "show_disclaimer_ref": true
+      }
+    },
+    {
+      "slide_no": 10,
+      "layout": "L04_chart_commentary",
+      "section_id": "forecast_drivers",
+      "title": "FY2026E revenue bridge",
+      "blocks": [
+        {
+          "block_type": "chart",
+          "priority": 1,
+          "chart": {
+            "chart_type": "waterfall",
+            "title": "FY2026E revenue bridge",
+            "x_labels": [
+              "FY2025",
+              "Volume",
+              "Price",
+              "Churn",
+              "FY2026E"
+            ],
+            "series": [
+              {
+                "name": "Bridge",
+                "metric_ids": [
+                  "MET-004",
+                  "MET-020",
+                  "MET-021",
+                  "MET-022",
+                  "MET-023"
+                ],
+                "display_transform": "billion"
+              }
+            ],
+            "unit_caption": "CNY bn",
+            "source_ids": [
+              "SRC-001"
+            ]
+          }
+        },
+        {
+          "block_type": "bullets",
+          "priority": 2,
+          "bullets": [
+            {
+              "text": "Volume expansion drives forecast growth, with a positive but modest price contribution.",
+              "refs": [
+                {
+                  "claim_id": "CLM-013"
+                }
+              ],
+              "claim_type": "inference"
+            }
+          ]
+        }
+      ],
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-001"
+        ],
+        "show_disclaimer_ref": true
+      }
+    },
+    {
+      "slide_no": 11,
+      "layout": "L05_financial_table",
+      "section_id": "valuation",
+      "title": "Comparable companies",
+      "blocks": [
+        {
+          "block_type": "table",
+          "priority": 1,
+          "table": {
+            "columns": [
+              "Metric",
+              "Company",
+              "Peer A",
+              "Peer B"
+            ],
+            "rows": [
+              {
+                "label": "PE",
+                "cells": [
+                  {
+                    "metric_id": "MET-024",
+                    "display_transform": "multiple",
+                    "decimals": 1
+                  },
+                  {
+                    "metric_id": "MET-025",
+                    "display_transform": "multiple",
+                    "decimals": 1
+                  },
+                  {
+                    "metric_id": "MET-026",
+                    "display_transform": "multiple",
+                    "decimals": 1
+                  }
+                ]
+              },
+              {
+                "label": "PS",
+                "cells": [
+                  {
+                    "metric_id": "MET-027",
+                    "display_transform": "multiple",
+                    "decimals": 1
+                  },
+                  {
+                    "metric_id": "MET-028",
+                    "display_transform": "multiple",
+                    "decimals": 1
+                  },
+                  {
+                    "metric_id": "MET-029",
+                    "display_transform": "multiple",
+                    "decimals": 1
+                  }
+                ]
+              },
+              {
+                "label": "Revenue growth",
+                "cells": [
+                  {
+                    "metric_id": "MET-009",
+                    "display_transform": "percent",
+                    "decimals": 1
+                  },
+                  {
+                    "metric_id": "MET-030",
+                    "display_transform": "percent",
+                    "decimals": 1
+                  },
+                  {
+                    "metric_id": "MET-031",
+                    "display_transform": "percent",
+                    "decimals": 1
+                  }
+                ]
+              }
+            ],
+            "unit_caption": "Multiples are fictional",
+            "source_ids": [
+              "SRC-005"
+            ]
+          }
+        },
+        {
+          "block_type": "bullets",
+          "priority": 2,
+          "bullets": [
+            {
+              "text": "The company trades below Peer A and above Peer B; the growth premium is not fully priced.",
+              "refs": [
+                {
+                  "claim_id": "CLM-014"
+                }
+              ],
+              "claim_type": "inference"
+            }
+          ]
+        }
+      ],
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-005"
+        ],
+        "show_disclaimer_ref": true
+      }
+    },
+    {
+      "slide_no": 12,
+      "layout": "L09_football_field",
+      "section_id": "valuation",
+      "title": "Valuation range and target price",
+      "blocks": [
+        {
+          "block_type": "football_field",
+          "priority": 1,
+          "football_field": {
+            "bars": [
+              {
+                "label": "Discounted cash flow",
+                "low": {
+                  "metric_id": "MET-016",
+                  "display_transform": "raw",
+                  "decimals": 1
+                },
+                "high": {
+                  "metric_id": "MET-017",
+                  "display_transform": "raw",
+                  "decimals": 1
+                }
+              },
+              {
+                "label": "Peer PE multiples",
+                "low": {
+                  "metric_id": "MET-018",
+                  "display_transform": "raw",
+                  "decimals": 1
+                },
+                "high": {
+                  "metric_id": "MET-019",
+                  "display_transform": "raw",
+                  "decimals": 1
+                }
+              }
+            ],
+            "current_price": {
+              "metric_id": "MET-014",
+              "display_transform": "raw",
+              "decimals": 2
+            },
+            "target_price": {
+              "metric_id": "MET-015",
+              "display_transform": "raw",
+              "decimals": 2
+            },
+            "assumption_lines": [
+              {
+                "text": "9.5% WACC, reflecting sector equity costs and low leverage.",
+                "refs": [
+                  {
+                    "assumption_id": "ASM-001"
+                  },
+                  {
+                    "claim_id": "CLM-010"
+                  }
+                ]
+              },
+              {
+                "text": "Base case: 15% revenue CAGR over 2026-2028.",
+                "refs": [
+                  {
+                    "claim_id": "CLM-009"
+                  },
+                  {
+                    "assumption_id": "ASM-002"
+                  }
+                ]
+              }
+            ],
+            "source_ids": [
+              "SRC-001",
+              "SRC-005"
+            ]
+          }
+        }
+      ],
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-001",
+          "SRC-005"
+        ],
+        "show_disclaimer_ref": true
+      }
+    },
+    {
+      "slide_no": 13,
+      "layout": "L10_catalysts_risks",
+      "section_id": "risks",
+      "title": "Catalysts and risks",
+      "blocks": [
+        {
+          "block_type": "paired_columns",
+          "priority": 1,
+          "paired_columns": {
+            "left_title": "Catalysts",
+            "right_title": "Risks",
+            "left_items": [
+              {
+                "title": "Next-generation control system launch",
+                "description": "Planned for Q4; an on-time launch could drive new orders.",
+                "chip": "3-12m",
+                "refs": [
+                  {
+                    "claim_id": "CLM-011"
+                  }
+                ]
+              }
+            ],
+            "right_items": [
+              {
+                "title": "Slowing downstream capex",
+                "chip": "S:high L:medium",
+                "refs": [
+                  {
+                    "claim_id": "CLM-005"
+                  }
+                ]
+              },
+              {
+                "title": "Price competition compressing margins",
+                "chip": "S:medium L:high",
+                "refs": [
+                  {
+                    "claim_id": "CLM-006"
+                  }
+                ]
+              },
+              {
+                "title": "Industrial policy shifts",
+                "chip": "S:medium L:low",
+                "refs": [
+                  {
+                    "claim_id": "CLM-007"
+                  }
+                ]
+              },
+              {
+                "title": "High customer concentration",
+                "chip": "S:medium L:medium",
+                "refs": [
+                  {
+                    "claim_id": "CLM-008"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-001",
+          "SRC-003",
+          "SRC-004"
+        ],
+        "show_disclaimer_ref": true
+      }
+    },
+    {
+      "slide_no": 14,
+      "layout": "L11_conclusion_sources",
+      "section_id": "conclusion_sources_disclaimer",
+      "title": "Conclusion, sources and disclaimer",
+      "blocks": [
+        {
+          "block_type": "text_panel",
+          "priority": 1,
+          "text_panel": {
+            "text": "We assign an Accumulate rating with a CNY 34.00 target price. Counterevidence: industry capacity is expanding quickly, and growth could fall well short of forecast if downstream capex slows.",
+            "refs": [
+              {
+                "claim_id": "CLM-004"
+              },
+              {
+                "claim_id": "CLM-005"
+              },
+              {
+                "metric_id": "MET-015"
+              }
+            ],
+            "style": "conclusion"
+          }
+        },
+        {
+          "block_type": "source_table",
+          "priority": 1,
+          "source_table": [
+            {
+              "source_id": "SRC-001",
+              "title": "示例智能制造2025年年度报告（虚构测试文件）",
+              "publisher": "示例智能制造股份有限公司",
+              "published_date": "2026-04-20",
+              "retrieved_at": "2026-07-10"
+            },
+            {
+              "source_id": "SRC-002",
+              "title": "Mock market data provider — daily close",
+              "publisher": "MockData",
+              "published_date": "2026-07-10",
+              "retrieved_at": "2026-07-10"
+            },
+            {
+              "source_id": "SRC-003",
+              "title": "《智能制造装备产业发展指导意见》（虚构政策文件）",
+              "publisher": "示例部委",
+              "published_date": "2026-03-01",
+              "retrieved_at": "2026-07-10"
+            },
+            {
+              "source_id": "SRC-004",
+              "title": "Mock industry outlook: factory automation 2026-2030",
+              "publisher": "Example Research Institute",
+              "published_date": "2026-05-15",
+              "retrieved_at": "2026-07-10"
+            },
+            {
+              "source_id": "SRC-005",
+              "title": "Mock comparable-company dataset (fictional peers)",
+              "publisher": "Example Research Institute",
+              "published_date": "2026-06-30",
+              "retrieved_at": "2026-07-10"
+            }
+          ]
+        },
+        {
+          "block_type": "text_panel",
+          "priority": 1,
+          "text_panel": {
+            "text": "Produced by the Jacaranda Stock Market Society using public information and an AI-assisted workflow, for educational and research purposes only; not investment advice. Data as of 10 July 2026. This sample uses fictional company data.",
+            "refs": [
+              {
+                "claim_id": "CLM-004"
+              }
+            ],
+            "style": "disclaimer"
+          }
+        }
+      ],
+      "footer": {
+        "show_page_number": true,
+        "data_as_of": "2026-07-10",
+        "source_ids": [
+          "SRC-001",
+          "SRC-002",
+          "SRC-003",
+          "SRC-004",
+          "SRC-005"
+        ],
+        "show_disclaimer_ref": false
+      }
+    }
+  ]
+}

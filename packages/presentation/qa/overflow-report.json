@@ -1,0 +1,35 @@
+[
+  {
+    "pptx": "jacaranda-template.pptx",
+    "edition": "zh-CN",
+    "slide_count": 16,
+    "page_size_in": [
+      13.333,
+      7.5
+    ],
+    "issues": [],
+    "status": "pass"
+  },
+  {
+    "pptx": "sample-report.zh-CN.pptx",
+    "edition": "zh-CN",
+    "slide_count": 14,
+    "page_size_in": [
+      13.333,
+      7.5
+    ],
+    "issues": [],
+    "status": "pass"
+  },
+  {
+    "pptx": "sample-report.en-AU.pptx",
+    "edition": "en-AU",
+    "slide_count": 14,
+    "page_size_in": [
+      13.333,
+      7.5
+    ],
+    "issues": [],
+    "status": "pass"
+  }
+]
