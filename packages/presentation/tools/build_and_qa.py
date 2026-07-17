@@ -4,7 +4,9 @@
 from __future__ import annotations
 
 import json
+import os
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -20,7 +22,21 @@ from template.deck import build_from_files  # noqa: E402
 
 FIX = PRES / "fixtures"
 OUTD = PRES / "qa"
-SOFFICE = "/Applications/LibreOffice.app/Contents/MacOS/soffice"
+MACOS_SOFFICE = "/Applications/LibreOffice.app/Contents/MacOS/soffice"
+
+
+def find_soffice() -> str | None:
+    """Resolve LibreOffice: SOFFICE_PATH env -> PATH -> macOS default -> None (skip)."""
+    candidates = [
+        os.environ.get("SOFFICE_PATH"),
+        shutil.which("libreoffice"),
+        shutil.which("soffice"),
+        MACOS_SOFFICE,
+    ]
+    for cand in candidates:
+        if cand and Path(cand).is_file():
+            return cand
+    return None
 
 results: list[tuple[str, bool, str]] = []
 
@@ -105,20 +121,27 @@ def main() -> int:
     check("disclaimer-zh", "不构成任何投资建议" in zh_text)
     check("disclaimer-en", "not investment advice" in en_text)
 
-    # 6. render previews for visual inspection
-    render_ok = True
-    for out_name in ["jacaranda-template.pptx", "sample-report.zh-CN.pptx",
-                     "sample-report.en-AU.pptx"]:
-        sub = OUTD / "previews" / out_name.replace(".pptx", "")
-        sub.mkdir(parents=True, exist_ok=True)
-        proc = subprocess.run(
-            [SOFFICE, "--headless", "--convert-to", "png", "--outdir", str(sub),
-             str(OUTD / out_name)], capture_output=True, text=True, timeout=300)
-        pdf = subprocess.run(
-            [SOFFICE, "--headless", "--convert-to", "pdf", "--outdir", str(sub),
-             str(OUTD / out_name)], capture_output=True, text=True, timeout=300)
-        render_ok = render_ok and pdf.returncode == 0
-    check("preview-render", render_ok)
+    # 6. render previews for visual inspection (explicitly skipped when unavailable)
+    soffice = find_soffice()
+    if soffice is None:
+        print("SKIP preview-render: LibreOffice not found "
+              "(set SOFFICE_PATH or install libreoffice/soffice on PATH); "
+              "PPTX artefacts and all other checks are unaffected")
+        check("preview-render", True, "skipped: LibreOffice not found")
+    else:
+        render_ok = True
+        for out_name in ["jacaranda-template.pptx", "sample-report.zh-CN.pptx",
+                         "sample-report.en-AU.pptx"]:
+            sub = OUTD / "previews" / out_name.replace(".pptx", "")
+            sub.mkdir(parents=True, exist_ok=True)
+            subprocess.run(
+                [soffice, "--headless", "--convert-to", "png", "--outdir", str(sub),
+                 str(OUTD / out_name)], capture_output=True, text=True, timeout=300)
+            pdf = subprocess.run(
+                [soffice, "--headless", "--convert-to", "pdf", "--outdir", str(sub),
+                 str(OUTD / out_name)], capture_output=True, text=True, timeout=300)
+            render_ok = render_ok and pdf.returncode == 0
+        check("preview-render", render_ok)
 
     ok = all(r[1] for r in results)
     print(f"\n{'ALL PASS' if ok else 'FAILURES PRESENT'} ({sum(1 for r in results if r[1])}/{len(results)})")

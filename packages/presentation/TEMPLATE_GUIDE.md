@@ -8,7 +8,12 @@ charts, tables and diagrams are native PowerPoint objects.
 python3 -m pip install -r packages/presentation/requirements.txt
 python3 packages/presentation/tools/make_fixtures.py    # regenerate fixtures (deterministic)
 python3 packages/presentation/tools/build_and_qa.py     # build template + zh/en decks + QA battery
+python3 packages/presentation/tests/run_tests.py        # unit tests (overflow/cover/edition/soffice)
 ```
+
+Preview rendering resolves LibreOffice via `SOFFICE_PATH` env var, then `libreoffice`/`soffice`
+on PATH, then the macOS default location; when none is found the visual-preview step is
+**explicitly skipped** (all other checks still run — no crash).
 
 Outputs land in `packages/presentation/qa/`: `jacaranda-template.pptx` (all L01–L11),
 `sample-report.zh-CN.pptx`, `sample-report.en-AU.pptx`, per-slide PNG/PDF previews,
@@ -86,10 +91,18 @@ share identical MET/CLM/SRC/ASM references.
 ## Overflow policy
 
 Three levels, per `layouts.md`: (1) drop lowest-priority blocks, (2) continuation/appendix slide,
-(3) fail with a machine-readable report. The build always emits `qa/overflow-report.json`
-(geometry bounds + unresolved-placeholder checks on the reopened file); text caps are enforced
-upstream by the deck compiler (S7 contract) and estimated again at build time via the
-`theme.est_lines` heuristics. Fonts are never shrunk below token sizes.
+(3) fail with a machine-readable report. The build always emits `qa/overflow-report.json`. Every entry carries the
+PresentationProvider-contract fields: `code`, `slide_no`, `layout`, **`block`** (traceable id,
+e.g. `blocks[2]/chart`), `priority`, **`action_taken`** (`dropped_block` /
+`rendered_with_overflow` / `failed` / `none`), `retryable` and **`reason`** — directly
+consumable by downstream retry/drop logic. Level-1 dropping is applied live during the build;
+geometry bounds and unresolved-placeholder checks run on the reopened file and map shapes back
+to their blocks. Text caps are enforced upstream by the deck compiler (S7 contract) and
+estimated again at build time via `theme.est_lines`. Fonts are never shrunk below token sizes.
+`edition` must be `zh-CN` or `en-AU`; `bilingual-summary` fails fast with
+`unsupported_edition` (out of scope per Issue #24). An L01 cover requires exactly one
+`cover_meta` block, located by type anywhere in `blocks` (`cover_meta_missing` /
+`cover_meta_duplicate` otherwise).
 
 ## QA battery
 

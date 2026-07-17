@@ -117,34 +117,62 @@ BLOCK_BUILDERS = {
 
 
 def build_content_slide(slide, theme: Theme, res: Resolver, lang: str,
-                        deck: dict, slide_spec: dict) -> None:
+                        deck: dict, slide_spec: dict, ctx=None) -> None:
     _header(slide, theme, lang, slide_spec)
     _footer(slide, theme, lang, deck, slide_spec)
     x, y, w, h = _content_geometry(theme)
     cursor = y
+    slide_no = slide_spec["slide_no"]
+    layout = slide_spec["layout"]
+    min_room = Emu(int(0.55 * IN))  # smallest height any block can render into
     n_charts = sum(1 for b in slide_spec["blocks"] if b["block_type"] == "chart")
-    for block in slide_spec["blocks"]:
+    for i, block in enumerate(slide_spec["blocks"]):
         btype = block["block_type"]
+        priority = block.get("priority", 1)
+        block_id = f"blocks[{i}]/{btype}"
+        room = Emu(theme.content_bottom - cursor)
+        if room < min_room:
+            # overflow policy level 1: drop lower-priority blocks; level 3: report failure
+            if ctx is not None:
+                if priority > 1:
+                    ctx.record_event(code="block_overflow", slide_no=slide_no,
+                                     layout=layout, block=block_id, priority=priority,
+                                     action_taken="dropped_block", retryable=True,
+                                     reason="no vertical room left before this block; "
+                                            "dropped per overflow policy level 1")
+                else:
+                    ctx.record_event(code="block_overflow", slide_no=slide_no,
+                                     layout=layout, block=block_id, priority=priority,
+                                     action_taken="failed", retryable=True,
+                                     reason="priority-1 block does not fit; recompress "
+                                            "the slide or move content to a "
+                                            "continuation slide (policy level 2/3)")
+            continue
+        y0 = cursor
         if btype == "chart":
-            remaining = Emu(theme.content_bottom - cursor - Emu(int(0.35 * IN)))
-            chart_h = Emu(int(min(remaining, Emu(int(3.6 * IN))) /
-                              (1 if n_charts == 1 else 1)))
+            chart_h = Emu(int(min(room - Emu(int(0.35 * IN)), Emu(int(3.6 * IN)))))
             if len(slide_spec["blocks"]) > 1:
                 chart_h = Emu(int(min(chart_h, Emu(int(3.0 * IN)))))
             cursor = blocks.build_chart(slide, theme, res, lang, block,
                                         x, cursor, w, chart_h)
         elif btype == "football_field":
-            remaining = Emu(theme.content_bottom - cursor - Emu(int(0.4 * IN)))
-            cursor = blocks.build_football_field(slide, theme, res, lang, block,
-                                                 x, cursor, w,
-                                                 Emu(int(min(remaining,
-                                                             Emu(int(3.4 * IN))))))
+            cursor = blocks.build_football_field(
+                slide, theme, res, lang, block, x, cursor, w,
+                Emu(int(min(room - Emu(int(0.4 * IN)), Emu(int(3.4 * IN))))))
         else:
             cursor = BLOCK_BUILDERS[btype](slide, theme, res, lang, block, x, cursor, w)
+        if ctx is not None:
+            ctx.record_span(slide_no, i, btype, priority, int(y0), int(cursor))
+            if cursor > theme.content_bottom + Emu(int(0.05 * IN)):
+                ctx.record_event(code="block_overflow", slide_no=slide_no, layout=layout,
+                                 block=block_id, priority=priority,
+                                 action_taken="rendered_with_overflow", retryable=True,
+                                 reason="block extends into the footer band; shorten its "
+                                        "content or raise its priority for dropping")
 
 
 def build_cover(slide, theme: Theme, res: Resolver, lang: str, deck: dict,
-                slide_spec: dict) -> None:
+                slide_spec: dict, ctx=None) -> None:
     bg = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, theme.page_w, theme.page_h)
     bg.fill.solid()
     bg.fill.fore_color.rgb = theme.dark
@@ -186,7 +214,18 @@ def build_cover(slide, theme: Theme, res: Resolver, lang: str, deck: dict,
         run2.text = slide_spec["kicker"]
         set_run_font(run2, theme, lang=lang, size=theme.size_pt("cover_subtitle", lang) - 4,
                      color=theme.light)
-    meta = slide_spec["blocks"][0]["cover_meta"]
+    from .deck import TemplateRenderError
+    meta_blocks = [b for b in slide_spec["blocks"] if b["block_type"] == "cover_meta"]
+    if not meta_blocks:
+        raise TemplateRenderError(
+            "cover_meta_missing",
+            f"L01_cover slide {slide_spec['slide_no']} has no cover_meta block")
+    if len(meta_blocks) > 1:
+        raise TemplateRenderError(
+            "cover_meta_duplicate",
+            f"L01_cover slide {slide_spec['slide_no']} has {len(meta_blocks)} "
+            "cover_meta blocks; exactly one is required")
+    meta = meta_blocks[0]["cover_meta"]
     lines = [meta["company_line"]]
     if meta.get("rating_line"):
         lines.append(meta["rating_line"])
@@ -209,7 +248,7 @@ def build_cover(slide, theme: Theme, res: Resolver, lang: str, deck: dict,
 
 
 def build_divider(slide, theme: Theme, res: Resolver, lang: str, deck: dict,
-                  slide_spec: dict) -> None:
+                  slide_spec: dict, ctx=None) -> None:
     bg = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, theme.page_w, theme.page_h)
     bg.fill.solid()
     bg.fill.fore_color.rgb = theme.background
@@ -251,9 +290,9 @@ LAYOUT_BUILDERS = {
 
 
 def build_slide(prs, theme: Theme, res: Resolver, lang: str, deck: dict,
-                slide_spec: dict):
+                slide_spec: dict, ctx=None):
     slide = prs.slides.add_slide(prs.slide_layouts[6])  # blank
     layout = slide_spec["layout"]
     builder = LAYOUT_BUILDERS.get(layout, build_content_slide)
-    builder(slide, theme, res, lang, deck, slide_spec)
+    builder(slide, theme, res, lang, deck, slide_spec, ctx)
     return slide

@@ -35,3 +35,11 @@ Previews: `qa/previews/<deck>/slide-NN.png` (+ PDF).
   acceptable because L02 is a signpost layout.
 - Waterfall/football "hidden base" series are visible in PowerPoint's chart data editor (standard
   technique); they are named `base` and documented in TEMPLATE_GUIDE.md.
+
+## Review-fix round (PR #25 threads)
+
+All four Codex review threads addressed and covered by `tests/run_tests.py` (23 assertions):
+contract-complete overflow report (block id + action_taken + reason, real-overflow test),
+cover_meta located by type with typed errors, bilingual-summary fail-fast
+(`unsupported_edition`), LibreOffice discovery chain (`SOFFICE_PATH` → PATH → macOS fallback →
+explicit skip). Full battery re-run after the fixes: 32/32.
