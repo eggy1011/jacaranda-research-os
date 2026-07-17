@@ -6,7 +6,7 @@
 |---|---|---|---|---|
 | 1 | Codex | Monorepo and security baseline | Done (PR #5) | Bootstrap docs |
 | 2 | Claude | Research and slide schemas | Done (PR #2, #4) | Bootstrap docs |
-| 3 | Codex | Unified market-data provider | Pending | 1 |
+| 3 | Codex | Unified market-data provider | In review (Issue #18) | 1 |
 | 4 | Claude | Research prompts and quality rubric | In review (Issue #13) | 2 |
 | 5 | Codex | OpenRouter free-only provider | Pending | 1, 2 |
 | 6 | Claude | Purple PPT template system | Pending | 2 |
@@ -29,4 +29,3 @@ Every Issue must state:
 - The other AI reviews each PR within its area of expertise.
 - Blocking review comments and CI failures must be resolved.
 - The human project owner approves the final merge.
-

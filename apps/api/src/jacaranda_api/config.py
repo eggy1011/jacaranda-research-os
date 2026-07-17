@@ -1,7 +1,7 @@
 from functools import lru_cache
 from typing import Annotated
 
-from pydantic import Field
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -13,6 +13,9 @@ class Settings(BaseSettings):
     app_env: str = "development"
     database_url: Annotated[str, Field(min_length=1)]
     redis_url: Annotated[str, Field(min_length=1)]
+    fmp_api_key: SecretStr | None = None
+    finnhub_api_key: SecretStr | None = None
+    sec_user_agent: str | None = None
 
 
 @lru_cache
