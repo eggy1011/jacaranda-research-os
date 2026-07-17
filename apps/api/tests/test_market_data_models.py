@@ -10,6 +10,7 @@ from jsonschema import Draft202012Validator
 from pydantic import ValidationError
 from referencing import Registry, Resource
 
+from jacaranda_api.market_data.adapters.base import utc_now
 from jacaranda_api.market_data.contracts import MarketDataResult
 from jacaranda_api.market_data.models import (
     CanonicalMetric,
@@ -75,6 +76,18 @@ def test_source_registry_is_persistent_and_deduplicates() -> None:
     assert second.registry.contains("SRC-999") is False
     with pytest.raises(KeyError):
         second.registry.resolve("SRC-999")
+
+
+def test_source_registry_distinguishes_retrieval_events() -> None:
+    first = SourceRegistry().register(source_draft())
+    later = first.registry.register(
+        source_draft().model_copy(
+            update={"retrieved_at": datetime(2026, 7, 17, 8, 30, tzinfo=UTC)}
+        )
+    )
+
+    assert later.source.source_id == "SRC-002"
+    assert later.registry.sources == (first.source, later.source)
 
 
 def test_source_registry_rejects_duplicate_state_and_exhaustion() -> None:
@@ -149,8 +162,12 @@ def test_provider_request_allocates_metric_ids() -> None:
 
 
 def test_research_fragments_validate_against_claude_schema() -> None:
-    registry_value = SourceRegistry().register(source_draft()).registry
+    retrieval_time = utc_now()
+    registry_value = SourceRegistry().register(
+        source_draft().model_copy(update={"retrieved_at": retrieval_time})
+    ).registry
     source = registry_value.sources[0]
+    metric_value = metric().model_copy(update={"retrieved_at": retrieval_time})
     schema_path = (
         Path(__file__).resolve().parents[3]
         / "packages/research-schema/research-package.schema.json"
@@ -169,7 +186,7 @@ def test_research_fragments_validate_against_claude_schema() -> None:
             source.model_dump(mode="json", by_alias=True, exclude_none=True)
         )
     )
-    assert not list(metric_validator.iter_errors(metric().model_dump(mode="json")))
+    assert not list(metric_validator.iter_errors(metric_value.model_dump(mode="json")))
 
 
 def test_canonical_source_accepts_schema_alias() -> None:

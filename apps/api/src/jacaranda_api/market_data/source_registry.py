@@ -19,7 +19,7 @@ class SourceRegistry:
 
     def __post_init__(self) -> None:
         ids = [source.source_id for source in self.sources]
-        identities = [(source.url_or_document, source.locator) for source in self.sources]
+        identities = [source.identity for source in self.sources]
         if len(ids) != len(set(ids)):
             raise ValueError("source identifiers must be unique")
         if len(identities) != len(set(identities)):
@@ -27,7 +27,7 @@ class SourceRegistry:
 
     def register(self, draft: SourceDraft) -> SourceRegistration:
         for source in self.sources:
-            if (source.url_or_document, source.locator) == draft.identity:
+            if source.identity == draft.identity:
                 return SourceRegistration(registry=self, source=source)
 
         next_index = (

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 import pytest
 from pydantic import SecretStr
@@ -82,6 +82,27 @@ async def test_akshare_quote_preserves_provenance(
     assert result.metrics[0].source_id == "SRC-001"
     assert result.metrics[0].retrieved_at == fixed_now
     assert result.source_registry.resolve("SRC-001").language == "zh"
+
+
+@pytest.mark.anyio
+async def test_refetch_allocates_source_for_new_retrieval(
+    load_market_fixture: Callable[[str], dict[str, object]], fixed_now: datetime
+) -> None:
+    client = QuoteClient(load_market_fixture("akshare_quote.json"))
+    first_provider = AkshareMarketDataProvider(client, clock=lambda: fixed_now)
+    second_now = fixed_now + timedelta(days=1)
+    second_provider = AkshareMarketDataProvider(client, clock=lambda: second_now)
+
+    first = await first_provider.fetch(
+        request("600519.SS", MarketDataCapability.QUOTE), SourceRegistry()
+    )
+    second = await second_provider.fetch(
+        request("600519.SS", MarketDataCapability.QUOTE), first.source_registry
+    )
+
+    assert len(second.source_registry.sources) == 2
+    assert second.metrics[0].source_id == "SRC-002"
+    assert second.source_registry.resolve("SRC-002").retrieved_at == second_now
 
 
 @pytest.mark.anyio
@@ -260,7 +281,20 @@ async def test_direct_adapter_call_rejects_unsupported_capability() -> None:
             request("600519.SS", MarketDataCapability.FINANCIALS), SourceRegistry()
         )
 
+    sec_client = SecClientStub({})
+    sec_provider = SecMarketDataProvider(
+        sec_client,
+        user_agent="Jacaranda Research fixture@example.invalid",
+    )
+    with pytest.raises(ProviderCapabilityError):
+        await sec_provider.fetch(
+            request("AAPL", MarketDataCapability.FILINGS), SourceRegistry()
+        )
+    assert sec_client.calls == []
+
 
 def test_fixture_clock_is_timezone_aware(fixed_now: datetime) -> None:
     assert fixed_now.tzinfo is UTC
-    assert utc_now().tzinfo is UTC
+    current = utc_now()
+    assert current.tzinfo is UTC
+    assert current.microsecond == 0

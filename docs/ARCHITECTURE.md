@@ -42,11 +42,13 @@ registration is persistent/immutable: registering a source returns a new registr
 | AKShare | CN-A | quote | none |
 | FMP | US | quote | `FMP_API_KEY` |
 | Finnhub | US | quote | `FINNHUB_API_KEY` |
-| SEC | US | financials, filings | `SEC_USER_AGENT` (not a secret) |
+| SEC | US | financials | `SEC_USER_AGENT` (not a secret) |
 
 This foundation contains only injected client protocols and strict response normalisation. Wiring
 real SDK/HTTP clients, caching and bounded retry execution belongs to a later integration task;
 tests use synthetic fixtures and block socket access.
+The `filings` capability is reserved until a typed filing-record result is defined; numeric SEC
+company facts are exposed only through `financials`.
 
 US ticker normalisation does not guess an exchange. The selected provider supplies and validates
 NYSE/NASDAQ/AMEX identity data when a later company-profile capability is added. A-share `.SS` /

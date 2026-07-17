@@ -54,7 +54,7 @@ class SecFactPayload(BaseModel):
 class SecMarketDataProvider:
     name = ProviderName.SEC
     markets = frozenset({Market.US})
-    capabilities = frozenset({MarketDataCapability.FINANCIALS, MarketDataCapability.FILINGS})
+    capabilities = frozenset({MarketDataCapability.FINANCIALS})
 
     def __init__(
         self,

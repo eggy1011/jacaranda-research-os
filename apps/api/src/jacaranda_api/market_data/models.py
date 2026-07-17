@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from enum import StrEnum
 from typing import Annotated, Literal
 
@@ -94,6 +94,14 @@ class CanonicalSource(BaseModel):
     reliability_tier: Literal["primary"] = "primary"
     language: Literal["zh", "en", "other"] | None = None
 
+    @property
+    def identity(self) -> tuple[str, str | None, datetime]:
+        return (
+            self.url_or_document,
+            self.locator,
+            self.retrieved_at.astimezone(UTC),
+        )
+
 
 class SourceDraft(BaseModel):
     """Source data before the package-local SRC identifier is allocated."""
@@ -111,8 +119,12 @@ class SourceDraft(BaseModel):
     language: Literal["zh", "en", "other"] | None = None
 
     @property
-    def identity(self) -> tuple[str, str | None]:
-        return self.url_or_document, self.locator
+    def identity(self) -> tuple[str, str | None, datetime]:
+        return (
+            self.url_or_document,
+            self.locator,
+            self.retrieved_at.astimezone(UTC),
+        )
 
     def with_id(self, source_id: str) -> CanonicalSource:
         return CanonicalSource(

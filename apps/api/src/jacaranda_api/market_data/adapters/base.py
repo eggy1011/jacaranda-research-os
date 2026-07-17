@@ -35,7 +35,7 @@ PayloadT = TypeVar("PayloadT", bound=BaseModel)
 
 
 def utc_now() -> datetime:
-    return datetime.now(UTC)
+    return datetime.now(UTC).replace(microsecond=0)
 
 
 def require_credential(provider: ProviderName, credential: SecretStr | None, setting: str) -> None:
