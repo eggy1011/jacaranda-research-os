@@ -60,7 +60,18 @@ Retrieves or parses filings, annual reports, announcements and user uploads into
 
 ### LLMProvider
 
-Accepts a task, structured input and output schema. Returns validated output plus actual model, latency and request metadata. Development configuration must remain free-only.
+The asynchronous provider-neutral contract accepts a registered task name, structured JSON input
+and a Draft 2020-12 output schema. The prompt catalogue is the task authority: the provider loads
+the prompt version and registry-bound schema without modifying Claude-owned files. Cross-file
+schema references are bundled into one self-contained object before a structured-output request,
+and every response is parsed strictly and validated again locally.
+
+The OpenRouter implementation is globally locked to `openrouter/free`, requests strict JSON Schema
+output with `require_parameters: true`, and records the actual returned model verbatim. It never
+uses `openrouter/auto`, a named paid model or a paid fallback. Invalid JSON, schema-invalid output
+and truncated completions receive at most three total attempts with structured validator feedback;
+transport, authentication and rate-limit failures are classified and returned to the future
+scheduler without an internal retry loop. Tests inject an offline HTTP boundary and block sockets.
 
 ### PresentationProvider
 
