@@ -5,7 +5,7 @@ import json
 from collections.abc import Mapping, Sequence
 from datetime import UTC, date, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from jsonschema import Draft202012Validator
 
@@ -80,7 +80,7 @@ class ScriptedMockLLMProvider:
 
     def _load(self, filename: str) -> dict[str, Any]:
         path = self._root / "packages/prompts/examples" / filename
-        return json.loads(path.read_text(encoding="utf-8"))
+        return cast(dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
 
     def _script(self, task_name: str, data: dict[str, Any]) -> dict[str, Any]:
         if task_name == "extraction":
@@ -131,7 +131,7 @@ class ScriptedMockLLMProvider:
         if edition not in {"zh-CN", "en-AU"}:
             raise ValueError("mock presentation supports only full zh-CN and en-AU editions")
         path = self._root / f"packages/presentation/fixtures/deck-sample.{edition}.json"
-        return json.loads(path.read_text(encoding="utf-8"))
+        return cast(dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
 
     @staticmethod
     def _without_annotations(value: dict[str, Any]) -> dict[str, Any]:

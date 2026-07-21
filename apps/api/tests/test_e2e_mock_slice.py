@@ -8,7 +8,7 @@ import socket
 import sys
 from dataclasses import replace
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import pytest
 from jsonschema import ValidationError as JsonSchemaValidationError
@@ -29,13 +29,14 @@ from jacaranda_api.e2e.validation import (
 )
 from jacaranda_api.llm.errors import LLMProviderError, RetryExhaustedError
 from jacaranda_api.llm.models import LLMResult
-from jacaranda_api.market_data.symbols import SymbolNormalizationError, normalize_symbol
+from jacaranda_api.market_data.errors import SymbolNormalizationError
+from jacaranda_api.market_data.symbols import normalize_symbol
 
 ROOT = Path(__file__).resolve().parents[3]
 
 
 def read(path: Path) -> dict[str, Any]:
-    return json.loads(path.read_text(encoding="utf-8"))
+    return cast(dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
 
 
 class SocketInspectingLLM(ScriptedMockLLMProvider):
