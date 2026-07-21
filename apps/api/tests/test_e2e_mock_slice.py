@@ -265,6 +265,13 @@ def test_presentation_failure_and_mock_provider_guards(
     )
     with pytest.raises(PresentationFailure):
         renderer.render(deck, package, tmp_path / "failed.pptx")
+    presentation_path = str(ROOT / "packages/presentation")
+    sys.path.insert(0, presentation_path)
+    try:
+        with pytest.raises(PresentationFailure):
+            renderer.render(deck, package, tmp_path / "failed-existing-path.pptx")
+    finally:
+        sys.path.remove(presentation_path)
     wrong_identity = json.loads(json.dumps(deck))
     wrong_identity["package_id"] = "RPK-WRONG"
     with pytest.raises(PresentationFailure, match="identity"):
