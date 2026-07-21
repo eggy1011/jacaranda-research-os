@@ -1,0 +1,6 @@
+# Template generation (Python 3.11+). LibreOffice is only needed for preview rendering.
+python-pptx>=1.0,<2
+Pillow>=10,<12
+jsonschema>=4.21,<5
+referencing>=0.35
+pypdfium2>=4,<5

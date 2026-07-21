@@ -61,3 +61,11 @@ Each layout definition must specify inputs, title/body limits, overflow behaviou
 
 Full per-layout specifications (L01–L11), the mapping from the 12 report sections to layouts, per-language character/word caps, missing-data rendering and the three-step overflow policy (drop by priority → appendix → fail, never shrink below token sizes) are defined in `packages/presentation/layouts.md`. The renderer consumes decks validating against `packages/research-schema/slide-deck.schema.json`.
 
+## Template system (Issue #24)
+
+`packages/presentation/template/` renders validated slide-deck JSON + research package into
+editable 16:9 PPTX via python-pptx (native charts/tables, no rasterised content). See
+`packages/presentation/TEMPLATE_GUIDE.md` for theme, layout mapping, chart/table/logo rules,
+overflow behaviour and the PresentationProvider entry point (`template.deck.build_deck`).
+Sample zh-CN and en-AU fictional decks, an all-layouts template deck and the visual QA report
+live under `packages/presentation/qa/`. Brand masters: `assets/brand/`.

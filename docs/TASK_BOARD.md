@@ -8,8 +8,8 @@
 | 2 | Claude | Research and slide schemas | Done (PR #2, #4) | Bootstrap docs |
 | 3 | Codex | Unified market-data provider | Done (Issue #18, PR #21) | 1 |
 | 4 | Claude | Research prompts and quality rubric | Done (Issue #13, PR #14) | 2 |
-| 5 | Codex | OpenRouter free-only provider | In progress (Issue #22) | 1, 2 |
-| 6 | Claude | Purple PPT template system | Pending | 2 |
+| 5 | Codex | OpenRouter free-only provider | Done (Issue #22, PR #23) | 1, 2 |
+| 6 | Claude | Purple PPT template system | In review (PR for Issue #24) | 2 |
 | 7 | Codex | End-to-end mock vertical slice | Pending | 3–6 |
 
 ## Issue requirements

@@ -1,0 +1,1311 @@
+{
+  "schema_version": "0.1.0",
+  "package_id": "RPK-600XXX-2026-002",
+  "status": "verified",
+  "as_of_date": "2026-07-10",
+  "created_at": "2026-07-17T10:00:00+10:00",
+  "company": {
+    "name": {
+      "zh_CN": "示例智能制造股份有限公司",
+      "en_AU": "Example Intelligent Manufacturing Co., Ltd."
+    },
+    "ticker": "600XXX",
+    "exchange": "MOCK",
+    "market": "CN-A",
+    "reporting_currency": "CNY",
+    "sector": {
+      "zh_CN": "工业自动化设备",
+      "en_AU": "Industrial automation equipment"
+    },
+    "is_mock": true,
+    "market_specific": {
+      "cn": {
+        "industry_classification_sw": "机械设备-自动化设备",
+        "share_classes": [
+          "A"
+        ],
+        "state_owned": false,
+        "display_unit_convention": "亿元",
+        "policy_context_claim_ids": [
+          "CLM-002"
+        ]
+      }
+    }
+  },
+  "sources": [
+    {
+      "source_id": "SRC-001",
+      "type": "annual_report",
+      "title": "示例智能制造2025年年度报告（虚构测试文件）",
+      "publisher": "示例智能制造股份有限公司",
+      "url_or_document": "upload://mock-annual-report-2025.pdf",
+      "locator": "合并报表及经营讨论",
+      "published_date": "2026-04-20",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "reliability_tier": "primary",
+      "language": "zh"
+    },
+    {
+      "source_id": "SRC-002",
+      "type": "market_data_api",
+      "title": "Mock market data provider — daily close",
+      "publisher": "MockData",
+      "url_or_document": "provider://mockdata/quote/600XXX?as_of=2026-07-10",
+      "locator": "close 2026-07-10",
+      "published_date": "2026-07-10",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "reliability_tier": "primary",
+      "language": "en"
+    },
+    {
+      "source_id": "SRC-003",
+      "type": "regulator",
+      "title": "《智能制造装备产业发展指导意见》（虚构政策文件）",
+      "publisher": "示例部委",
+      "url_or_document": "https://example.gov.mock/policy/2026-guidance",
+      "locator": "第三节",
+      "published_date": "2026-03-01",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "reliability_tier": "primary",
+      "language": "zh"
+    },
+    {
+      "source_id": "SRC-004",
+      "type": "third_party_research",
+      "title": "Mock industry outlook: factory automation 2026-2030",
+      "publisher": "Example Research Institute",
+      "url_or_document": "https://example-research.mock/fa-2026",
+      "locator": "Exhibit 4",
+      "published_date": "2026-05-15",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "reliability_tier": "secondary",
+      "language": "en"
+    },
+    {
+      "source_id": "SRC-005",
+      "type": "third_party_research",
+      "title": "Mock comparable-company dataset (fictional peers)",
+      "publisher": "Example Research Institute",
+      "url_or_document": "https://example-research.mock/comps-2026",
+      "locator": "Table 2",
+      "published_date": "2026-06-30",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "reliability_tier": "secondary",
+      "language": "en"
+    }
+  ],
+  "metrics": [
+    {
+      "metric_id": "MET-001",
+      "name": {
+        "zh_CN": "营业收入（2022财年）",
+        "en_AU": "Revenue (FY2022)"
+      },
+      "value": 2890000000.0,
+      "unit": "CNY",
+      "currency": "CNY",
+      "period": "FY2022",
+      "as_of_date": "2022-12-31",
+      "source_id": "SRC-001",
+      "source_url_or_document": "upload://mock-annual-report-2025.pdf#p102",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "provider"
+    },
+    {
+      "metric_id": "MET-002",
+      "name": {
+        "zh_CN": "营业收入（2023财年）",
+        "en_AU": "Revenue (FY2023)"
+      },
+      "value": 3260000000.0,
+      "unit": "CNY",
+      "currency": "CNY",
+      "period": "FY2023",
+      "as_of_date": "2023-12-31",
+      "source_id": "SRC-001",
+      "source_url_or_document": "upload://mock-annual-report-2025.pdf#p102",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "provider"
+    },
+    {
+      "metric_id": "MET-003",
+      "name": {
+        "zh_CN": "营业收入（2024财年）",
+        "en_AU": "Revenue (FY2024)"
+      },
+      "value": 3760000000.0,
+      "unit": "CNY",
+      "currency": "CNY",
+      "period": "FY2024",
+      "as_of_date": "2024-12-31",
+      "source_id": "SRC-001",
+      "source_url_or_document": "upload://mock-annual-report-2025.pdf#p102",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "provider"
+    },
+    {
+      "metric_id": "MET-004",
+      "name": {
+        "zh_CN": "营业收入（2025财年）",
+        "en_AU": "Revenue (FY2025)"
+      },
+      "value": 4520000000.0,
+      "unit": "CNY",
+      "currency": "CNY",
+      "period": "FY2025",
+      "as_of_date": "2025-12-31",
+      "source_id": "SRC-001",
+      "source_url_or_document": "upload://mock-annual-report-2025.pdf#p102",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "provider"
+    },
+    {
+      "metric_id": "MET-005",
+      "name": {
+        "zh_CN": "归母净利润（2022财年）",
+        "en_AU": "Net profit (FY2022)"
+      },
+      "value": 280000000.0,
+      "unit": "CNY",
+      "currency": "CNY",
+      "period": "FY2022",
+      "as_of_date": "2022-12-31",
+      "source_id": "SRC-001",
+      "source_url_or_document": "upload://mock-annual-report-2025.pdf#p102",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "provider"
+    },
+    {
+      "metric_id": "MET-006",
+      "name": {
+        "zh_CN": "归母净利润（2023财年）",
+        "en_AU": "Net profit (FY2023)"
+      },
+      "value": 340000000.0,
+      "unit": "CNY",
+      "currency": "CNY",
+      "period": "FY2023",
+      "as_of_date": "2023-12-31",
+      "source_id": "SRC-001",
+      "source_url_or_document": "upload://mock-annual-report-2025.pdf#p102",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "provider"
+    },
+    {
+      "metric_id": "MET-007",
+      "name": {
+        "zh_CN": "归母净利润（2024财年）",
+        "en_AU": "Net profit (FY2024)"
+      },
+      "value": 410000000.0,
+      "unit": "CNY",
+      "currency": "CNY",
+      "period": "FY2024",
+      "as_of_date": "2024-12-31",
+      "source_id": "SRC-001",
+      "source_url_or_document": "upload://mock-annual-report-2025.pdf#p102",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "provider"
+    },
+    {
+      "metric_id": "MET-008",
+      "name": {
+        "zh_CN": "归母净利润（2025财年）",
+        "en_AU": "Net profit (FY2025)"
+      },
+      "value": 512000000.0,
+      "unit": "CNY",
+      "currency": "CNY",
+      "period": "FY2025",
+      "as_of_date": "2025-12-31",
+      "source_id": "SRC-001",
+      "source_url_or_document": "upload://mock-annual-report-2025.pdf#p102",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "provider"
+    },
+    {
+      "metric_id": "MET-009",
+      "name": {
+        "zh_CN": "营业收入同比增速（2025财年）",
+        "en_AU": "Revenue growth YoY (FY2025)"
+      },
+      "value": 20.2,
+      "unit": "%",
+      "currency": null,
+      "period": "FY2025",
+      "as_of_date": "2025-12-31",
+      "source_id": "SRC-001",
+      "source_url_or_document": "upload://mock-annual-report-2025.pdf#p102",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "deterministic_calc",
+      "calculation": {
+        "formula": "(MET-004 / MET-003 - 1) * 100",
+        "input_metric_ids": [
+          "MET-004",
+          "MET-003"
+        ]
+      }
+    },
+    {
+      "metric_id": "MET-010",
+      "name": {
+        "zh_CN": "净利率（2025财年）",
+        "en_AU": "Net margin (FY2025)"
+      },
+      "value": 11.3,
+      "unit": "%",
+      "currency": null,
+      "period": "FY2025",
+      "as_of_date": "2025-12-31",
+      "source_id": "SRC-001",
+      "source_url_or_document": "upload://mock-annual-report-2025.pdf#p102",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "deterministic_calc",
+      "calculation": {
+        "formula": "MET-008 / MET-004 * 100",
+        "input_metric_ids": [
+          "MET-008",
+          "MET-004"
+        ]
+      }
+    },
+    {
+      "metric_id": "MET-011",
+      "name": {
+        "zh_CN": "智能装备收入（2025财年）",
+        "en_AU": "Intelligent equipment revenue (FY2025)"
+      },
+      "value": 2710000000.0,
+      "unit": "CNY",
+      "currency": "CNY",
+      "period": "FY2025",
+      "as_of_date": "2025-12-31",
+      "source_id": "SRC-001",
+      "source_url_or_document": "upload://mock-annual-report-2025.pdf#p102",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "provider"
+    },
+    {
+      "metric_id": "MET-012",
+      "name": {
+        "zh_CN": "自动化部件收入（2025财年）",
+        "en_AU": "Automation components revenue (FY2025)"
+      },
+      "value": 1360000000.0,
+      "unit": "CNY",
+      "currency": "CNY",
+      "period": "FY2025",
+      "as_of_date": "2025-12-31",
+      "source_id": "SRC-001",
+      "source_url_or_document": "upload://mock-annual-report-2025.pdf#p102",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "provider"
+    },
+    {
+      "metric_id": "MET-013",
+      "name": {
+        "zh_CN": "服务收入（2025财年）",
+        "en_AU": "Services revenue (FY2025)"
+      },
+      "value": 450000000.0,
+      "unit": "CNY",
+      "currency": "CNY",
+      "period": "FY2025",
+      "as_of_date": "2025-12-31",
+      "source_id": "SRC-001",
+      "source_url_or_document": "upload://mock-annual-report-2025.pdf#p102",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "provider"
+    },
+    {
+      "metric_id": "MET-032",
+      "name": {
+        "zh_CN": "智能装备收入（2024财年）",
+        "en_AU": "Intelligent equipment revenue (FY2024)"
+      },
+      "value": 2330000000.0,
+      "unit": "CNY",
+      "currency": "CNY",
+      "period": "FY2024",
+      "as_of_date": "2024-12-31",
+      "source_id": "SRC-001",
+      "source_url_or_document": "upload://mock-annual-report-2025.pdf#p102",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "provider"
+    },
+    {
+      "metric_id": "MET-033",
+      "name": {
+        "zh_CN": "自动化部件收入（2024财年）",
+        "en_AU": "Automation components revenue (FY2024)"
+      },
+      "value": 1050000000.0,
+      "unit": "CNY",
+      "currency": "CNY",
+      "period": "FY2024",
+      "as_of_date": "2024-12-31",
+      "source_id": "SRC-001",
+      "source_url_or_document": "upload://mock-annual-report-2025.pdf#p102",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "provider"
+    },
+    {
+      "metric_id": "MET-034",
+      "name": {
+        "zh_CN": "服务收入（2024财年）",
+        "en_AU": "Services revenue (FY2024)"
+      },
+      "value": 380000000.0,
+      "unit": "CNY",
+      "currency": "CNY",
+      "period": "FY2024",
+      "as_of_date": "2024-12-31",
+      "source_id": "SRC-001",
+      "source_url_or_document": "upload://mock-annual-report-2025.pdf#p102",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "provider"
+    },
+    {
+      "metric_id": "MET-014",
+      "name": {
+        "zh_CN": "收盘价",
+        "en_AU": "Closing price"
+      },
+      "value": 28.4,
+      "unit": "CNY/share",
+      "currency": "CNY",
+      "period": "PIT",
+      "as_of_date": "2026-07-10",
+      "source_id": "SRC-002",
+      "source_url_or_document": "provider://mockdata/quote/600XXX?as_of=2026-07-10",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "provider"
+    },
+    {
+      "metric_id": "MET-015",
+      "name": {
+        "zh_CN": "目标价（基准情景）",
+        "en_AU": "Target price (base case)"
+      },
+      "value": 34.0,
+      "unit": "CNY/share",
+      "currency": "CNY",
+      "period": "PIT",
+      "as_of_date": "2026-07-10",
+      "source_id": "SRC-001",
+      "source_url_or_document": "internal://valuation-model/dcf-base",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "deterministic_calc",
+      "calculation": {
+        "formula": "DCF base case per-share value (WACC per ASM-001)",
+        "input_metric_ids": [
+          "MET-004",
+          "MET-008"
+        ]
+      }
+    },
+    {
+      "metric_id": "MET-016",
+      "name": {
+        "zh_CN": "DCF估值下限",
+        "en_AU": "DCF valuation low"
+      },
+      "value": 29.5,
+      "unit": "CNY/share",
+      "currency": "CNY",
+      "period": "PIT",
+      "as_of_date": "2026-07-10",
+      "source_id": "SRC-001",
+      "source_url_or_document": "internal://valuation-model/dcf-range",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "deterministic_calc",
+      "calculation": {
+        "formula": "DCF sensitivity lower bound",
+        "input_metric_ids": [
+          "MET-004",
+          "MET-008"
+        ]
+      }
+    },
+    {
+      "metric_id": "MET-017",
+      "name": {
+        "zh_CN": "DCF估值上限",
+        "en_AU": "DCF valuation high"
+      },
+      "value": 38.0,
+      "unit": "CNY/share",
+      "currency": "CNY",
+      "period": "PIT",
+      "as_of_date": "2026-07-10",
+      "source_id": "SRC-001",
+      "source_url_or_document": "internal://valuation-model/dcf-range",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "deterministic_calc",
+      "calculation": {
+        "formula": "DCF sensitivity upper bound",
+        "input_metric_ids": [
+          "MET-004",
+          "MET-008"
+        ]
+      }
+    },
+    {
+      "metric_id": "MET-018",
+      "name": {
+        "zh_CN": "可比公司PE估值下限",
+        "en_AU": "Peer PE valuation low"
+      },
+      "value": 27.0,
+      "unit": "CNY/share",
+      "currency": "CNY",
+      "period": "PIT",
+      "as_of_date": "2026-07-10",
+      "source_id": "SRC-005",
+      "source_url_or_document": "internal://valuation-model/pe-comps",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "deterministic_calc",
+      "calculation": {
+        "formula": "peer PE 25th percentile x FY2025 EPS",
+        "input_metric_ids": [
+          "MET-008"
+        ]
+      }
+    },
+    {
+      "metric_id": "MET-019",
+      "name": {
+        "zh_CN": "可比公司PE估值上限",
+        "en_AU": "Peer PE valuation high"
+      },
+      "value": 35.5,
+      "unit": "CNY/share",
+      "currency": "CNY",
+      "period": "PIT",
+      "as_of_date": "2026-07-10",
+      "source_id": "SRC-005",
+      "source_url_or_document": "internal://valuation-model/pe-comps",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "deterministic_calc",
+      "calculation": {
+        "formula": "peer PE 75th percentile x FY2025 EPS",
+        "input_metric_ids": [
+          "MET-008"
+        ]
+      }
+    },
+    {
+      "metric_id": "MET-020",
+      "name": {
+        "zh_CN": "销量贡献（2026财年预测）",
+        "en_AU": "Volume contribution (FY2026E)"
+      },
+      "value": 450000000.0,
+      "unit": "CNY",
+      "currency": "CNY",
+      "period": "2026H1",
+      "as_of_date": "2026-07-10",
+      "source_id": "SRC-001",
+      "source_url_or_document": "internal://valuation-model/bridge",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "deterministic_calc",
+      "calculation": {
+        "formula": "volume-driven revenue delta",
+        "input_metric_ids": [
+          "MET-004"
+        ]
+      }
+    },
+    {
+      "metric_id": "MET-021",
+      "name": {
+        "zh_CN": "价格贡献（2026财年预测）",
+        "en_AU": "Price contribution (FY2026E)"
+      },
+      "value": 180000000.0,
+      "unit": "CNY",
+      "currency": "CNY",
+      "period": "2026H1",
+      "as_of_date": "2026-07-10",
+      "source_id": "SRC-001",
+      "source_url_or_document": "internal://valuation-model/bridge",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "deterministic_calc",
+      "calculation": {
+        "formula": "price/mix revenue delta",
+        "input_metric_ids": [
+          "MET-004"
+        ]
+      }
+    },
+    {
+      "metric_id": "MET-022",
+      "name": {
+        "zh_CN": "客户流失影响（2026财年预测）",
+        "en_AU": "Churn impact (FY2026E)"
+      },
+      "value": -120000000.0,
+      "unit": "CNY",
+      "currency": "CNY",
+      "period": "2026H1",
+      "as_of_date": "2026-07-10",
+      "source_id": "SRC-001",
+      "source_url_or_document": "internal://valuation-model/bridge",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "deterministic_calc",
+      "calculation": {
+        "formula": "churn revenue delta",
+        "input_metric_ids": [
+          "MET-004"
+        ]
+      }
+    },
+    {
+      "metric_id": "MET-023",
+      "name": {
+        "zh_CN": "营业收入（2026财年预测）",
+        "en_AU": "Revenue (FY2026E)"
+      },
+      "value": 5030000000.0,
+      "unit": "CNY",
+      "currency": "CNY",
+      "period": "2026H1",
+      "as_of_date": "2026-07-10",
+      "source_id": "SRC-001",
+      "source_url_or_document": "internal://valuation-model/bridge",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "deterministic_calc",
+      "calculation": {
+        "formula": "MET-004 + MET-020 + MET-021 + MET-022",
+        "input_metric_ids": [
+          "MET-004",
+          "MET-020",
+          "MET-021",
+          "MET-022"
+        ]
+      }
+    },
+    {
+      "metric_id": "MET-024",
+      "name": {
+        "zh_CN": "市盈率（公司）",
+        "en_AU": "PE (company)"
+      },
+      "value": 18.2,
+      "unit": "x",
+      "currency": null,
+      "period": "PIT",
+      "as_of_date": "2026-07-10",
+      "source_id": "SRC-005",
+      "source_url_or_document": "https://example-research.mock/comps-2026#t2",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "provider"
+    },
+    {
+      "metric_id": "MET-025",
+      "name": {
+        "zh_CN": "市盈率（同业A）",
+        "en_AU": "PE (Peer A)"
+      },
+      "value": 22.5,
+      "unit": "x",
+      "currency": null,
+      "period": "PIT",
+      "as_of_date": "2026-07-10",
+      "source_id": "SRC-005",
+      "source_url_or_document": "https://example-research.mock/comps-2026#t2",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "provider"
+    },
+    {
+      "metric_id": "MET-026",
+      "name": {
+        "zh_CN": "市盈率（同业B）",
+        "en_AU": "PE (Peer B)"
+      },
+      "value": 15.8,
+      "unit": "x",
+      "currency": null,
+      "period": "PIT",
+      "as_of_date": "2026-07-10",
+      "source_id": "SRC-005",
+      "source_url_or_document": "https://example-research.mock/comps-2026#t2",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "provider"
+    },
+    {
+      "metric_id": "MET-027",
+      "name": {
+        "zh_CN": "市销率（公司）",
+        "en_AU": "PS (company)"
+      },
+      "value": 2.1,
+      "unit": "x",
+      "currency": null,
+      "period": "PIT",
+      "as_of_date": "2026-07-10",
+      "source_id": "SRC-005",
+      "source_url_or_document": "https://example-research.mock/comps-2026#t2",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "provider"
+    },
+    {
+      "metric_id": "MET-028",
+      "name": {
+        "zh_CN": "市销率（同业A）",
+        "en_AU": "PS (Peer A)"
+      },
+      "value": 2.8,
+      "unit": "x",
+      "currency": null,
+      "period": "PIT",
+      "as_of_date": "2026-07-10",
+      "source_id": "SRC-005",
+      "source_url_or_document": "https://example-research.mock/comps-2026#t2",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "provider"
+    },
+    {
+      "metric_id": "MET-029",
+      "name": {
+        "zh_CN": "市销率（同业B）",
+        "en_AU": "PS (Peer B)"
+      },
+      "value": 1.6,
+      "unit": "x",
+      "currency": null,
+      "period": "PIT",
+      "as_of_date": "2026-07-10",
+      "source_id": "SRC-005",
+      "source_url_or_document": "https://example-research.mock/comps-2026#t2",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "provider"
+    },
+    {
+      "metric_id": "MET-030",
+      "name": {
+        "zh_CN": "收入增速（同业A）",
+        "en_AU": "Revenue growth (Peer A)"
+      },
+      "value": 12.5,
+      "unit": "%",
+      "currency": null,
+      "period": "FY2025",
+      "as_of_date": "2025-12-31",
+      "source_id": "SRC-005",
+      "source_url_or_document": "https://example-research.mock/comps-2026#t2",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "provider"
+    },
+    {
+      "metric_id": "MET-031",
+      "name": {
+        "zh_CN": "收入增速（同业B）",
+        "en_AU": "Revenue growth (Peer B)"
+      },
+      "value": 8.9,
+      "unit": "%",
+      "currency": null,
+      "period": "FY2025",
+      "as_of_date": "2025-12-31",
+      "source_id": "SRC-005",
+      "source_url_or_document": "https://example-research.mock/comps-2026#t2",
+      "retrieved_at": "2026-07-10T09:00:00+08:00",
+      "computed_by": "provider"
+    }
+  ],
+  "claims": [
+    {
+      "claim_id": "CLM-001",
+      "type": "fact",
+      "text": {
+        "zh_CN": "公司2025财年营业收入与归母净利润均实现两位数增长，收入创历史新高。",
+        "en_AU": "FY2025 revenue and net profit both grew at double-digit rates, with revenue at a record high."
+      },
+      "review_status": "verified",
+      "source_ids": [
+        "SRC-001"
+      ],
+      "metric_ids": [
+        "MET-004",
+        "MET-008",
+        "MET-009"
+      ],
+      "confidence": 0.98
+    },
+    {
+      "claim_id": "CLM-002",
+      "type": "fact",
+      "text": {
+        "zh_CN": "产业指导意见（虚构）提出支持智能制造装备国产替代。",
+        "en_AU": "The (fictional) industry guidance supports domestic substitution in intelligent manufacturing equipment."
+      },
+      "review_status": "verified",
+      "source_ids": [
+        "SRC-003"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "claim_id": "CLM-003",
+      "type": "inference",
+      "text": {
+        "zh_CN": "在政策支持和收入高增长背景下，公司有望继续扩大国内市场份额。",
+        "en_AU": "With policy support and strong revenue growth, the company is likely to keep gaining domestic share."
+      },
+      "review_status": "verified",
+      "based_on_claim_ids": [
+        "CLM-001",
+        "CLM-002"
+      ],
+      "confidence": 0.7
+    },
+    {
+      "claim_id": "CLM-004",
+      "type": "opinion",
+      "text": {
+        "zh_CN": "我们认为公司是国产替代的主要受益者之一，给予“增持”评级。",
+        "en_AU": "We view the company as a key beneficiary of domestic substitution and assign an Accumulate rating."
+      },
+      "review_status": "verified",
+      "based_on_claim_ids": [
+        "CLM-003"
+      ],
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "CLM-005",
+      "type": "inference",
+      "text": {
+        "zh_CN": "行业产能扩张较快，若下游资本开支放缓，公司增速可能明显低于我们的预测。",
+        "en_AU": "Industry capacity is expanding quickly; if downstream capex slows, growth could fall well short of our forecast."
+      },
+      "review_status": "verified",
+      "source_ids": [
+        "SRC-004"
+      ],
+      "confidence": 0.6,
+      "is_counterevidence": true
+    },
+    {
+      "claim_id": "CLM-006",
+      "type": "inference",
+      "text": {
+        "zh_CN": "同业价格竞争加剧可能压缩毛利率。",
+        "en_AU": "Intensifying price competition among peers may compress gross margin."
+      },
+      "review_status": "verified",
+      "source_ids": [
+        "SRC-004"
+      ],
+      "confidence": 0.65
+    },
+    {
+      "claim_id": "CLM-007",
+      "type": "inference",
+      "text": {
+        "zh_CN": "产业政策方向若调整，相关补贴和订单支持可能减弱。",
+        "en_AU": "A shift in industrial policy direction could weaken subsidy and order support."
+      },
+      "review_status": "verified",
+      "based_on_claim_ids": [
+        "CLM-002"
+      ],
+      "confidence": 0.5
+    },
+    {
+      "claim_id": "CLM-008",
+      "type": "fact",
+      "text": {
+        "zh_CN": "公司前五大客户收入占比较高（2025年年报，虚构数据）。",
+        "en_AU": "Revenue concentration among the top five customers is high (FY2025 annual report, fictional data)."
+      },
+      "review_status": "verified",
+      "source_ids": [
+        "SRC-001"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "claim_id": "CLM-009",
+      "type": "inference",
+      "text": {
+        "zh_CN": "基准情景假设2026-2028年收入复合增速15%，对应DCF每股价值34.0元。",
+        "en_AU": "Our base case assumes a 15% revenue CAGR over 2026-2028, implying a DCF value of CNY 34.0 per share."
+      },
+      "review_status": "verified",
+      "metric_ids": [
+        "MET-015"
+      ],
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "CLM-010",
+      "type": "inference",
+      "text": {
+        "zh_CN": "WACC取9.5%，反映A股工业自动化板块的股权成本与公司较低的杠杆水平。",
+        "en_AU": "We apply a 9.5% WACC, reflecting A-share industrial-automation equity costs and the company's low leverage."
+      },
+      "review_status": "verified",
+      "source_ids": [
+        "SRC-004"
+      ],
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "CLM-011",
+      "type": "inference",
+      "text": {
+        "zh_CN": "公司计划于2026年四季度发布新一代控制系统，如期落地有望带来新订单。",
+        "en_AU": "The company plans to launch its next-generation control system in Q4 2026; an on-time launch could drive new orders."
+      },
+      "review_status": "verified",
+      "source_ids": [
+        "SRC-001"
+      ],
+      "confidence": 0.55
+    },
+    {
+      "claim_id": "CLM-012",
+      "type": "fact",
+      "text": {
+        "zh_CN": "智能装备是最大收入分部，服务收入占比仍然较低（虚构数据）。",
+        "en_AU": "Intelligent equipment is the largest segment while services remain a small share of revenue (fictional data)."
+      },
+      "review_status": "verified",
+      "source_ids": [
+        "SRC-001"
+      ],
+      "metric_ids": [
+        "MET-011",
+        "MET-012",
+        "MET-013"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "claim_id": "CLM-013",
+      "type": "inference",
+      "text": {
+        "zh_CN": "销量扩张是2026财年预测收入增长的主要驱动，价格贡献为正但幅度有限。",
+        "en_AU": "Volume expansion drives the FY2026E revenue bridge, with a positive but modest price contribution."
+      },
+      "review_status": "verified",
+      "metric_ids": [
+        "MET-020",
+        "MET-021",
+        "MET-022",
+        "MET-023"
+      ],
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "CLM-014",
+      "type": "inference",
+      "text": {
+        "zh_CN": "公司估值低于同业A、高于同业B，增速溢价尚未完全反映在市盈率中。",
+        "en_AU": "The company trades below Peer A and above Peer B; its growth premium is not fully reflected in the PE multiple."
+      },
+      "review_status": "verified",
+      "metric_ids": [
+        "MET-024",
+        "MET-025",
+        "MET-026"
+      ],
+      "source_ids": [
+        "SRC-005"
+      ],
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "CLM-015",
+      "type": "fact",
+      "text": {
+        "zh_CN": "公司于2016年成立，2021年上市，2024年设立海外制造基地（虚构沿革）。",
+        "en_AU": "The company was founded in 2016, listed in 2021 and opened an overseas manufacturing base in 2024 (fictional history)."
+      },
+      "review_status": "verified",
+      "source_ids": [
+        "SRC-001"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "claim_id": "CLM-016",
+      "type": "fact",
+      "text": {
+        "zh_CN": "公司位于产业链中游的自动化设备制造环节，上游为核心零部件，下游为制造业客户。",
+        "en_AU": "The company operates midstream in automation-equipment manufacturing, with core components upstream and manufacturing customers downstream."
+      },
+      "review_status": "verified",
+      "source_ids": [
+        "SRC-001"
+      ],
+      "confidence": 0.9
+    }
+  ],
+  "sections": [
+    {
+      "section_id": "cover",
+      "title": {
+        "zh_CN": "封面",
+        "en_AU": "Cover"
+      },
+      "claim_ids": []
+    },
+    {
+      "section_id": "investment_thesis",
+      "title": {
+        "zh_CN": "投资摘要",
+        "en_AU": "Investment thesis"
+      },
+      "claim_ids": [
+        "CLM-004",
+        "CLM-003",
+        "CLM-005"
+      ],
+      "key_metric_ids": [
+        "MET-004",
+        "MET-009",
+        "MET-014",
+        "MET-015"
+      ]
+    },
+    {
+      "section_id": "company_snapshot",
+      "title": {
+        "zh_CN": "公司概览",
+        "en_AU": "Company snapshot"
+      },
+      "claim_ids": [
+        "CLM-001",
+        "CLM-015"
+      ],
+      "key_metric_ids": [
+        "MET-004",
+        "MET-008",
+        "MET-010"
+      ]
+    },
+    {
+      "section_id": "industry_value_chain",
+      "title": {
+        "zh_CN": "行业与产业链",
+        "en_AU": "Industry and value chain"
+      },
+      "claim_ids": [
+        "CLM-002",
+        "CLM-016"
+      ]
+    },
+    {
+      "section_id": "business_model_segments",
+      "title": {
+        "zh_CN": "商业模式与业务分部",
+        "en_AU": "Business model and segments"
+      },
+      "claim_ids": [
+        "CLM-012",
+        "CLM-008"
+      ],
+      "key_metric_ids": [
+        "MET-011",
+        "MET-012",
+        "MET-013"
+      ]
+    },
+    {
+      "section_id": "competition_moat",
+      "title": {
+        "zh_CN": "竞争格局与护城河",
+        "en_AU": "Competition and moat"
+      },
+      "claim_ids": [
+        "CLM-006",
+        "CLM-014"
+      ]
+    },
+    {
+      "section_id": "historical_financials",
+      "title": {
+        "zh_CN": "历史财务",
+        "en_AU": "Historical financials"
+      },
+      "claim_ids": [
+        "CLM-001"
+      ],
+      "key_metric_ids": [
+        "MET-001",
+        "MET-002",
+        "MET-003",
+        "MET-004"
+      ]
+    },
+    {
+      "section_id": "forecast_drivers",
+      "title": {
+        "zh_CN": "预测驱动",
+        "en_AU": "Forecast drivers"
+      },
+      "claim_ids": [
+        "CLM-013"
+      ],
+      "key_metric_ids": [
+        "MET-020",
+        "MET-021",
+        "MET-022",
+        "MET-023"
+      ]
+    },
+    {
+      "section_id": "valuation",
+      "title": {
+        "zh_CN": "估值",
+        "en_AU": "Valuation"
+      },
+      "claim_ids": [
+        "CLM-009",
+        "CLM-010",
+        "CLM-014"
+      ],
+      "key_metric_ids": [
+        "MET-015",
+        "MET-016",
+        "MET-017",
+        "MET-018",
+        "MET-019"
+      ]
+    },
+    {
+      "section_id": "catalysts",
+      "title": {
+        "zh_CN": "催化剂",
+        "en_AU": "Catalysts"
+      },
+      "claim_ids": [
+        "CLM-011"
+      ]
+    },
+    {
+      "section_id": "risks",
+      "title": {
+        "zh_CN": "风险",
+        "en_AU": "Risks"
+      },
+      "claim_ids": [
+        "CLM-005",
+        "CLM-006",
+        "CLM-007",
+        "CLM-008"
+      ]
+    },
+    {
+      "section_id": "conclusion_sources_disclaimer",
+      "title": {
+        "zh_CN": "结论、来源与免责声明",
+        "en_AU": "Conclusion, sources and disclaimer"
+      },
+      "claim_ids": [
+        "CLM-004",
+        "CLM-005"
+      ]
+    }
+  ],
+  "valuation": {
+    "methods": [
+      {
+        "method": "dcf",
+        "label": {
+          "zh_CN": "现金流折现",
+          "en_AU": "Discounted cash flow"
+        },
+        "low": "MET-016",
+        "high": "MET-017",
+        "assumption_ids": [
+          "ASM-001",
+          "ASM-002"
+        ]
+      },
+      {
+        "method": "pe_comps",
+        "label": {
+          "zh_CN": "可比公司PE",
+          "en_AU": "Peer PE multiples"
+        },
+        "low": "MET-018",
+        "high": "MET-019"
+      }
+    ],
+    "assumptions": [
+      {
+        "assumption_id": "ASM-001",
+        "name": {
+          "zh_CN": "加权平均资本成本",
+          "en_AU": "Weighted average cost of capital"
+        },
+        "value_text": "WACC 9.5%",
+        "rationale_claim_id": "CLM-010"
+      },
+      {
+        "assumption_id": "ASM-002",
+        "name": {
+          "zh_CN": "收入复合增速（2026-2028）",
+          "en_AU": "Revenue CAGR (2026-2028)"
+        },
+        "value_text": "revenue CAGR 15% (2026-2028)",
+        "rationale_claim_id": "CLM-009"
+      }
+    ],
+    "scenarios": {
+      "base": {
+        "narrative_claim_id": "CLM-009",
+        "target_price_metric_id": "MET-015",
+        "probability": 0.6
+      }
+    },
+    "target_price_metric_id": "MET-015",
+    "current_price_metric_id": "MET-014",
+    "rating": "accumulate",
+    "counterevidence_claim_ids": [
+      "CLM-005"
+    ]
+  },
+  "catalysts": [
+    {
+      "catalyst_id": "CAT-001",
+      "title": {
+        "zh_CN": "新一代控制系统发布",
+        "en_AU": "Next-generation control system launch"
+      },
+      "claim_id": "CLM-011",
+      "timeframe": "3-12m",
+      "expected_date": "2026-11-30",
+      "direction": "positive"
+    }
+  ],
+  "risks": [
+    {
+      "risk_id": "RSK-001",
+      "title": {
+        "zh_CN": "下游资本开支放缓",
+        "en_AU": "Slowing downstream capital expenditure"
+      },
+      "claim_id": "CLM-005",
+      "category": "industry",
+      "severity": "high",
+      "likelihood": "medium"
+    },
+    {
+      "risk_id": "RSK-002",
+      "title": {
+        "zh_CN": "价格竞争压缩毛利率",
+        "en_AU": "Price competition compressing margins"
+      },
+      "claim_id": "CLM-006",
+      "category": "competition",
+      "severity": "medium",
+      "likelihood": "high"
+    },
+    {
+      "risk_id": "RSK-003",
+      "title": {
+        "zh_CN": "产业政策变化",
+        "en_AU": "Industrial policy shifts"
+      },
+      "claim_id": "CLM-007",
+      "category": "policy_regulation",
+      "severity": "medium",
+      "likelihood": "low"
+    },
+    {
+      "risk_id": "RSK-004",
+      "title": {
+        "zh_CN": "客户集中度较高",
+        "en_AU": "High customer concentration"
+      },
+      "claim_id": "CLM-008",
+      "category": "operations",
+      "severity": "medium",
+      "likelihood": "medium"
+    }
+  ],
+  "quality": {
+    "rubric_version": "0.1.0",
+    "checks": [
+      {
+        "check_id": "QC-01",
+        "result": "pass",
+        "details": "presentation fixture"
+      },
+      {
+        "check_id": "QC-02",
+        "result": "pass",
+        "details": "presentation fixture"
+      },
+      {
+        "check_id": "QC-03",
+        "result": "pass",
+        "details": "presentation fixture"
+      },
+      {
+        "check_id": "QC-04",
+        "result": "pass",
+        "details": "presentation fixture"
+      },
+      {
+        "check_id": "QC-05",
+        "result": "pass",
+        "details": "presentation fixture"
+      },
+      {
+        "check_id": "QC-06",
+        "result": "pass",
+        "details": "presentation fixture"
+      },
+      {
+        "check_id": "QC-07",
+        "result": "pass",
+        "details": "presentation fixture"
+      },
+      {
+        "check_id": "QC-08",
+        "result": "pass",
+        "details": "presentation fixture"
+      },
+      {
+        "check_id": "QC-09",
+        "result": "pass",
+        "details": "presentation fixture"
+      },
+      {
+        "check_id": "QC-10",
+        "result": "pass",
+        "details": "presentation fixture"
+      },
+      {
+        "check_id": "QC-11",
+        "result": "not_run",
+        "details": "overflow checked at render time by the template QA pass"
+      }
+    ],
+    "overall": "acceptable"
+  },
+  "disclaimer": {
+    "text": {
+      "zh_CN": "本报告由蓝楹会基于公开信息与AI辅助流程生成，仅供学习与研究用途，不构成任何投资建议。数据截至2026年7月10日。本样例使用虚构公司数据。",
+      "en_AU": "Produced by the Jacaranda Stock Market Society using public information and an AI-assisted workflow, for educational and research purposes only; not investment advice. Data as of 10 July 2026. This sample uses fictional company data."
+    },
+    "version": "0.1.0"
+  },
+  "generation_metadata": {
+    "pipeline_version": "presentation-fixture",
+    "llm_calls": [
+      {
+        "task": "fixture_only",
+        "requested_model": "openrouter/free",
+        "returned_model": "n/a (handwritten fixture)"
+      }
+    ],
+    "notes": "Deterministic presentation fixture; all company data fictional."
+  }
+}
