@@ -84,6 +84,14 @@ class PipelineArtifacts(BaseModel):
 JsonDict = dict[str, Any]
 
 
+class PipelineConfigurationError(ValueError):
+    """A required, registry-driven mock pipeline binding is absent or ambiguous."""
+
+    def __init__(self, code: str, message: str) -> None:
+        self.code = code
+        super().__init__(f"{code}: {message}")
+
+
 class PresentationResult(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, frozen=True, extra="forbid")
 

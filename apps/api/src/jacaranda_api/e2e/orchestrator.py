@@ -4,6 +4,7 @@ import asyncio
 import copy
 import hashlib
 import json
+import re
 from pathlib import Path
 from typing import Any, cast
 from unittest.mock import patch
@@ -20,6 +21,7 @@ from jacaranda_api.e2e.models import (
     InvocationStatus,
     JsonDict,
     PipelineArtifacts,
+    PipelineConfigurationError,
 )
 from jacaranda_api.e2e.presentation import TemplatePresentationProvider
 from jacaranda_api.e2e.validation import load_json, validate_decks, validate_package
@@ -93,8 +95,8 @@ class MockResearchOrchestrator:
         s5 = await self._execute(self._one_task("S5"), {"analysis": s3, "valuation": s4})
         package = self._assemble_package(market, s3, s4, s5, request)
         translations = await self._translate(package)
-        self._apply_translations(package, translations)
-        self._set_generation_metadata(package)
+        translation_notes = self._apply_translations(package, translations)
+        self._set_generation_metadata(package, translation_notes)
         validate_package(self._root, package)
         decks: dict[str, JsonDict] = {
             edition: await self._deck(package, edition) for edition in request.editions
@@ -124,16 +126,48 @@ class MockResearchOrchestrator:
             SourceRegistry(),
         )
         provider_fragments = result.as_research_fragments()
-        source = cast(list[JsonDict], provider_fragments["sources"])[0]
-        metric = cast(list[JsonDict], provider_fragments["metrics"])[0]
+        provider_sources = cast(list[JsonDict], provider_fragments["sources"])
+        provider_metrics = cast(list[JsonDict], provider_fragments["metrics"])
+        if len(provider_sources) != 1 or len(provider_metrics) != 1:
+            raise PipelineConfigurationError(
+                "invalid_mock_provider_output",
+                "the fictional quote provider must produce exactly one source and one metric",
+            )
+        source = copy.deepcopy(provider_sources[0])
+        metric = copy.deepcopy(provider_metrics[0])
         source["source_id"] = "SRC-002"
         metric["source_id"] = "SRC-002"
         fixture = load_json(self._root / "packages/presentation/fixtures/mock-package.json")
-        fixture["sources"][1] = source
-        fixture["metrics"] = [
-            metric if item["metric_id"] == "MET-014" else item for item in fixture["metrics"]
+        sources = self._replace_fixture_record(
+            fixture["sources"], "source_id", "SRC-002", source
+        )
+        metrics = self._replace_fixture_record(
+            fixture["metrics"], "metric_id", "MET-014", metric
+        )
+        return {"sources": sources, "metrics": metrics}
+
+    @staticmethod
+    def _replace_fixture_record(
+        records: Any, identifier: str, expected_id: str, replacement: JsonDict
+    ) -> list[JsonDict]:
+        if not isinstance(records, list):
+            raise PipelineConfigurationError(
+                "invalid_mock_fixture",
+                f"the mock fixture must provide a {identifier} record for {expected_id}",
+            )
+        matches = [
+            index
+            for index, item in enumerate(records)
+            if isinstance(item, dict) and item.get(identifier) == expected_id
         ]
-        return {"sources": fixture["sources"], "metrics": fixture["metrics"]}
+        if len(matches) != 1:
+            raise PipelineConfigurationError(
+                "invalid_mock_fixture",
+                f"the mock fixture must contain exactly one {identifier}={expected_id}",
+            )
+        copied = copy.deepcopy(records)
+        copied[matches[0]] = replacement
+        return cast(list[JsonDict], copied)
 
     async def _execute(self, task_name: str, structured_input: JsonDict) -> JsonDict:
         task = self._catalog.resolve(task_name)
@@ -308,13 +342,121 @@ class MockResearchOrchestrator:
         return texts
 
     @staticmethod
-    def _apply_translations(package: JsonDict, batches: list[JsonDict]) -> None:
-        expected = {item["path"] for item in MockResearchOrchestrator._localized_texts(package)}
-        actual = {item["path"] for batch in batches for item in batch["texts"]}
-        if actual != expected:
-            raise ValueError("translation batch merge did not preserve every unique path")
+    def _localized_text_targets(package: JsonDict) -> list[tuple[str, JsonDict]]:
+        targets: list[tuple[str, JsonDict]] = []
 
-    def _set_generation_metadata(self, package: JsonDict) -> None:
+        def visit(value: Any, path: str) -> None:
+            if isinstance(value, dict):
+                if set(value) == {"zh_CN", "en_AU"}:
+                    targets.append((path, cast(JsonDict, value)))
+                else:
+                    for key in sorted(value):
+                        visit(value[key], f"{path}.{key}" if path else key)
+            elif isinstance(value, list):
+                for index, item in enumerate(value):
+                    visit(item, f"{path}[{index}]")
+
+        visit(package, "")
+        return targets
+
+    @staticmethod
+    def _apply_translations(package: JsonDict, batches: list[JsonDict]) -> tuple[str, ...]:
+        targets = MockResearchOrchestrator._localized_text_targets(package)
+        targets_by_path = {path: value for path, value in targets}
+        translated_by_path: dict[str, JsonDict] = {}
+        translated_languages: dict[str, str] = {}
+        translation_flags: list[JsonDict] = []
+        glossary_flags: list[JsonDict] = []
+        for batch in batches:
+            authoritative_language = batch.get("authoritative_language")
+            if authoritative_language not in {"zh_CN", "en_AU"}:
+                raise ValueError(
+                    "translation batch must declare a supported authoritative language"
+                )
+            translated_language = "en_AU" if authoritative_language == "zh_CN" else "zh_CN"
+            for item in batch["texts"]:
+                path = item["path"]
+                target = targets_by_path.get(path)
+                if target is None:
+                    raise ValueError(f"translation batch contains an unknown path: {path}")
+                if path in translated_by_path:
+                    raise ValueError(f"translation batch contains a duplicate path: {path}")
+                if item[authoritative_language] != target[authoritative_language]:
+                    raise ValueError(
+                        f"translation batch changed authoritative content at path: {path}"
+                    )
+                if (
+                    MockResearchOrchestrator._protected_translation_tokens(
+                        item[translated_language]
+                    )
+                    != MockResearchOrchestrator._protected_translation_tokens(
+                        target[translated_language]
+                    )
+                ):
+                    raise ValueError(
+                        "translation batch changed protected identifiers or numeric values "
+                        f"at path: {path}"
+                    )
+                translated_by_path[path] = item
+                translated_languages[path] = translated_language
+            translation_flags.extend(cast(list[JsonDict], batch["translation_flags"]))
+            glossary_flags.extend(cast(list[JsonDict], batch["glossary_flags"]))
+        missing_paths = [path for path, _ in targets if path not in translated_by_path]
+        if missing_paths:
+            raise ValueError(f"translation batch is missing path: {missing_paths[0]}")
+        review_notes = MockResearchOrchestrator._translation_review_notes(
+            translation_flags, glossary_flags, set(targets_by_path)
+        )
+        for path, target in targets:
+            translated = translated_by_path[path]
+            target[translated_languages[path]] = translated[translated_languages[path]]
+        return review_notes
+
+    @staticmethod
+    def _protected_translation_tokens(text: Any) -> tuple[str, ...]:
+        if not isinstance(text, str):
+            raise ValueError("translation batch text must be a string")
+        return tuple(
+            re.findall(
+                r"(?<![A-Za-z0-9_])(?:MET|CLM|SRC|ASM|RSK|CAT)-\d{3}(?![A-Za-z0-9_])"
+                r"|(?<![A-Za-z0-9_])\d+(?:\.\d+)?%?(?![A-Za-z0-9_])",
+                text,
+            )
+        )
+
+    @staticmethod
+    def _translation_review_notes(
+        translation_flags: list[JsonDict], glossary_flags: list[JsonDict], known_paths: set[str]
+    ) -> tuple[str, ...]:
+        def require_known_path(flag: JsonDict) -> str:
+            path = flag["path"]
+            if not isinstance(path, str):
+                raise ValueError("translation review flag path must be a string")
+            if path not in known_paths:
+                raise ValueError(f"translation review flag contains an unknown path: {path}")
+            return path
+
+        notes = [
+            f"translation_flag path={require_known_path(flag)} problem={flag['problem']}"
+            for flag in translation_flags
+        ]
+        notes.extend(
+            "glossary_flag "
+            f"path={require_known_path(flag)} term={flag['term']} "
+            f"proposed_mapping={flag['proposed_mapping']}"
+            for flag in glossary_flags
+        )
+        return tuple(sorted(notes))
+
+    def _set_generation_metadata(
+        self, package: JsonDict, translation_notes: tuple[str, ...]
+    ) -> None:
+        notes = (
+            "Offline fixture-only run; no network or credentials used; "
+            "human approval not performed."
+        )
+        if translation_notes:
+            notes += " Translation and glossary review flags: " + " | ".join(translation_notes)
         package["generation_metadata"] = {
             "pipeline_version": "issue-26-offline-v1",
             "prompt_versions": {
@@ -331,17 +473,12 @@ class MockResearchOrchestrator:
                 }
                 for result in self._results
             ],
-            "notes": (
-                "Offline fixture-only run; no network or credentials used; "
-                "human approval not performed."
-            ),
+            "notes": notes,
         }
 
     async def _deck(self, package: JsonDict, edition: str) -> JsonDict:
         deck_id = f"DCK-600XXX-2026-002-{'ZH' if edition == 'zh-CN' else 'EN'}"
-        plan_tasks = self._tasks_by_stage["S7"]
-        plan_task = next(task.task_name for task in plan_tasks if task.input_schema is None)
-        slide_task = next(task.task_name for task in plan_tasks if task.input_schema is not None)
+        plan_task, slide_task = self._s7_task_names()
         plan = await self._execute(
             plan_task,
             {
@@ -375,6 +512,22 @@ class MockResearchOrchestrator:
             **{key: value for key, value in plan.items() if key != "slide_stubs"},
             "slides": slides,
         }
+
+    def _s7_task_names(self) -> tuple[str, str]:
+        required = ("slide_compression_plan", "slide_compression_slide")
+        selected: list[str] = []
+        for task_name in required:
+            count = sum(
+                task.task_name == task_name for task in self._tasks_by_stage["S7"]
+            )
+            if count != 1:
+                state = "missing" if count == 0 else "duplicated"
+                raise PipelineConfigurationError(
+                    "invalid_s7_task_registry",
+                    f"{state} required S7 task: {task_name}",
+                )
+            selected.append(task_name)
+        return selected[0], selected[1]
 
     @staticmethod
     def _excerpt(package: JsonDict, stub: JsonDict) -> JsonDict:
