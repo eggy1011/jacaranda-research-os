@@ -13,8 +13,13 @@ dependencies = [
   "jsonschema>=4.23,<5",
   "pydantic>=2.10,<3",
   "pydantic-settings>=2.7,<3",
+  "Pillow>=10,<12",
+  "python-pptx>=1.0,<2",
   "uvicorn[standard]>=0.34,<1",
 ]
+
+[project.scripts]
+jacaranda-mock-e2e = "jacaranda_api.e2e.cli:main"
 
 [project.optional-dependencies]
 dev = [

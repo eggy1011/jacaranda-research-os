@@ -9,6 +9,9 @@ RUN addgroup --system jacaranda && adduser --system --ingroup jacaranda jacarand
 
 COPY apps/api/pyproject.toml ./pyproject.toml
 COPY apps/api/src ./src
+COPY PROJECT_BRIEF.md ./PROJECT_BRIEF.md
+COPY packages ./packages
+COPY assets/brand ./assets/brand
 RUN pip install --no-cache-dir .
 
 USER jacaranda

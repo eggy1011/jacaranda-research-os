@@ -87,6 +87,22 @@ CI repeats these checks, builds and starts all four Compose services, verifies t
 endpoints, and scans the Git history for secrets. Tests must use mocks or fixtures and must not call
 live providers.
 
+## Offline mock vertical slice
+
+Issue #26 provides a credential-free S1–S7 integration path. It uses only the fictional `600XXX`
+fixtures, blocks socket creation for the full run, batches S6 at 20 texts or fewer, and executes S7
+as one plan call followed by one call per slide:
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -e 'apps/api[dev]'
+.venv/bin/jacaranda-mock-e2e --output-dir /tmp/jacaranda-mock-run
+```
+
+The new or empty output directory receives `research-package.json`, both edition Deck JSON files,
+editable PPTX files, passing overflow reports, a deterministic manifest, and checkpoint audit data.
+The mock package stops at `verified`; this workflow never performs human `approved` promotion.
+
 ## Service boundaries
 
 - `apps/web/`: browser application and a same-origin health proxy.

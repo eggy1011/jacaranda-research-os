@@ -75,6 +75,10 @@ class PromptCatalog:
             batching=batching,
         )
 
+    def all_tasks(self) -> tuple[PromptTask, ...]:
+        """Return executable tasks in registry order for deterministic schedulers."""
+        return tuple(self.resolve(task_name) for task_name in self._tasks)
+
     def _load_registry(self) -> dict[str, JsonObject]:
         registry_path = self._prompt_root / "registry.json"
         try:
