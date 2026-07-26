@@ -175,9 +175,9 @@ async def test_missing_usage_is_explicitly_none() -> None:
 
 @pytest.mark.parametrize(
     "model",
-    ["openrouter/auto", "openai/gpt-paid", "vendor/model:free", "", " OPENROUTER/FREE "],
+    ["openrouter/auto", "openai/gpt-paid", "", " OPENROUTER/FREE ", "no-slash:free"],
 )
-def test_any_model_other_than_free_router_is_rejected(model: str) -> None:
+def test_disallowed_models_are_rejected_without_paid_opt_in(model: str) -> None:
     client = FakeHTTPClient([])
     with pytest.raises(FreeOnlyModelPolicyError):
         OpenRouterLLMProvider(
@@ -187,6 +187,46 @@ def test_any_model_other_than_free_router_is_rejected(model: str) -> None:
             http_client=client,
         )
     assert client.payloads == []
+
+
+def test_explicit_free_model_is_allowed_without_opt_in() -> None:
+    provider = OpenRouterLLMProvider(
+        api_key=SecretStr("fixture-key"),
+        requested_model="vendor/model:free",
+        catalog=FakeCatalog(),
+        http_client=FakeHTTPClient([]),
+    )
+    assert provider is not None
+
+
+def test_paid_model_requires_explicit_opt_in() -> None:
+    client = FakeHTTPClient([])
+    with pytest.raises(FreeOnlyModelPolicyError):
+        OpenRouterLLMProvider(
+            api_key=SecretStr("fixture-key"),
+            requested_model="deepseek/deepseek-chat",
+            catalog=FakeCatalog(),
+            http_client=client,
+        )
+    provider = OpenRouterLLMProvider(
+        api_key=SecretStr("fixture-key"),
+        requested_model="deepseek/deepseek-chat",
+        catalog=FakeCatalog(),
+        http_client=client,
+        allow_paid_model=True,
+    )
+    assert provider is not None
+
+
+def test_auto_router_is_rejected_even_with_paid_opt_in() -> None:
+    with pytest.raises(FreeOnlyModelPolicyError):
+        OpenRouterLLMProvider(
+            api_key=SecretStr("fixture-key"),
+            requested_model="openrouter/auto",
+            catalog=FakeCatalog(),
+            http_client=FakeHTTPClient([]),
+            allow_paid_model=True,
+        )
 
 
 def test_retry_limit_is_bounded() -> None:
