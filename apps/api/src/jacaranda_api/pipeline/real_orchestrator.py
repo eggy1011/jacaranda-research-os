@@ -271,7 +271,7 @@ class RealResearchOrchestrator(StageOrchestrator):
         path = self._cache_dir / f"{key}.json"
         if not path.is_file():
             return None
-        return json.loads(path.read_text(encoding="utf-8"))
+        return cast(object, json.loads(path.read_text(encoding="utf-8")))
 
     def _cache_store(self, key: str, value: object) -> None:
         if self._cache_dir is None:
