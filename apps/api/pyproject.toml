@@ -15,9 +15,10 @@ dependencies = [
   "httpx>=0.28,<1",
   "jsonschema>=4.23,<5",
   "openpyxl>=3.1,<4",
-  "pydantic>=2.10,<3",
+  "pydantic[email]>=2.10,<3",
   "pydantic-settings>=2.7,<3",
   "Pillow>=10,<12",
+  "pwdlib[argon2]>=0.2,<1",
   "pypdf>=5.1,<7",
   "python-docx>=1.1,<2",
   "python-multipart>=0.0.18,<1",
@@ -30,6 +31,7 @@ dependencies = [
 jacaranda-mock-e2e = "jacaranda_api.pipeline.cli:main"
 jacaranda-evidence = "jacaranda_api.pipeline.cli_evidence:main"
 jacaranda-real-e2e = "jacaranda_api.pipeline.cli_real:main"
+jacaranda-invite = "jacaranda_api.auth.cli_invite:main"
 
 [project.optional-dependencies]
 dev = [

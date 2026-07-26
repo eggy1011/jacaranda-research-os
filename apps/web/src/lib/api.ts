@@ -92,10 +92,39 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     }
     throw new ApiError(response.status, detail);
   }
+  if (response.status === 204) {
+    return undefined as T;
+  }
   return (await response.json()) as T;
 }
 
+export interface CurrentUser {
+  id: string;
+  email: string;
+  role: "member" | "reviewer" | "admin" | string;
+}
+
 export const api = {
+  me: () => request<CurrentUser>("auth/me"),
+  login: (email: string, password: string) =>
+    request<CurrentUser>("auth/login", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    }),
+  register: (inviteCode: string, email: string, password: string) =>
+    request<CurrentUser>("auth/register", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ invite_code: inviteCode, email, password }),
+    }),
+  logout: () => request<void>("auth/logout", { method: "POST" }),
+  createInvite: (role: string) =>
+    request<{ invite_code: string; role: string }>("admin/invites", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ role }),
+    }),
   listProjects: () => request<Project[]>("projects"),
   createProject: (symbol: string) =>
     request<Project>("projects", {

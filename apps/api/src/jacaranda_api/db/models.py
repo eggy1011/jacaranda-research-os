@@ -41,6 +41,29 @@ class User(TimestampMixin, Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
 
+class Invite(TimestampMixin, Base):
+    __tablename__ = "invites"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    code_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    role: Mapped[str] = mapped_column(String(16), default="member")
+    created_by: Mapped[str | None] = mapped_column(
+        String(32), ForeignKey("users.id"), nullable=True
+    )
+    used_by: Mapped[str | None] = mapped_column(
+        String(32), ForeignKey("users.id"), nullable=True
+    )
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class Session(TimestampMixin, Base):
+    __tablename__ = "sessions"
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)  # sha256 of the token
+    user_id: Mapped[str] = mapped_column(String(32), ForeignKey("users.id"), index=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
 class Project(TimestampMixin, Base):
     __tablename__ = "projects"
 

@@ -16,9 +16,11 @@ async function forward(
   const search = request.nextUrl.search;
   const target = `${API_BASE_URL}/${path.map(encodeURIComponent).join("/")}${search}`;
   const headers = new Headers();
-  const contentType = request.headers.get("content-type");
-  if (contentType) {
-    headers.set("content-type", contentType);
+  for (const name of ["content-type", "cookie"]) {
+    const value = request.headers.get(name);
+    if (value) {
+      headers.set(name, value);
+    }
   }
   try {
     const response = await fetch(target, {
@@ -32,7 +34,12 @@ async function forward(
       cache: "no-store",
     });
     const responseHeaders = new Headers();
-    for (const name of ["content-type", "content-disposition", "content-length"]) {
+    for (const name of [
+      "content-type",
+      "content-disposition",
+      "content-length",
+      "set-cookie",
+    ]) {
       const value = response.headers.get(name);
       if (value) {
         responseHeaders.set(name, value);

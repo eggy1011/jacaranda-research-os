@@ -7,6 +7,7 @@ from typing import Any, cast
 
 import httpx
 import pytest
+from auth_helpers import sign_in
 from pytest import MonkeyPatch
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
@@ -49,6 +50,7 @@ async def client(
     app.state.session_factory = db
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as http:
+        await sign_in(http, db)
         yield http
 
 

@@ -8,6 +8,7 @@ import type { ReactNode } from "react";
 import { Providers } from "@/components/providers";
 import { routing } from "@/i18n/routing";
 import { LocaleSwitch } from "./locale-switch";
+import { UserMenu } from "./user-menu";
 
 import "../globals.css";
 
@@ -52,6 +53,7 @@ export default async function LocaleLayout({
                   {t("projects")}
                 </Link>
                 <LocaleSwitch label={t("language")} />
+                <UserMenu />
               </nav>
             </div>
           </header>
