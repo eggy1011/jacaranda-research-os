@@ -196,7 +196,12 @@ class StubOrchestrator:
         self._error = error
 
     async def run(
-        self, symbol: str, output_dir: Path, *, resume: bool = False
+        self,
+        symbol: str,
+        output_dir: Path,
+        *,
+        resume: bool = False,
+        uploads: list[dict[str, Any]] | None = None,
     ) -> PipelineArtifacts:
         assert resume is True
         await self._listener("01-extraction", "started")

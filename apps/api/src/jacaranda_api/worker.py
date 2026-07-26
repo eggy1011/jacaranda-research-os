@@ -134,6 +134,67 @@ async def _record_success(
         )
 
 
+async def parse_upload(ctx: dict[str, Any], upload_id: str) -> str:
+    """arq task: parse a stored upload into locator-addressed blocks."""
+    from jacaranda_api.db.models import Upload
+    from jacaranda_api.documents.parser import (
+        DocumentParseError,
+        UnsupportedDocumentError,
+        parse_document,
+    )
+
+    session_factory = cast(async_sessionmaker[AsyncSession], ctx["session_factory"])
+    async with session_factory() as session:
+        upload = await session.get(Upload, upload_id)
+        if upload is None:
+            return "missing"
+        upload.status = "parsing"
+        path = Path(upload.path)
+        await session.commit()
+
+    try:
+        parsed = parse_document(path)
+    except (UnsupportedDocumentError, DocumentParseError, OSError) as error:
+        async with session_factory() as session:
+            upload = await session.get(Upload, upload_id)
+            if upload is not None:
+                upload.status = "failed"
+                upload.error = {"code": type(error).__name__, "message": str(error)[:500]}
+                await session.commit()
+        return "failed"
+
+    async with session_factory() as session:
+        upload = await session.get(Upload, upload_id)
+        if upload is not None:
+            upload.status = "parsed"
+            upload.parsed = parsed.as_dict()
+            upload.error = None
+            await session.commit()
+    return "parsed"
+
+
+async def _parsed_uploads(session: AsyncSession, project_id: str) -> list[dict[str, Any]]:
+    from jacaranda_api.db.models import Upload
+
+    uploads = await session.scalars(
+        select(Upload)
+        .where(Upload.project_id == project_id, Upload.status == "parsed")
+        .order_by(Upload.created_at)
+    )
+    payloads: list[dict[str, Any]] = []
+    for upload in uploads:
+        parsed = upload.parsed or {}
+        payloads.append(
+            {
+                "upload_id": upload.id,
+                "filename": upload.filename,
+                "created_at": upload.created_at.isoformat(),
+                "blocks": parsed.get("blocks", []),
+            }
+        )
+    return payloads
+
+
 async def execute_run(ctx: dict[str, Any], run_id: str) -> str:
     """arq task: run the real pipeline for a queued run, resuming from disk
     checkpoints on every attempt so retries never re-spend completed stages."""
@@ -156,6 +217,7 @@ async def execute_run(ctx: dict[str, Any], run_id: str) -> str:
         run.output_dir = output_dir
         symbol = run.symbol
         attempt = run.attempt
+        uploads = await _parsed_uploads(session, run.project_id)
         await session.commit()
 
     async def listener(key: str, status: str) -> None:
@@ -165,7 +227,9 @@ async def execute_run(ctx: dict[str, Any], run_id: str) -> str:
 
     orchestrator = _build_orchestrator(settings, root, listener)
     try:
-        artifacts = await orchestrator.run(symbol, Path(output_dir), resume=True)
+        artifacts = await orchestrator.run(
+            symbol, Path(output_dir), resume=True, uploads=uploads
+        )
     except Exception as error:
         async with session_factory() as session:
             run = await session.get(Run, run_id)
@@ -209,7 +273,7 @@ async def on_shutdown(ctx: dict[str, Any]) -> None:
 
 
 class WorkerSettings:
-    functions = [execute_run]
+    functions = [execute_run, parse_upload]
     on_startup = on_startup
     on_shutdown = on_shutdown
     max_tries = MAX_TRIES

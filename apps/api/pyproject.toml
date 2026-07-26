@@ -14,9 +14,12 @@ dependencies = [
   "fastapi>=0.115,<1",
   "httpx>=0.28,<1",
   "jsonschema>=4.23,<5",
+  "openpyxl>=3.1,<4",
   "pydantic>=2.10,<3",
   "pydantic-settings>=2.7,<3",
   "Pillow>=10,<12",
+  "pypdf>=5.1,<7",
+  "python-docx>=1.1,<2",
   "python-multipart>=0.0.18,<1",
   "python-pptx>=1.0,<2",
   "sqlalchemy[asyncio]>=2.0.36,<3",
@@ -38,6 +41,7 @@ dev = [
   "pytest-cov>=6,<8",
   "ruff>=0.9,<1",
   "types-jsonschema>=4.23,<5",
+  "types-openpyxl>=3.1,<4",
 ]
 live = [
   "akshare>=1.14,<2",
@@ -66,7 +70,16 @@ strict = true
 files = ["src", "tests"]
 
 [[tool.mypy.overrides]]
-module = ["akshare.*", "pandas.*"]
+module = [
+  "akshare",
+  "akshare.*",
+  "docx",
+  "docx.*",
+  "openpyxl",
+  "openpyxl.*",
+  "pandas",
+  "pandas.*",
+]
 ignore_missing_imports = true
 
 [tool.coverage.run]

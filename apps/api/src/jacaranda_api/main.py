@@ -10,7 +10,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 from jacaranda_api.config import get_settings
-from jacaranda_api.routers import artifacts, packages, projects, runs
+from jacaranda_api.routers import artifacts, packages, projects, runs, uploads
 from jacaranda_api.routers.deps import ArqJobQueue
 
 logger = logging.getLogger(__name__)
@@ -76,6 +76,7 @@ def create_app(app_env: str | None = None) -> FastAPI:
     )
     api.include_router(projects.router)
     api.include_router(runs.router)
+    api.include_router(uploads.router)
     api.include_router(packages.router)
     api.include_router(artifacts.router)
     return api
