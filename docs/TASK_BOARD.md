@@ -24,9 +24,9 @@ state and a demonstrable artifact.
 | 1 | Real A-share evidence: `e2e/`→`pipeline/`, live AKShare client, `jacaranda-real-e2e --symbol … --resume`, model rotation (D-008) | 1 真实A股证据 | Done (PR #28–#32); live-LLM smoke awaits an OPENROUTER_API_KEY |
 | 2 | Persistence + jobs: SQLAlchemy/Alembic, arq worker with per-stage resume, projects/runs/packages/artifacts API | 2 文件与项目保存 | Done (PR #33) |
 | 3 | Uploads + parsing: pypdf/python-docx/openpyxl with `upload://{file_id}#page=N` locators into S1 | 2 文件与项目保存 | Done (PR #34) |
-| 4 | Full bilingual web flow: next-intl, shadcn/ui, project/run/package/deck pages, section editor with QC feedback, PNG deck preview | 3 完整网页流程 | In progress |
-| 5 | Formal output: LibreOffice PDF export, draft→verified→approved lifecycle (`is_mock` never approvable), version snapshots | 4 正式输出 | Pending |
-| 6 | Internal beta: invite-code auth (D-009), roles, RUNBOOK, prod compose + Caddy docs, monitoring/backup; acceptance = 3 real companies run by members | 5 内部Beta | Pending |
+| 4 | Full bilingual web flow: next-intl, shadcn/ui, project/run/package/deck pages, section editor with QC feedback, PNG deck preview | 3 完整网页流程 | Done part 1 (PR #35); editor + deck preview folded into later phases |
+| 5 | Formal output: LibreOffice PDF export, draft→verified→approved lifecycle (`is_mock` never approvable), version snapshots | 4 正式输出 | Done (PR #36) |
+| 6 | Internal beta: invite-code auth (D-009), roles, RUNBOOK, prod compose + Caddy docs, monitoring/backup; acceptance = 3 real companies run by members | 5 内部Beta | In progress |
 | 7 | Hardening: prompt/presentation validators in CI, golden-fixture digest regression, per-stage token/cost panel, model-rotation visibility | — | Pending |
 
 ## Working agreement
