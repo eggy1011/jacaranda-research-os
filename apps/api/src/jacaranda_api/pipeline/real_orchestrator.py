@@ -34,6 +34,9 @@ from jacaranda_api.pipeline.validation import (
 
 PIPELINE_VERSION = "real-v1"
 
+# (stage_key, status) — status is one of started/completed/cached/failed.
+StageListener = Callable[[str, str], Awaitable[None]]
+
 
 class RealResearchOrchestrator(StageOrchestrator):
     """Live wiring of the shared stage machinery: real AKShare evidence, real
@@ -52,6 +55,7 @@ class RealResearchOrchestrator(StageOrchestrator):
         akshare_client: AkshareClient,
         presentation: PresentationProvider | None = None,
         max_attempts: int = 3,
+        stage_listener: StageListener | None = None,
     ) -> None:
         root = repository_root.resolve()
         super().__init__(
@@ -61,6 +65,7 @@ class RealResearchOrchestrator(StageOrchestrator):
             max_attempts=max_attempts,
         )
         self._akshare_client = akshare_client
+        self._stage_listener = stage_listener
         self._cache_dir: Path | None = None
         self._symbol_code = ""
         self._year = ""
@@ -247,12 +252,23 @@ class RealResearchOrchestrator(StageOrchestrator):
         suffix = "ZH" if edition == "zh-CN" else "EN"
         return f"DCK-{self._symbol_code}-{self._year}-001-{suffix}"
 
+    async def _notify(self, key: str, status: str) -> None:
+        if self._stage_listener is not None:
+            await self._stage_listener(key, status)
+
     async def _cached(self, key: str, thunk: Callable[[], Awaitable[JsonDict]]) -> JsonDict:
         cached = self._cache_load(key)
         if cached is not None:
+            await self._notify(key, "cached")
             return cast(JsonDict, cached)
-        value = await thunk()
+        await self._notify(key, "started")
+        try:
+            value = await thunk()
+        except Exception:
+            await self._notify(key, "failed")
+            raise
         self._cache_store(key, value)
+        await self._notify(key, "completed")
         return value
 
     async def _cached_list(
@@ -260,9 +276,16 @@ class RealResearchOrchestrator(StageOrchestrator):
     ) -> list[JsonDict]:
         cached = self._cache_load(key)
         if cached is not None:
+            await self._notify(key, "cached")
             return cast(list[JsonDict], cached)
-        value = await thunk()
+        await self._notify(key, "started")
+        try:
+            value = await thunk()
+        except Exception:
+            await self._notify(key, "failed")
+            raise
         self._cache_store(key, value)
+        await self._notify(key, "completed")
         return value
 
     def _cache_load(self, key: str) -> object | None:

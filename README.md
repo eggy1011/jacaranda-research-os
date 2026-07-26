@@ -57,6 +57,20 @@ Then open:
 PostgreSQL and Redis listen on localhost only. The web container reaches the API over the private
 Compose network, and provider credentials are never exposed through `NEXT_PUBLIC_` variables.
 
+The API runs `alembic upgrade head` on startup, and a `worker` container (arq) executes queued
+research runs against the shared `/data` volume. The project/run flow over HTTP:
+
+```bash
+curl -X POST localhost:8000/projects -H 'content-type: application/json' -d '{"symbol": "600519"}'
+curl -X POST localhost:8000/projects/<project-id>/runs
+curl localhost:8000/runs/<run-id>              # per-stage progress
+curl localhost:8000/runs/<run-id>/artifacts    # download links once succeeded
+```
+
+Real runs require `OPENROUTER_API_KEY` (and optionally `OPENROUTER_MODELS`/`ALLOW_PAID_MODELS`,
+see D-008) in the ignored `.env`; the worker retries retryable failures with backoff and resumes
+from per-stage checkpoints instead of re-spending model calls.
+
 Stop the stack with:
 
 ```bash

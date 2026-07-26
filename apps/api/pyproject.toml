@@ -8,13 +8,18 @@ version = "0.1.0"
 description = "Jacaranda Research OS API"
 requires-python = ">=3.11"
 dependencies = [
+  "alembic>=1.14,<2",
+  "arq>=0.26,<1",
+  "asyncpg>=0.30,<1",
   "fastapi>=0.115,<1",
   "httpx>=0.28,<1",
   "jsonschema>=4.23,<5",
   "pydantic>=2.10,<3",
   "pydantic-settings>=2.7,<3",
   "Pillow>=10,<12",
+  "python-multipart>=0.0.18,<1",
   "python-pptx>=1.0,<2",
+  "sqlalchemy[asyncio]>=2.0.36,<3",
   "uvicorn[standard]>=0.34,<1",
 ]
 
@@ -25,6 +30,7 @@ jacaranda-real-e2e = "jacaranda_api.pipeline.cli_real:main"
 
 [project.optional-dependencies]
 dev = [
+  "aiosqlite>=0.20,<1",
   "mypy>=1.14,<3",
   "pandas>=2.2,<3",
   "pandas-stubs>=2.2,<3",
