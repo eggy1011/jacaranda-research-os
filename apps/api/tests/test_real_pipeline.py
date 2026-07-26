@@ -607,6 +607,38 @@ class TestRealPipeline:
         assert manifest["status"] == "draft"
 
     @pytest.mark.anyio
+    async def test_uploads_become_secondary_sources_with_locators(
+        self, tmp_path: Path
+    ) -> None:
+        uploads: list[JsonDict] = [
+            {
+                "upload_id": "u1",
+                "filename": "annual-report.pdf",
+                "created_at": "2026-07-27T08:00:00+00:00",
+                "blocks": [
+                    {"locator": "page=3", "kind": "text", "text": "公司主营高端制造产品。"}
+                ],
+            }
+        ]
+        orchestrator = RealResearchOrchestrator(
+            ROOT,
+            llm=FakeRealLLM(),
+            akshare_client=EvidenceClient(),
+            presentation=NullPresentation(),
+        )
+        artifacts = await orchestrator.run(
+            "600519", tmp_path / "run", uploads=uploads
+        )
+        package = load_json(artifacts.research_package)
+        upload_sources = [
+            source for source in package["sources"] if source["type"] == "user_upload"
+        ]
+        assert len(upload_sources) == 1
+        assert upload_sources[0]["url_or_document"] == "upload://u1"
+        assert upload_sources[0]["reliability_tier"] == "secondary"
+        validate_real_package(ROOT, package)
+
+    @pytest.mark.anyio
     async def test_resume_reuses_disk_checkpoints(self, tmp_path: Path) -> None:
         out = tmp_path / "run"
         first = FakeRealLLM()

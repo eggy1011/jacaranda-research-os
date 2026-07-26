@@ -26,6 +26,7 @@ from jacaranda_api.pipeline.presentation import (
     TemplatePresentationProvider,
 )
 from jacaranda_api.pipeline.quality import evaluate_quality
+from jacaranda_api.pipeline.upload_evidence import merge_upload_evidence
 from jacaranda_api.pipeline.validation import (
     SemanticValidationError,
     validate_decks,
@@ -71,7 +72,12 @@ class RealResearchOrchestrator(StageOrchestrator):
         self._year = ""
 
     async def run(
-        self, symbol: str, output_dir: Path, *, resume: bool = False
+        self,
+        symbol: str,
+        output_dir: Path,
+        *,
+        resume: bool = False,
+        uploads: list[JsonDict] | None = None,
     ) -> PipelineArtifacts:
         resolved = output_dir.resolve()
         if resume:
@@ -85,11 +91,12 @@ class RealResearchOrchestrator(StageOrchestrator):
             "00-evidence",
             lambda: build_evidence_pack(symbol, self._akshare_client),
         )
+        evidence, upload_chunks = merge_upload_evidence(evidence, uploads or [])
         self._symbol_code = evidence["symbol"]["provider_symbol"]
         self._year = evidence["generated_at"][:4]
         self.run_id = f"RUN-{self._symbol_code}-{evidence['generated_at'][:10]}"
 
-        chunks = build_evidence_chunks(evidence)
+        chunks = [*build_evidence_chunks(evidence), *upload_chunks]
         company = build_company_block(evidence)
         as_of_date = cast(str, evidence["generated_at"][:10])
 
@@ -303,10 +310,13 @@ class RealResearchOrchestrator(StageOrchestrator):
 
     @staticmethod
     def _verification_sources(evidence: JsonDict, chunks: list[JsonDict]) -> list[JsonDict]:
-        text_by_source = {chunk["source_id"]: chunk for chunk in chunks}
+        texts_by_source: dict[str, dict[str, str]] = {}
+        for chunk in chunks:
+            texts_by_source.setdefault(str(chunk["source_id"]), {})[
+                str(chunk["locator"])
+            ] = str(chunk["text"])
         sources: list[JsonDict] = []
         for source in evidence["sources"]:
-            chunk = text_by_source.get(source["source_id"])
             sources.append(
                 {
                     "source_id": source["source_id"],
@@ -314,9 +324,7 @@ class RealResearchOrchestrator(StageOrchestrator):
                     "reliability_tier": source["reliability_tier"],
                     "published_date": source.get("published_date"),
                     "title": source["title"],
-                    "text_by_locator": (
-                        {chunk["locator"]: chunk["text"]} if chunk is not None else {}
-                    ),
+                    "text_by_locator": texts_by_source.get(str(source["source_id"]), {}),
                 }
             )
         return sources

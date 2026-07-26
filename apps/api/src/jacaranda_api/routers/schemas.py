@@ -68,6 +68,20 @@ class PackageDetailOut(PackageOut):
     document: dict[str, Any]
 
 
+class UploadOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    project_id: str
+    filename: str
+    content_type: str
+    size_bytes: int
+    status: str
+    error: dict[str, Any] | None
+    created_at: datetime
+    updated_at: datetime
+
+
 class ArtifactOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
