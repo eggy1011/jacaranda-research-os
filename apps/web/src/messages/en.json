@@ -1,0 +1,88 @@
+{
+  "nav": {
+    "title": "Jacaranda Research OS",
+    "projects": "Projects",
+    "language": "中文"
+  },
+  "home": {
+    "heading": "Bilingual, source-grounded equity research",
+    "sub": "From real evidence to deliverable Chinese and English research reports — every number has a source.",
+    "cta": "Open projects",
+    "backend": "Backend status"
+  },
+  "projects": {
+    "title": "Research projects",
+    "empty": "No projects yet. Enter an A-share code to create the first one.",
+    "create": "Create project",
+    "symbolPlaceholder": "A-share code, e.g. 600519 or 000001.SZ",
+    "symbolInvalid": "Unrecognised A-share code",
+    "created": "Created",
+    "market": "Market"
+  },
+  "project": {
+    "overview": "Project overview",
+    "uploads": "Documents",
+    "uploadHint": "PDF / Word / Excel up to 50 MB. Parsed content enters the research flow with page-level locators.",
+    "uploadButton": "Upload file",
+    "uploading": "Uploading…",
+    "uploadStatus": {
+      "stored": "Stored",
+      "parsing": "Parsing",
+      "parsed": "Parsed",
+      "failed": "Failed"
+    },
+    "runs": "Research runs",
+    "startRun": "Start research",
+    "startRunHint": "Fetches live market and financial data, executes the S1–S7 research flow and produces a bilingual draft.",
+    "runInProgress": "A run is already in progress",
+    "noRuns": "No runs yet.",
+    "packages": "Research packages",
+    "noPackages": "No research packages yet.",
+    "viewRun": "View progress",
+    "viewPackage": "View package"
+  },
+  "run": {
+    "title": "Run progress",
+    "status": {
+      "queued": "Queued",
+      "running": "Running",
+      "succeeded": "Succeeded",
+      "failed": "Failed"
+    },
+    "stageStatus": {
+      "started": "In progress",
+      "completed": "Completed",
+      "cached": "Reused",
+      "failed": "Failed"
+    },
+    "stages": "Stage progress",
+    "noStages": "Waiting for a worker to pick up the job…",
+    "error": "Error",
+    "retry": "Retry (resumes from checkpoint)",
+    "attempt": "Attempt {n}",
+    "artifacts": "Artifacts",
+    "backToProject": "Back to project"
+  },
+  "package": {
+    "title": "Research package",
+    "status": {
+      "draft": "Draft (awaiting human review)",
+      "verified": "Verified",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "mock": "Mock data",
+    "real": "Real data",
+    "sections": "Sections",
+    "claims": "Claims",
+    "metrics": "Metrics",
+    "sources": "Sources",
+    "quality": "Quality checks",
+    "download": "Download"
+  },
+  "common": {
+    "loading": "Loading…",
+    "error": "Something went wrong: {message}",
+    "refresh": "Refresh"
+  }
+}

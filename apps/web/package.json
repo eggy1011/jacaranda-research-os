@@ -11,7 +11,9 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.101.4",
     "next": "^16.0.0",
+    "next-intl": "^4.13.4",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
