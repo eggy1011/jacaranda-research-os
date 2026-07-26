@@ -16,22 +16,22 @@ from jsonschema import ValidationError as JsonSchemaValidationError
 from pptx import Presentation
 from pydantic import ValidationError
 
-from jacaranda_api.e2e import MockResearchOrchestrator
-from jacaranda_api.e2e.cli import main, repository_root
-from jacaranda_api.e2e.mock_providers import FixtureAkshareClient, ScriptedMockLLMProvider
-from jacaranda_api.e2e.models import DemoRequest, PipelineConfigurationError
-from jacaranda_api.e2e.orchestrator import run_pipeline
-from jacaranda_api.e2e.presentation import PresentationFailure, TemplatePresentationProvider
-from jacaranda_api.e2e.validation import (
+from jacaranda_api.llm.errors import LLMProviderError, RetryExhaustedError
+from jacaranda_api.llm.models import LLMResult
+from jacaranda_api.market_data.errors import SymbolNormalizationError
+from jacaranda_api.market_data.symbols import normalize_symbol
+from jacaranda_api.pipeline import MockResearchOrchestrator
+from jacaranda_api.pipeline.cli import main, repository_root
+from jacaranda_api.pipeline.mock_providers import FixtureAkshareClient, ScriptedMockLLMProvider
+from jacaranda_api.pipeline.models import DemoRequest, PipelineConfigurationError
+from jacaranda_api.pipeline.orchestrator import run_pipeline
+from jacaranda_api.pipeline.presentation import PresentationFailure, TemplatePresentationProvider
+from jacaranda_api.pipeline.validation import (
     SemanticValidationError,
     load_json,
     validate_decks,
     validate_package,
 )
-from jacaranda_api.llm.errors import LLMProviderError, RetryExhaustedError
-from jacaranda_api.llm.models import LLMResult
-from jacaranda_api.market_data.errors import SymbolNormalizationError
-from jacaranda_api.market_data.symbols import normalize_symbol
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -368,7 +368,7 @@ def test_mock_market_fixture_lookup_is_identifier_based(
         fixture["metrics"] = list(reversed(fixture["metrics"]))
         return fixture
 
-    monkeypatch.setattr("jacaranda_api.e2e.orchestrator.load_json", reordered_fixture)
+    monkeypatch.setattr("jacaranda_api.pipeline.orchestrator.load_json", reordered_fixture)
     market = asyncio.run(MockResearchOrchestrator(ROOT)._market_data(DemoRequest()))
     assert next(item for item in market["sources"] if item["source_id"] == "SRC-002")[
         "type"
@@ -384,7 +384,7 @@ def test_mock_market_fixture_lookup_is_identifier_based(
         ]
         return fixture
 
-    monkeypatch.setattr("jacaranda_api.e2e.orchestrator.load_json", missing_metric_fixture)
+    monkeypatch.setattr("jacaranda_api.pipeline.orchestrator.load_json", missing_metric_fixture)
     with pytest.raises(PipelineConfigurationError, match="exactly one metric_id=MET-014"):
         asyncio.run(MockResearchOrchestrator(ROOT)._market_data(DemoRequest()))
 
@@ -407,7 +407,7 @@ def test_mock_market_fixture_lookup_is_identifier_based(
         return EmptyProviderResult()
 
     monkeypatch.setattr(
-        "jacaranda_api.e2e.orchestrator.AkshareMarketDataProvider.fetch", empty_fetch
+        "jacaranda_api.pipeline.orchestrator.AkshareMarketDataProvider.fetch", empty_fetch
     )
     with pytest.raises(PipelineConfigurationError, match="exactly one source and one metric"):
         asyncio.run(MockResearchOrchestrator(ROOT)._market_data(DemoRequest()))
@@ -556,5 +556,5 @@ def test_module_entrypoint_invokes_main(tmp_path: Path, monkeypatch: pytest.Monk
         "argv",
         ["jacaranda-mock-e2e", "--output-dir", str(tmp_path / "module")],
     )
-    runpy.run_module("jacaranda_api.e2e.cli", run_name="__main__")
+    runpy.run_module("jacaranda_api.pipeline.cli", run_name="__main__")
     assert (tmp_path / "module/manifest.json").is_file()

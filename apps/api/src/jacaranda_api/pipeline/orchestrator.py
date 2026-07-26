@@ -9,22 +9,6 @@ from pathlib import Path
 from typing import Any, cast
 from unittest.mock import patch
 
-from jacaranda_api.e2e.mock_providers import (
-    FixtureAkshareClient,
-    ScriptedMockLLMProvider,
-    fixed_clock,
-)
-from jacaranda_api.e2e.models import (
-    AttemptRecord,
-    Checkpoint,
-    DemoRequest,
-    InvocationStatus,
-    JsonDict,
-    PipelineArtifacts,
-    PipelineConfigurationError,
-)
-from jacaranda_api.e2e.presentation import TemplatePresentationProvider
-from jacaranda_api.e2e.validation import load_json, validate_decks, validate_package
 from jacaranda_api.llm.catalog import PromptCatalog
 from jacaranda_api.llm.contracts import LLMProvider
 from jacaranda_api.llm.errors import LLMProviderError, RetryExhaustedError
@@ -39,6 +23,22 @@ from jacaranda_api.market_data.models import (
     ProviderRequest,
 )
 from jacaranda_api.market_data.source_registry import SourceRegistry
+from jacaranda_api.pipeline.mock_providers import (
+    FixtureAkshareClient,
+    ScriptedMockLLMProvider,
+    fixed_clock,
+)
+from jacaranda_api.pipeline.models import (
+    AttemptRecord,
+    Checkpoint,
+    DemoRequest,
+    InvocationStatus,
+    JsonDict,
+    PipelineArtifacts,
+    PipelineConfigurationError,
+)
+from jacaranda_api.pipeline.presentation import TemplatePresentationProvider
+from jacaranda_api.pipeline.validation import load_json, validate_decks, validate_package
 
 
 class MockResearchOrchestrator:

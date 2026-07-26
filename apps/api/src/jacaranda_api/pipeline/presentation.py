@@ -7,8 +7,8 @@ from typing import Any
 
 from jsonschema import Draft202012Validator
 
-from jacaranda_api.e2e.models import PresentationResult
-from jacaranda_api.e2e.validation import load_json, validate_package
+from jacaranda_api.pipeline.models import PresentationResult
+from jacaranda_api.pipeline.validation import load_json, validate_package
 
 
 class PresentationFailure(RuntimeError):

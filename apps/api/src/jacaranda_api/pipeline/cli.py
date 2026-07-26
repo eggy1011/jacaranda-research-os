@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from jacaranda_api.e2e.orchestrator import run_pipeline
+from jacaranda_api.pipeline.orchestrator import run_pipeline
 
 
 def repository_root() -> Path:
