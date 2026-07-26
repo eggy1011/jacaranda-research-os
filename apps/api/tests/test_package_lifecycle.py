@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from collections.abc import AsyncIterator
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import httpx
 import pytest
@@ -19,8 +19,13 @@ ROOT = Path(__file__).resolve().parents[3]
 
 
 def _fixture_document(*, is_mock: bool, status: str = "draft") -> dict[str, Any]:
-    document = json.loads(
-        (ROOT / "packages/presentation/fixtures/mock-package.json").read_text(encoding="utf-8")
+    document = cast(
+        dict[str, Any],
+        json.loads(
+            (ROOT / "packages/presentation/fixtures/mock-package.json").read_text(
+                encoding="utf-8"
+            )
+        ),
     )
     document["status"] = status
     document["company"]["is_mock"] = is_mock
