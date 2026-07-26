@@ -78,7 +78,11 @@
     "metrics": "Metrics",
     "sources": "Sources",
     "quality": "Quality checks",
-    "download": "Download"
+    "download": "Download",
+    "verify": "Mark verified",
+    "approve": "Approve",
+    "reject": "Reject",
+    "versions": "Versions"
   },
   "common": {
     "loading": "Loading…",

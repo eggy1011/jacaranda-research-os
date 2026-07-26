@@ -68,6 +68,12 @@ class PackageDetailOut(PackageOut):
     document: dict[str, Any]
 
 
+class PackageDocumentUpdate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    document: dict[str, Any]
+
+
 class UploadOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

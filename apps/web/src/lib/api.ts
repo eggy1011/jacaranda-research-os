@@ -118,6 +118,16 @@ export const api = {
   listPackages: (projectId: string) =>
     request<PackageSummary[]>(`projects/${projectId}/packages`),
   getPackage: (packageId: string) => request<PackageDetail>(`packages/${packageId}`),
+  verifyPackage: (packageId: string) =>
+    request<PackageSummary>(`packages/${packageId}/verify`, { method: "POST" }),
+  approvePackage: (packageId: string) =>
+    request<PackageSummary>(`packages/${packageId}/approve`, { method: "POST" }),
+  rejectPackage: (packageId: string) =>
+    request<PackageSummary>(`packages/${packageId}/reject`, { method: "POST" }),
+  listVersions: (packageId: string) =>
+    request<{ version: number; status: string; digest: string; created_at: string }[]>(
+      `packages/${packageId}/versions`,
+    ),
   listArtifacts: (runId: string) => request<Artifact[]>(`runs/${runId}/artifacts`),
   artifactDownloadUrl: (artifactId: string) =>
     `/api/backend/artifacts/${artifactId}/download`,

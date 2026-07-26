@@ -5,6 +5,12 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
+# Formal PDF output (milestone 4): headless LibreOffice + CJK fonts so the
+# Chinese edition renders correctly.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libreoffice-impress fonts-noto-cjk \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN addgroup --system jacaranda && adduser --system --ingroup jacaranda jacaranda
 
 COPY apps/api/pyproject.toml ./pyproject.toml

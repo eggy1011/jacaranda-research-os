@@ -78,7 +78,11 @@
     "metrics": "指标",
     "sources": "来源",
     "quality": "质量检查",
-    "download": "下载"
+    "download": "下载",
+    "verify": "确认验证",
+    "approve": "批准发布",
+    "reject": "退回",
+    "versions": "版本历史"
   },
   "common": {
     "loading": "加载中…",
