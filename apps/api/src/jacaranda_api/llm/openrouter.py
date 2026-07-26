@@ -74,8 +74,27 @@ class _Completion(BaseModel):
     usage: _Usage | None = None
 
 
+def model_allowed(model: str, *, allow_paid: bool) -> bool:
+    """D-008 model policy: the free router or explicit :free models are always
+    allowed; anything else requires the explicit paid opt-in. openrouter/auto is
+    never allowed — model selection must stay deterministic and auditable."""
+    if model == FREE_MODEL:
+        return True
+    if not model or model != model.strip() or "/" not in model:
+        return False
+    if model == "openrouter/auto":
+        return False
+    if model.endswith(":free"):
+        return True
+    return allow_paid
+
+
 class OpenRouterLLMProvider:
-    """Free-only OpenRouter implementation with strict local output validation."""
+    """OpenRouter implementation with strict local output validation.
+
+    Model policy (D-008): free models by default; a named paid model requires
+    the explicit allow_paid_model opt-in and is never selected silently.
+    """
 
     def __init__(
         self,
@@ -86,8 +105,9 @@ class OpenRouterLLMProvider:
         http_client: OpenRouterHTTPClient,
         max_attempts: int = DEFAULT_MAX_ATTEMPTS,
         clock: Clock = perf_counter_ns,
+        allow_paid_model: bool = False,
     ) -> None:
-        if requested_model != FREE_MODEL:
+        if not model_allowed(requested_model, allow_paid=allow_paid_model):
             raise FreeOnlyModelPolicyError()
         if not 1 <= max_attempts <= DEFAULT_MAX_ATTEMPTS:
             raise ValueError("max_attempts must be between 1 and 3")
