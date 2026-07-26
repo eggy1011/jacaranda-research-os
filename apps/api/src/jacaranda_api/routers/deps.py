@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import AsyncIterator
-from typing import Protocol
+from typing import Protocol, cast
 
 from fastapi import HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
@@ -26,7 +26,7 @@ def _session_factory(request: Request) -> async_sessionmaker[AsyncSession]:
     factory = getattr(request.app.state, "session_factory", None)
     if factory is None:
         raise HTTPException(status_code=503, detail="database is not configured")
-    return factory
+    return cast(async_sessionmaker[AsyncSession], factory)
 
 
 async def get_session(request: Request) -> AsyncIterator[AsyncSession]:
@@ -44,4 +44,4 @@ def get_queue(request: Request) -> JobQueue:
     queue = getattr(request.app.state, "job_queue", None)
     if queue is None:
         raise HTTPException(status_code=503, detail="job queue is not available")
-    return queue
+    return cast(JobQueue, queue)
