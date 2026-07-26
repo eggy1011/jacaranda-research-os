@@ -50,6 +50,22 @@ jobs:
       - run: mypy src tests
       - run: pytest
 
+  research-contracts:
+    name: Prompt and presentation contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -r packages/presentation/requirements.txt
+      - name: Prompt catalogue validator (QC-01/QC-03 prototype)
+        run: python packages/prompts/tests/validate.py
+      - name: Presentation template tests
+        run: python packages/presentation/tests/run_tests.py
+
   compose:
     name: Compose runtime smoke test
     runs-on: ubuntu-latest

@@ -22,7 +22,17 @@ const STAGE_ORDER = [
   "06-translation",
   "07-deck-zh-CN",
   "07-deck-en-AU",
+  "08-pdf-export",
+  "09-llm-usage",
 ];
+
+function usageSummary(detail: Record<string, unknown> | null): string | null {
+  if (!detail || typeof detail.input_tokens !== "number") {
+    return null;
+  }
+  const models = Object.keys((detail.models as Record<string, number>) ?? {}).join(", ");
+  return `${detail.calls} calls · ${detail.input_tokens}→${detail.output_tokens} tokens · ${models}`;
+}
 
 export default function RunPage({
   params,
@@ -108,15 +118,22 @@ export default function RunPage({
               return (
                 <li
                   key={key}
-                  className="flex items-center justify-between rounded-lg border border-[#B7A3CB]/30 px-3 py-2 text-sm"
+                  className="flex items-center justify-between gap-3 rounded-lg border border-[#B7A3CB]/30 px-3 py-2 text-sm"
                 >
                   <span className="font-mono text-[#34234F]">{key}</span>
-                  {stage ? (
-                    <StatusBadge
-                      status={stage.status}
-                      label={t(`stageStatus.${stage.status}` as never)}
-                    />
-                  ) : null}
+                  <span className="flex items-center gap-3">
+                    {stage && usageSummary(stage.detail) ? (
+                      <span className="text-xs text-slate-500">
+                        {usageSummary(stage.detail)}
+                      </span>
+                    ) : null}
+                    {stage ? (
+                      <StatusBadge
+                        status={stage.status}
+                        label={t(`stageStatus.${stage.status}` as never)}
+                      />
+                    ) : null}
+                  </span>
                 </li>
               );
             })}
