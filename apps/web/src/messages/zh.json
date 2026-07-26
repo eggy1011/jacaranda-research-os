@@ -1,0 +1,88 @@
+{
+  "nav": {
+    "title": "蓝楹研究操作系统",
+    "projects": "研究项目",
+    "language": "English"
+  },
+  "home": {
+    "heading": "双语、可溯源的股票研究平台",
+    "sub": "从真实证据到可交付的中英文研究报告，每个数字都有来源。",
+    "cta": "进入研究项目",
+    "backend": "后端状态"
+  },
+  "projects": {
+    "title": "研究项目",
+    "empty": "还没有项目。输入 A 股代码创建第一个研究项目。",
+    "create": "创建项目",
+    "symbolPlaceholder": "A 股代码，如 600519 或 000001.SZ",
+    "symbolInvalid": "无法识别的 A 股代码",
+    "created": "创建时间",
+    "market": "市场"
+  },
+  "project": {
+    "overview": "项目总览",
+    "uploads": "资料上传",
+    "uploadHint": "支持 PDF / Word / Excel，单个文件不超过 50 MB。解析后的内容会带页码等定位信息进入研究流程。",
+    "uploadButton": "上传文件",
+    "uploading": "上传中…",
+    "uploadStatus": {
+      "stored": "已存储",
+      "parsing": "解析中",
+      "parsed": "已解析",
+      "failed": "解析失败"
+    },
+    "runs": "研究运行",
+    "startRun": "开始研究",
+    "startRunHint": "系统将抓取真实行情与财务数据，执行 S1–S7 研究流程并生成双语初稿。",
+    "runInProgress": "有运行正在进行中",
+    "noRuns": "还没有运行记录。",
+    "packages": "研究包",
+    "noPackages": "还没有生成的研究包。",
+    "viewRun": "查看进度",
+    "viewPackage": "查看研究包"
+  },
+  "run": {
+    "title": "运行进度",
+    "status": {
+      "queued": "排队中",
+      "running": "运行中",
+      "succeeded": "已完成",
+      "failed": "失败"
+    },
+    "stageStatus": {
+      "started": "进行中",
+      "completed": "完成",
+      "cached": "已复用",
+      "failed": "失败"
+    },
+    "stages": "阶段进度",
+    "noStages": "等待 worker 领取任务…",
+    "error": "错误信息",
+    "retry": "重试（从断点继续）",
+    "attempt": "第 {n} 次尝试",
+    "artifacts": "产物下载",
+    "backToProject": "返回项目"
+  },
+  "package": {
+    "title": "研究包",
+    "status": {
+      "draft": "草稿（待人工审核）",
+      "verified": "已验证",
+      "approved": "已批准",
+      "rejected": "已拒绝"
+    },
+    "mock": "样例数据",
+    "real": "真实数据",
+    "sections": "章节",
+    "claims": "论点",
+    "metrics": "指标",
+    "sources": "来源",
+    "quality": "质量检查",
+    "download": "下载"
+  },
+  "common": {
+    "loading": "加载中…",
+    "error": "出错了：{message}",
+    "refresh": "刷新"
+  }
+}
