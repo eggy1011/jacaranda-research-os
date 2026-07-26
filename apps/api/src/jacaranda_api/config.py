@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     app_env: str = "development"
     database_url: Annotated[str, Field(min_length=1)]
     redis_url: Annotated[str, Field(min_length=1)]
+    # Root for run artifacts and uploads; a shared volume in Docker Compose.
+    data_dir: str = "data"
     openrouter_api_key: SecretStr | None = None
     openrouter_base_url: str = "https://openrouter.ai/api/v1"
     openrouter_model: str = "openrouter/free"

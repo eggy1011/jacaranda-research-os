@@ -9,10 +9,14 @@ RUN addgroup --system jacaranda && adduser --system --ingroup jacaranda jacarand
 
 COPY apps/api/pyproject.toml ./pyproject.toml
 COPY apps/api/src ./src
+COPY apps/api/alembic.ini ./alembic.ini
+COPY apps/api/alembic ./alembic
 COPY PROJECT_BRIEF.md ./PROJECT_BRIEF.md
 COPY packages ./packages
 COPY assets/brand ./assets/brand
-RUN pip install --no-cache-dir .
+RUN pip install --no-cache-dir ".[live]"
+
+RUN mkdir -p /data && chown jacaranda:jacaranda /data
 
 USER jacaranda
 
