@@ -6,9 +6,11 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from typing import Literal
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from pydantic import BaseModel
 
+from jacaranda_api.auth import router as auth_router
+from jacaranda_api.auth.deps import require_role
 from jacaranda_api.config import get_settings
 from jacaranda_api.routers import artifacts, packages, projects, runs, uploads
 from jacaranda_api.routers.deps import ArqJobQueue
@@ -74,11 +76,17 @@ def create_app(app_env: str | None = None) -> FastAPI:
         tags=["system"],
         methods=["GET"],
     )
-    api.include_router(projects.router)
-    api.include_router(runs.router)
-    api.include_router(uploads.router)
-    api.include_router(packages.router)
-    api.include_router(artifacts.router)
+    api.state.secure_cookies = environment == "production"
+    api.include_router(auth_router.router)
+    # Internal beta: everything below requires a signed-in member; package
+    # verify/approve/reject/edit additionally require the reviewer role
+    # (enforced on those endpoints).
+    member = [Depends(require_role("member"))]
+    api.include_router(projects.router, dependencies=member)
+    api.include_router(runs.router, dependencies=member)
+    api.include_router(uploads.router, dependencies=member)
+    api.include_router(packages.router, dependencies=member)
+    api.include_router(artifacts.router, dependencies=member)
     return api
 
 

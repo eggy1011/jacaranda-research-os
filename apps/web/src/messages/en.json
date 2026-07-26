@@ -88,5 +88,24 @@
     "loading": "Loading…",
     "error": "Something went wrong: {message}",
     "refresh": "Refresh"
+  },
+  "auth": {
+    "login": "Sign in",
+    "register": "Register",
+    "logout": "Sign out",
+    "email": "Email",
+    "password": "Password",
+    "inviteCode": "Invite code",
+    "passwordHint": "At least 10 characters.",
+    "switchToRegister": "Have an invite code? Register",
+    "switchToLogin": "Already registered? Sign in",
+    "invites": "Invites",
+    "mintInvite": "Mint invite code",
+    "inviteOnce": "The code is shown once — copy it now and send it to the member.",
+    "role": {
+      "member": "Member",
+      "reviewer": "Reviewer",
+      "admin": "Admin"
+    }
   }
 }

@@ -7,6 +7,7 @@ from typing import Any
 
 import httpx
 import pytest
+from auth_helpers import sign_in
 from pytest import MonkeyPatch
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
@@ -48,6 +49,7 @@ async def client(
     app.state.job_queue = queue
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as http:
+        await sign_in(http, db)
         yield http, queue
 
 
@@ -123,6 +125,7 @@ async def test_queue_unavailable_returns_503(
     app.state.session_factory = db
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as http:
+        await sign_in(http, db, email="queueless@example.com")
         project_id = (await http.post("/projects", json={"symbol": "600519"})).json()["id"]
         assert (await http.post(f"/projects/{project_id}/runs")).status_code == 503
 

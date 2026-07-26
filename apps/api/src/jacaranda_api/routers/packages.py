@@ -9,6 +9,7 @@ from jsonschema import ValidationError as JsonSchemaValidationError
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from jacaranda_api.auth.deps import require_role
 from jacaranda_api.db.models import PackageVersion, ResearchPackage
 from jacaranda_api.pipeline.cli import repository_root
 from jacaranda_api.pipeline.validation import (
@@ -89,7 +90,11 @@ async def get_package(package_id: str, session: SessionDep) -> ResearchPackage:
     return await _get_or_404(session, package_id)
 
 
-@router.post("/packages/{package_id}/verify", response_model=PackageOut)
+@router.post(
+    "/packages/{package_id}/verify",
+    response_model=PackageOut,
+    dependencies=[Depends(require_role("reviewer"))],
+)
 async def verify_package(package_id: str, session: SessionDep) -> ResearchPackage:
     """Human confirmation that the draft holds up: structure re-validated, no
     hard QC failure. Role enforcement (reviewer) arrives with authentication."""
@@ -109,7 +114,11 @@ async def verify_package(package_id: str, session: SessionDep) -> ResearchPackag
     return package
 
 
-@router.post("/packages/{package_id}/approve", response_model=PackageOut)
+@router.post(
+    "/packages/{package_id}/approve",
+    response_model=PackageOut,
+    dependencies=[Depends(require_role("reviewer"))],
+)
 async def approve_package(package_id: str, session: SessionDep) -> ResearchPackage:
     """Only a human can approve, and a mock package can never be approved —
     the platform's hardest invariant."""
@@ -124,7 +133,11 @@ async def approve_package(package_id: str, session: SessionDep) -> ResearchPacka
     return package
 
 
-@router.post("/packages/{package_id}/reject", response_model=PackageOut)
+@router.post(
+    "/packages/{package_id}/reject",
+    response_model=PackageOut,
+    dependencies=[Depends(require_role("reviewer"))],
+)
 async def reject_package(package_id: str, session: SessionDep) -> ResearchPackage:
     package = await _get_or_404(session, package_id)
     if package.status == "approved":
@@ -137,7 +150,11 @@ async def reject_package(package_id: str, session: SessionDep) -> ResearchPackag
     return package
 
 
-@router.patch("/packages/{package_id}/document", response_model=PackageDetailOut)
+@router.patch(
+    "/packages/{package_id}/document",
+    response_model=PackageDetailOut,
+    dependencies=[Depends(require_role("reviewer"))],
+)
 async def update_document(
     package_id: str, payload: PackageDocumentUpdate, session: SessionDep
 ) -> ResearchPackage:
