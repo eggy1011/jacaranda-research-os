@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 from pathlib import Path
 from typing import Any, cast
 
@@ -246,15 +247,50 @@ async def execute_run(ctx: dict[str, Any], run_id: str) -> str:
             raise Retry(defer=30 * attempt) from error
         raise
 
+    pdf_paths, pdf_failure = _export_pdfs(artifacts)
+    await listener("08-pdf-export", "failed" if pdf_failure else "completed")
+
     async with session_factory() as session:
         run = await session.get(Run, run_id)
         if run is not None:
             await _record_success(session, run, artifacts)
+            for edition, pdf_path in pdf_paths.items():
+                existing_pdf = await session.scalar(
+                    select(Artifact).where(
+                        Artifact.run_id == run.id, Artifact.path == str(pdf_path)
+                    )
+                )
+                if existing_pdf is None:
+                    session.add(
+                        Artifact(
+                            run_id=run.id,
+                            kind="pdf",
+                            edition=edition,
+                            path=str(pdf_path),
+                        )
+                    )
             run.status = "succeeded"
-            run.error = None
+            # A missing PDF never fails the run: the draft package and PPTX are
+            # already useful, and the export can be retried after fixing soffice.
+            run.error = {"code": "pdf_export_failed", "message": pdf_failure} if (
+                pdf_failure
+            ) else None
             run.finished_at = utc_now()
             await session.commit()
     return "succeeded"
+
+
+def _export_pdfs(artifacts: PipelineArtifacts) -> tuple[dict[str, Path], str | None]:
+    from jacaranda_api.pipeline.export import PdfExportError, convert_pptx_to_pdf
+
+    produced: dict[str, Path] = {}
+    failure: str | None = None
+    for edition, pptx_path in artifacts.pptx.items():
+        try:
+            produced[edition] = convert_pptx_to_pdf(pptx_path, artifacts.root)
+        except (PdfExportError, subprocess.TimeoutExpired) as error:
+            failure = str(error)[:300]
+    return produced, failure
 
 
 async def on_startup(ctx: dict[str, Any]) -> None:

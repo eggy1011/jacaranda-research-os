@@ -285,6 +285,11 @@ async def test_worker_success_records_package_stages_artifacts(
         "_build_orchestrator",
         lambda settings, root, listener: StubOrchestrator(listener),
     )
+    exported = tmp_path / "report.zh-CN.pdf"
+    exported.write_bytes(b"pdf")
+    monkeypatch.setattr(
+        worker_module, "_export_pdfs", lambda artifacts: ({"zh-CN": exported}, None)
+    )
     try:
         outcome = await execute_run(ctx, run_id)
     finally:
@@ -295,10 +300,13 @@ async def test_worker_success_records_package_stages_artifacts(
         assert run is not None
         assert run.status == "succeeded"
         assert run.finished_at is not None
-        stages = list(
-            await session.scalars(select(RunStage).where(RunStage.run_id == run_id))
-        )
-        assert [stage.status for stage in stages] == ["completed"]
+        stages = {
+            stage.key: stage.status
+            for stage in await session.scalars(
+                select(RunStage).where(RunStage.run_id == run_id)
+            )
+        }
+        assert stages == {"01-extraction": "completed", "08-pdf-export": "completed"}
         package = await session.scalar(
             select(ResearchPackage).where(ResearchPackage.run_id == run_id)
         )
@@ -309,7 +317,7 @@ async def test_worker_success_records_package_stages_artifacts(
             await session.scalars(select(Artifact).where(Artifact.run_id == run_id))
         )
         kinds = sorted(artifact.kind for artifact in artifacts)
-        assert kinds == ["manifest", "package", "pptx"]
+        assert kinds == ["manifest", "package", "pdf", "pptx"]
 
     # a second invocation is a no-op
     ctx = _worker_ctx(db, tmp_path, monkeypatch)

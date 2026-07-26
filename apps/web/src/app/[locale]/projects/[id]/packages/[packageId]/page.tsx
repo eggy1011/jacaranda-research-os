@@ -1,12 +1,12 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
-import { use } from "react";
+import { use, useState } from "react";
 
 import { api } from "@/lib/api";
-import { Card, CardTitle, ErrorNote, StatusBadge } from "@/components/ui";
+import { Button, Card, CardTitle, ErrorNote, StatusBadge } from "@/components/ui";
 
 interface LocalizedText {
   zh_CN: string;
@@ -54,9 +54,34 @@ export default function PackagePage({
   const locale = useLocale();
   const lang = locale === "zh" ? "zh_CN" : "en_AU";
 
+  const queryClient = useQueryClient();
+  const [actionError, setActionError] = useState<string | null>(null);
   const pkg = useQuery({
     queryKey: ["package", packageId],
     queryFn: () => api.getPackage(packageId),
+  });
+  const artifacts = useQuery({
+    queryKey: ["artifacts", pkg.data?.run_id],
+    queryFn: () => api.listArtifacts(pkg.data!.run_id!),
+    enabled: Boolean(pkg.data?.run_id),
+  });
+  const versions = useQuery({
+    queryKey: ["versions", packageId],
+    queryFn: () => api.listVersions(packageId),
+  });
+  const transition = useMutation({
+    mutationFn: (action: "verify" | "approve" | "reject") =>
+      action === "verify"
+        ? api.verifyPackage(packageId)
+        : action === "approve"
+          ? api.approvePackage(packageId)
+          : api.rejectPackage(packageId),
+    onSuccess: () => {
+      setActionError(null);
+      void queryClient.invalidateQueries({ queryKey: ["package", packageId] });
+      void queryClient.invalidateQueries({ queryKey: ["versions", packageId] });
+    },
+    onError: (error: unknown) => setActionError(String(error)),
   });
 
   if (pkg.isLoading) {
@@ -90,6 +115,49 @@ export default function PackagePage({
       <p className="-mt-4 text-sm text-slate-500">
         {document.package_id} · {document.as_of_date}
       </p>
+
+      <div className="flex flex-wrap items-center gap-3">
+        {pkg.data.status === "draft" || pkg.data.status === "rejected" ? (
+          <Button onClick={() => transition.mutate("verify")} disabled={transition.isPending}>
+            {t("verify")}
+          </Button>
+        ) : null}
+        {pkg.data.status === "verified" && !pkg.data.is_mock ? (
+          <Button onClick={() => transition.mutate("approve")} disabled={transition.isPending}>
+            {t("approve")}
+          </Button>
+        ) : null}
+        {pkg.data.status !== "approved" && pkg.data.status !== "rejected" ? (
+          <Button
+            variant="danger"
+            onClick={() => transition.mutate("reject")}
+            disabled={transition.isPending}
+          >
+            {t("reject")}
+          </Button>
+        ) : null}
+        {(artifacts.data ?? [])
+          .filter((artifact) => artifact.kind === "pdf" || artifact.kind === "pptx")
+          .map((artifact) => (
+            <a
+              key={artifact.id}
+              className="text-sm font-medium text-[#563F7C] underline hover:text-[#34234F]"
+              href={api.artifactDownloadUrl(artifact.id)}
+            >
+              {t("download")} {artifact.kind.toUpperCase()}
+              {artifact.edition ? ` · ${artifact.edition}` : ""}
+            </a>
+          ))}
+      </div>
+      {actionError ? <ErrorNote>{actionError}</ErrorNote> : null}
+      {versions.data && versions.data.length > 0 ? (
+        <p className="text-xs text-slate-500">
+          {t("versions")}:{" "}
+          {versions.data
+            .map((item) => `v${item.version} ${item.status} (${item.digest.slice(0, 8)})`)
+            .join(" · ")}
+        </p>
+      ) : null}
 
       <Card>
         <CardTitle>{t("sections")}</CardTitle>
