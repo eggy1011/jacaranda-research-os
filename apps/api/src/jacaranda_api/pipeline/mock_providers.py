@@ -19,9 +19,57 @@ class FixtureAkshareClient:
     """Network-free client injected into the real AKShare adapter contract."""
 
     async def fetch_quote(self, symbol: str) -> Mapping[str, object]:
+        self._require_sentinel(symbol)
+        return {"latest": 28.4, "trade_date": date(2026, 7, 10), "currency": "CNY"}
+
+    async def fetch_financial_indicators(self, symbol: str) -> Mapping[str, object]:
+        self._require_sentinel(symbol)
+        common = {"period": "FY2025", "as_of_date": date(2025, 12, 31)}
+        return {
+            "records": [
+                {
+                    "field": "total_revenue",
+                    "name_zh": "营业总收入",
+                    "name_en": "Total operating revenue",
+                    "value": 8_420_000_000.0,
+                    "unit": "CNY",
+                    "currency": "CNY",
+                    **common,
+                },
+                {
+                    "field": "roe",
+                    "name_zh": "净资产收益率",
+                    "name_en": "Return on equity",
+                    "value": 14.2,
+                    "unit": "%",
+                    "currency": None,
+                    **common,
+                },
+                {
+                    "field": "gross_margin",
+                    "name_zh": "销售毛利率",
+                    "name_en": "Gross margin",
+                    "value": None,
+                    "unit": "%",
+                    "currency": None,
+                    **common,
+                },
+            ]
+        }
+
+    async def fetch_company_profile(self, symbol: str) -> Mapping[str, object]:
+        self._require_sentinel(symbol)
+        return {
+            "name_zh": "示例智能制造股份有限公司",
+            "name_en": "Example Intelligent Manufacturing Co., Ltd.",
+            "industry": "智能制造",
+            "listing_date": date(2015, 6, 1),
+        }
+
+    @staticmethod
+    def _require_sentinel(symbol: str) -> None:
         if symbol != "600XXX":
             raise ValueError("fixture client accepts only the fictional sentinel")
-        return {"latest": 28.4, "trade_date": date(2026, 7, 10), "currency": "CNY"}
 
 
 class ScriptedMockLLMProvider:

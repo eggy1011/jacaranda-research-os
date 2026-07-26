@@ -47,6 +47,18 @@ class QuoteClient:
             raise self.failure
         return self.payload
 
+    async def fetch_financial_indicators(self, symbol: str) -> Mapping[str, object]:
+        self.symbols.append(symbol)
+        if self.failure:
+            raise self.failure
+        return self.payload
+
+    async def fetch_company_profile(self, symbol: str) -> Mapping[str, object]:
+        self.symbols.append(symbol)
+        if self.failure:
+            raise self.failure
+        return self.payload
+
 
 class SecClientStub:
     def __init__(self, payload: Mapping[str, object]) -> None:
@@ -278,7 +290,7 @@ async def test_direct_adapter_call_rejects_unsupported_capability() -> None:
     provider = AkshareMarketDataProvider(QuoteClient())
     with pytest.raises(ProviderCapabilityError):
         await provider.fetch(
-            request("600519.SS", MarketDataCapability.FINANCIALS), SourceRegistry()
+            request("600519.SS", MarketDataCapability.FILINGS), SourceRegistry()
         )
 
     sec_client = SecClientStub({})

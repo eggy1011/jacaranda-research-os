@@ -20,14 +20,20 @@ dependencies = [
 
 [project.scripts]
 jacaranda-mock-e2e = "jacaranda_api.pipeline.cli:main"
+jacaranda-evidence = "jacaranda_api.pipeline.cli_evidence:main"
 
 [project.optional-dependencies]
 dev = [
   "mypy>=1.14,<3",
+  "pandas>=2.2,<3",
+  "pandas-stubs>=2.2,<3",
   "pytest>=8.3,<10",
   "pytest-cov>=6,<8",
   "ruff>=0.9,<1",
   "types-jsonschema>=4.23,<5",
+]
+live = [
+  "akshare>=1.14,<2",
 ]
 
 [tool.setuptools.packages.find]
@@ -51,6 +57,10 @@ select = ["E", "F", "I", "B", "UP", "S"]
 python_version = "3.11"
 strict = true
 files = ["src", "tests"]
+
+[[tool.mypy.overrides]]
+module = ["akshare.*", "pandas.*"]
+ignore_missing_imports = true
 
 [tool.coverage.run]
 branch = true
