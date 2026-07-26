@@ -107,6 +107,23 @@ The new or empty output directory receives `research-package.json`, both edition
 editable PPTX files, passing overflow reports, a deterministic manifest, and checkpoint audit data.
 The mock package stops at `verified`; this workflow never performs human `approved` promotion.
 
+## Real A-share pipeline
+
+The live wiring shares the same stage machinery. It needs the `[live]` extra (AKShare) and an
+`OPENROUTER_API_KEY`; model candidates follow D-008 (`OPENROUTER_MODELS`, free first, paid only
+with `ALLOW_PAID_MODELS=true`):
+
+```bash
+.venv/bin/python -m pip install -e 'apps/api[dev,live]'
+.venv/bin/jacaranda-evidence --symbol 600519 --output-dir /tmp/evidence-run
+.venv/bin/jacaranda-real-e2e --symbol 600519 --output-dir /tmp/real-run
+```
+
+Every stage checkpoints to `<output-dir>/checkpoints/`; rerun with `--resume` to continue an
+interrupted run without re-spending model calls. A real run always produces a **draft** package
+(`is_mock: false`) — QC-06 requires human review before anything can be marked verified, and mock
+packages can never be approved.
+
 ## Service boundaries
 
 - `apps/web/`: browser application and a same-origin health proxy.

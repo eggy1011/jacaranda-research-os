@@ -3,16 +3,25 @@ from __future__ import annotations
 import importlib
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol
 
 from jsonschema import Draft202012Validator
 
 from jacaranda_api.pipeline.models import PresentationResult
-from jacaranda_api.pipeline.validation import load_json, validate_package
+from jacaranda_api.pipeline.validation import load_json, validate_renderable_package
 
 
 class PresentationFailure(RuntimeError):
     pass
+
+
+class PresentationProvider(Protocol):
+    def render(
+        self,
+        deck: dict[str, Any],
+        package: dict[str, Any],
+        output_path: Path,
+    ) -> PresentationResult: ...
 
 
 class TemplatePresentationProvider:
@@ -27,7 +36,7 @@ class TemplatePresentationProvider:
         package: dict[str, Any],
         output_path: Path,
     ) -> PresentationResult:
-        validate_package(self._root, package)
+        validate_renderable_package(self._root, package)
         schema = load_json(self._root / "packages/research-schema/slide-deck.schema.json")
         Draft202012Validator(schema).validate(deck)
         if deck["package_id"] != package["package_id"] or deck["edition"] not in {

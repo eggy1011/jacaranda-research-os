@@ -37,137 +37,48 @@ from jacaranda_api.pipeline.models import (
     PipelineArtifacts,
     PipelineConfigurationError,
 )
-from jacaranda_api.pipeline.presentation import TemplatePresentationProvider
+from jacaranda_api.pipeline.presentation import (
+    PresentationProvider,
+    TemplatePresentationProvider,
+)
 from jacaranda_api.pipeline.validation import load_json, validate_decks, validate_package
 
+_STAGES = ("S1", "S2", "S3a", "S3b", "S3c", "S3d", "S4", "S5", "S6", "S7")
 
-class MockResearchOrchestrator:
-    """Deterministic S1-S7 vertical slice; no transport-capable dependency is constructed."""
+
+class StageOrchestrator:
+    """Shared S1-S7 stage machinery: catalog-driven execution with bounded
+    retries, checkpoint/audit records, translation application, deck generation
+    and artifact writing. Wirings (mock or real) supply providers and assembly."""
+
+    run_id = "RUN-UNSET"
+    network_label = "unspecified"
 
     def __init__(
         self,
         repository_root: Path,
         *,
-        llm: LLMProvider | None = None,
-        presentation: TemplatePresentationProvider | None = None,
+        llm: LLMProvider,
+        presentation: PresentationProvider,
         max_attempts: int = 3,
     ) -> None:
         self._root = repository_root.resolve()
         self._catalog = PromptCatalog(self._root)
         self._tasks_by_stage = {
             stage: tuple(task for task in self._catalog.all_tasks() if task.stage == stage)
-            for stage in ("S1", "S2", "S3a", "S3b", "S3c", "S3d", "S4", "S5", "S6", "S7")
+            for stage in _STAGES
         }
-        self._llm = llm or ScriptedMockLLMProvider(self._root)
-        self._presentation = presentation or TemplatePresentationProvider(self._root)
+        self._llm = llm
+        self._presentation = presentation
         self._max_attempts = max_attempts
         self._checkpoints: list[Checkpoint] = []
         self._results: list[LLMResult] = []
-
-    async def run(self, request: DemoRequest, output_dir: Path) -> PipelineArtifacts:
-        with (
-            patch("socket.socket", side_effect=RuntimeError("network disabled for mock pipeline")),
-            patch(
-                "socket.create_connection",
-                side_effect=RuntimeError("network disabled for mock pipeline"),
-            ),
-        ):
-            return await self._run_socket_blocked(request, output_dir)
-
-    async def _run_socket_blocked(
-        self, request: DemoRequest, output_dir: Path
-    ) -> PipelineArtifacts:
-        self._prepare_output(output_dir)
-        market = await self._market_data(request)
-        s1 = await self._execute(
-            self._one_task("S1"),
-            {"company_context": request.model_dump(), "evidence_chunks": [market]},
-        )
-        s2 = await self._execute(
-            self._one_task("S2"), {"sources": market["sources"], "candidates": s1}
-        )
-        analysis_input = {"verified": s2, "metrics": market["metrics"], "next_claim_id": "CLM-001"}
-        s3 = {
-            stage: await self._execute(self._one_task(stage), analysis_input)
-            for stage in ("S3a", "S3b", "S3c", "S3d")
-        }
-        s4 = await self._execute(self._one_task("S4"), {"analysis": s3, "verified": s2})
-        s5 = await self._execute(self._one_task("S5"), {"analysis": s3, "valuation": s4})
-        package = self._assemble_package(market, s3, s4, s5, request)
-        translations = await self._translate(package)
-        translation_notes = self._apply_translations(package, translations)
-        self._set_generation_metadata(package, translation_notes)
-        validate_package(self._root, package)
-        decks: dict[str, JsonDict] = {
-            edition: await self._deck(package, edition) for edition in request.editions
-        }
-        validate_decks(self._root, package, decks)
-        return self._write_artifacts(output_dir.resolve(), package, decks)
 
     def _one_task(self, stage: str) -> str:
         tasks = self._tasks_by_stage[stage]
         if len(tasks) != 1:
             raise ValueError(f"stage {stage} must bind exactly one registered task")
         return tasks[0].task_name
-
-    async def _market_data(self, request: DemoRequest) -> JsonDict:
-        symbol = NormalizedSymbol(
-            original=request.symbol,
-            canonical="600XXX.SS",
-            provider_symbol="600XXX",
-            market=Market.CN_A,
-            exchange=Exchange.SSE,
-        )
-        provider = AkshareMarketDataProvider(FixtureAkshareClient(), clock=fixed_clock)
-        result = await provider.fetch(
-            ProviderRequest(
-                symbol=symbol, capability=MarketDataCapability.QUOTE, metric_id_start=14
-            ),
-            SourceRegistry(),
-        )
-        provider_fragments = result.as_research_fragments()
-        provider_sources = cast(list[JsonDict], provider_fragments["sources"])
-        provider_metrics = cast(list[JsonDict], provider_fragments["metrics"])
-        if len(provider_sources) != 1 or len(provider_metrics) != 1:
-            raise PipelineConfigurationError(
-                "invalid_mock_provider_output",
-                "the fictional quote provider must produce exactly one source and one metric",
-            )
-        source = copy.deepcopy(provider_sources[0])
-        metric = copy.deepcopy(provider_metrics[0])
-        source["source_id"] = "SRC-002"
-        metric["source_id"] = "SRC-002"
-        fixture = load_json(self._root / "packages/presentation/fixtures/mock-package.json")
-        sources = self._replace_fixture_record(
-            fixture["sources"], "source_id", "SRC-002", source
-        )
-        metrics = self._replace_fixture_record(
-            fixture["metrics"], "metric_id", "MET-014", metric
-        )
-        return {"sources": sources, "metrics": metrics}
-
-    @staticmethod
-    def _replace_fixture_record(
-        records: Any, identifier: str, expected_id: str, replacement: JsonDict
-    ) -> list[JsonDict]:
-        if not isinstance(records, list):
-            raise PipelineConfigurationError(
-                "invalid_mock_fixture",
-                f"the mock fixture must provide a {identifier} record for {expected_id}",
-            )
-        matches = [
-            index
-            for index, item in enumerate(records)
-            if isinstance(item, dict) and item.get(identifier) == expected_id
-        ]
-        if len(matches) != 1:
-            raise PipelineConfigurationError(
-                "invalid_mock_fixture",
-                f"the mock fixture must contain exactly one {identifier}={expected_id}",
-            )
-        copied = copy.deepcopy(records)
-        copied[matches[0]] = replacement
-        return cast(list[JsonDict], copied)
 
     async def _execute(self, task_name: str, structured_input: JsonDict) -> JsonDict:
         task = self._catalog.resolve(task_name)
@@ -196,7 +107,7 @@ class MockResearchOrchestrator:
                     raise LLMProviderError(
                         code="schema_validation_failed",
                         retryable=True,
-                        message="mock output failed local validation",
+                        message="model output failed local validation",
                         attempt_count=attempt_number,
                     )
                 attempts.append(
@@ -243,7 +154,7 @@ class MockResearchOrchestrator:
                         stage=task.stage,
                         path="/",
                         retryable=True,
-                        detail="previous fixture attempt failed; retry this invocation only",
+                        detail="previous attempt failed; retry this invocation only",
                     ),
                 )
         raise AssertionError("retry loop is exhaustive")
@@ -272,33 +183,6 @@ class MockResearchOrchestrator:
                 output_sha256=digest,
             )
         )
-
-    def _assemble_package(
-        self,
-        market: JsonDict,
-        s3: JsonDict,
-        s4: JsonDict,
-        s5: JsonDict,
-        request: DemoRequest,
-    ) -> JsonDict:
-        package = load_json(self._root / "packages/presentation/fixtures/mock-package.json")
-        package["status"] = "verified"
-        package["company"]["name"] = request.company_name
-        package["company"]["exchange"] = request.exchange
-        package["as_of_date"] = request.as_of_date.isoformat()
-        package["sources"] = market["sources"]
-        package["metrics"] = market["metrics"]
-        generated_claims: dict[str, JsonDict] = {}
-        for output in s3.values():
-            generated_claims.update({claim["claim_id"]: claim for claim in output["claims"]})
-        for claim in s4["claims"] + s5["supporting_claims"]:
-            generated_claims[claim["claim_id"]] = claim
-        package["claims"] = [
-            generated_claims.get(claim["claim_id"], claim) for claim in package["claims"]
-        ]
-        package["catalysts"] = s5["catalysts"]
-        package["risks"] = s5["risks"]
-        return package
 
     async def _translate(self, package: JsonDict) -> list[JsonDict]:
         texts = self._localized_texts(package)
@@ -361,7 +245,7 @@ class MockResearchOrchestrator:
 
     @staticmethod
     def _apply_translations(package: JsonDict, batches: list[JsonDict]) -> tuple[str, ...]:
-        targets = MockResearchOrchestrator._localized_text_targets(package)
+        targets = StageOrchestrator._localized_text_targets(package)
         targets_by_path = {path: value for path, value in targets}
         translated_by_path: dict[str, JsonDict] = {}
         translated_languages: dict[str, str] = {}
@@ -386,10 +270,8 @@ class MockResearchOrchestrator:
                         f"translation batch changed authoritative content at path: {path}"
                     )
                 if (
-                    MockResearchOrchestrator._protected_translation_tokens(
-                        item[translated_language]
-                    )
-                    != MockResearchOrchestrator._protected_translation_tokens(
+                    StageOrchestrator._protected_translation_tokens(item[translated_language])
+                    != StageOrchestrator._protected_translation_tokens(
                         target[translated_language]
                     )
                 ):
@@ -404,7 +286,7 @@ class MockResearchOrchestrator:
         missing_paths = [path for path, _ in targets if path not in translated_by_path]
         if missing_paths:
             raise ValueError(f"translation batch is missing path: {missing_paths[0]}")
-        review_notes = MockResearchOrchestrator._translation_review_notes(
+        review_notes = StageOrchestrator._translation_review_notes(
             translation_flags, glossary_flags, set(targets_by_path)
         )
         for path, target in targets:
@@ -448,36 +330,11 @@ class MockResearchOrchestrator:
         )
         return tuple(sorted(notes))
 
-    def _set_generation_metadata(
-        self, package: JsonDict, translation_notes: tuple[str, ...]
-    ) -> None:
-        notes = (
-            "Offline fixture-only run; no network or credentials used; "
-            "human approval not performed."
-        )
-        if translation_notes:
-            notes += " Translation and glossary review flags: " + " | ".join(translation_notes)
-        package["generation_metadata"] = {
-            "pipeline_version": "issue-26-offline-v1",
-            "prompt_versions": {
-                result.task_name: result.prompt_version for result in self._results
-            },
-            "llm_calls": [
-                {
-                    "task": result.task_name,
-                    "requested_model": result.requested_model,
-                    "returned_model": result.returned_model,
-                    "latency_ms": result.latency_ms,
-                    "input_tokens": result.input_tokens,
-                    "output_tokens": result.output_tokens,
-                }
-                for result in self._results
-            ],
-            "notes": notes,
-        }
+    def _deck_id(self, edition: str) -> str:
+        raise NotImplementedError
 
     async def _deck(self, package: JsonDict, edition: str) -> JsonDict:
-        deck_id = f"DCK-600XXX-2026-002-{'ZH' if edition == 'zh-CN' else 'EN'}"
+        deck_id = self._deck_id(edition)
         plan_task, slide_task = self._s7_task_names()
         plan = await self._execute(
             plan_task,
@@ -517,9 +374,7 @@ class MockResearchOrchestrator:
         required = ("slide_compression_plan", "slide_compression_slide")
         selected: list[str] = []
         for task_name in required:
-            count = sum(
-                task.task_name == task_name for task in self._tasks_by_stage["S7"]
-            )
+            count = sum(task.task_name == task_name for task in self._tasks_by_stage["S7"])
             if count != 1:
                 state = "missing" if count == 0 else "duplicated"
                 raise PipelineConfigurationError(
@@ -538,23 +393,26 @@ class MockResearchOrchestrator:
         source_ids = {item["source_id"] for item in metrics}
         for claim in claims:
             source_ids.update(claim.get("source_ids", []))
-        return {
+        excerpt: JsonDict = {
             "metrics": metrics,
             "claims": claims,
             "sources": [item for item in package["sources"] if item["source_id"] in source_ids],
             "assumptions": package["valuation"]["assumptions"],
-            "valuation_refs": {
-                "target_price_metric_id": package["valuation"]["target_price_metric_id"],
-                "current_price_metric_id": package["valuation"]["current_price_metric_id"],
-                "rating": package["valuation"]["rating"],
-            },
         }
+        valuation_refs: JsonDict = {"rating": package["valuation"]["rating"]}
+        valuation = package["valuation"]
+        if "target_price_metric_id" in valuation:
+            valuation_refs["target_price_metric_id"] = valuation["target_price_metric_id"]
+        if "current_price_metric_id" in valuation:
+            valuation_refs["current_price_metric_id"] = valuation["current_price_metric_id"]
+        excerpt["valuation_refs"] = valuation_refs
+        return excerpt
 
     def _write_artifacts(
         self, root: Path, package: JsonDict, decks: dict[str, JsonDict]
     ) -> PipelineArtifacts:
         audit = root / "audit"
-        audit.mkdir(parents=True)
+        audit.mkdir(parents=True, exist_ok=True)
         package_path = root / "research-package.json"
         self._write_json(package_path, package)
         deck_paths: dict[str, Path] = {}
@@ -578,9 +436,9 @@ class MockResearchOrchestrator:
         manifest_path = root / "manifest.json"
         json_paths = [package_path, *deck_paths.values(), *report_paths.values(), checkpoint_path]
         manifest = {
-            "run_id": "MOCK-RUN-20260710-001",
-            "network": "socket-blocked",
-            "status": "verified",
+            "run_id": self.run_id,
+            "network": self.network_label,
+            "status": package["status"],
             "artifacts": [
                 {
                     "path": str(path.relative_to(root)),
@@ -626,11 +484,187 @@ class MockResearchOrchestrator:
         encoded = json.dumps(
             value, ensure_ascii=False, sort_keys=True, separators=(",", ":")
         ).encode()
-        return MockResearchOrchestrator._digest_bytes(encoded)
+        return StageOrchestrator._digest_bytes(encoded)
 
     @staticmethod
     def _digest_bytes(value: bytes) -> str:
         return hashlib.sha256(value).hexdigest()
+
+
+class MockResearchOrchestrator(StageOrchestrator):
+    """Deterministic S1-S7 vertical slice; no transport-capable dependency is constructed."""
+
+    run_id = "MOCK-RUN-20260710-001"
+    network_label = "socket-blocked"
+
+    def __init__(
+        self,
+        repository_root: Path,
+        *,
+        llm: LLMProvider | None = None,
+        presentation: TemplatePresentationProvider | None = None,
+        max_attempts: int = 3,
+    ) -> None:
+        root = repository_root.resolve()
+        super().__init__(
+            root,
+            llm=llm or ScriptedMockLLMProvider(root),
+            presentation=presentation or TemplatePresentationProvider(root),
+            max_attempts=max_attempts,
+        )
+
+    async def run(self, request: DemoRequest, output_dir: Path) -> PipelineArtifacts:
+        with (
+            patch("socket.socket", side_effect=RuntimeError("network disabled for mock pipeline")),
+            patch(
+                "socket.create_connection",
+                side_effect=RuntimeError("network disabled for mock pipeline"),
+            ),
+        ):
+            return await self._run_socket_blocked(request, output_dir)
+
+    async def _run_socket_blocked(
+        self, request: DemoRequest, output_dir: Path
+    ) -> PipelineArtifacts:
+        self._prepare_output(output_dir)
+        market = await self._market_data(request)
+        s1 = await self._execute(
+            self._one_task("S1"),
+            {"company_context": request.model_dump(), "evidence_chunks": [market]},
+        )
+        s2 = await self._execute(
+            self._one_task("S2"), {"sources": market["sources"], "candidates": s1}
+        )
+        analysis_input = {"verified": s2, "metrics": market["metrics"], "next_claim_id": "CLM-001"}
+        s3 = {
+            stage: await self._execute(self._one_task(stage), analysis_input)
+            for stage in ("S3a", "S3b", "S3c", "S3d")
+        }
+        s4 = await self._execute(self._one_task("S4"), {"analysis": s3, "verified": s2})
+        s5 = await self._execute(self._one_task("S5"), {"analysis": s3, "valuation": s4})
+        package = self._assemble_package(market, s3, s4, s5, request)
+        translations = await self._translate(package)
+        translation_notes = self._apply_translations(package, translations)
+        self._set_generation_metadata(package, translation_notes)
+        validate_package(self._root, package)
+        decks: dict[str, JsonDict] = {
+            edition: await self._deck(package, edition) for edition in request.editions
+        }
+        validate_decks(self._root, package, decks)
+        return self._write_artifacts(output_dir.resolve(), package, decks)
+
+    def _deck_id(self, edition: str) -> str:
+        return f"DCK-600XXX-2026-002-{'ZH' if edition == 'zh-CN' else 'EN'}"
+
+    async def _market_data(self, request: DemoRequest) -> JsonDict:
+        symbol = NormalizedSymbol(
+            original=request.symbol,
+            canonical="600XXX.SS",
+            provider_symbol="600XXX",
+            market=Market.CN_A,
+            exchange=Exchange.SSE,
+        )
+        provider = AkshareMarketDataProvider(FixtureAkshareClient(), clock=fixed_clock)
+        result = await provider.fetch(
+            ProviderRequest(
+                symbol=symbol, capability=MarketDataCapability.QUOTE, metric_id_start=14
+            ),
+            SourceRegistry(),
+        )
+        provider_fragments = result.as_research_fragments()
+        provider_sources = cast(list[JsonDict], provider_fragments["sources"])
+        provider_metrics = cast(list[JsonDict], provider_fragments["metrics"])
+        if len(provider_sources) != 1 or len(provider_metrics) != 1:
+            raise PipelineConfigurationError(
+                "invalid_mock_provider_output",
+                "the fictional quote provider must produce exactly one source and one metric",
+            )
+        source = copy.deepcopy(provider_sources[0])
+        metric = copy.deepcopy(provider_metrics[0])
+        source["source_id"] = "SRC-002"
+        metric["source_id"] = "SRC-002"
+        fixture = load_json(self._root / "packages/presentation/fixtures/mock-package.json")
+        sources = self._replace_fixture_record(fixture["sources"], "source_id", "SRC-002", source)
+        metrics = self._replace_fixture_record(fixture["metrics"], "metric_id", "MET-014", metric)
+        return {"sources": sources, "metrics": metrics}
+
+    @staticmethod
+    def _replace_fixture_record(
+        records: Any, identifier: str, expected_id: str, replacement: JsonDict
+    ) -> list[JsonDict]:
+        if not isinstance(records, list):
+            raise PipelineConfigurationError(
+                "invalid_mock_fixture",
+                f"the mock fixture must provide a {identifier} record for {expected_id}",
+            )
+        matches = [
+            index
+            for index, item in enumerate(records)
+            if isinstance(item, dict) and item.get(identifier) == expected_id
+        ]
+        if len(matches) != 1:
+            raise PipelineConfigurationError(
+                "invalid_mock_fixture",
+                f"the mock fixture must contain exactly one {identifier}={expected_id}",
+            )
+        copied = copy.deepcopy(records)
+        copied[matches[0]] = replacement
+        return cast(list[JsonDict], copied)
+
+    def _assemble_package(
+        self,
+        market: JsonDict,
+        s3: JsonDict,
+        s4: JsonDict,
+        s5: JsonDict,
+        request: DemoRequest,
+    ) -> JsonDict:
+        package = load_json(self._root / "packages/presentation/fixtures/mock-package.json")
+        package["status"] = "verified"
+        package["company"]["name"] = request.company_name
+        package["company"]["exchange"] = request.exchange
+        package["as_of_date"] = request.as_of_date.isoformat()
+        package["sources"] = market["sources"]
+        package["metrics"] = market["metrics"]
+        generated_claims: dict[str, JsonDict] = {}
+        for output in s3.values():
+            generated_claims.update({claim["claim_id"]: claim for claim in output["claims"]})
+        for claim in s4["claims"] + s5["supporting_claims"]:
+            generated_claims[claim["claim_id"]] = claim
+        package["claims"] = [
+            generated_claims.get(claim["claim_id"], claim) for claim in package["claims"]
+        ]
+        package["catalysts"] = s5["catalysts"]
+        package["risks"] = s5["risks"]
+        return package
+
+    def _set_generation_metadata(
+        self, package: JsonDict, translation_notes: tuple[str, ...]
+    ) -> None:
+        notes = (
+            "Offline fixture-only run; no network or credentials used; "
+            "human approval not performed."
+        )
+        if translation_notes:
+            notes += " Translation and glossary review flags: " + " | ".join(translation_notes)
+        package["generation_metadata"] = {
+            "pipeline_version": "issue-26-offline-v1",
+            "prompt_versions": {
+                result.task_name: result.prompt_version for result in self._results
+            },
+            "llm_calls": [
+                {
+                    "task": result.task_name,
+                    "requested_model": result.requested_model,
+                    "returned_model": result.returned_model,
+                    "latency_ms": result.latency_ms,
+                    "input_tokens": result.input_tokens,
+                    "output_tokens": result.output_tokens,
+                }
+                for result in self._results
+            ],
+            "notes": notes,
+        }
 
 
 def run_pipeline(repository_root: Path, output_dir: Path) -> PipelineArtifacts:

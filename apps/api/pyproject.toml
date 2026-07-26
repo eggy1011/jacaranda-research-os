@@ -21,6 +21,7 @@ dependencies = [
 [project.scripts]
 jacaranda-mock-e2e = "jacaranda_api.pipeline.cli:main"
 jacaranda-evidence = "jacaranda_api.pipeline.cli_evidence:main"
+jacaranda-real-e2e = "jacaranda_api.pipeline.cli_real:main"
 
 [project.optional-dependencies]
 dev = [

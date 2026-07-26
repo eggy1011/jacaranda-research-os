@@ -16,11 +16,11 @@ def load_json(path: Path) -> dict[str, Any]:
     return cast(dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
 
 
-def validate_package(repository_root: Path, package: dict[str, Any]) -> None:
+def _validate_structure(repository_root: Path, package: dict[str, Any]) -> None:
+    """Shared structural gate: schema, resolvable references, 12 sections,
+    counterevidence surfaced in the thesis, and fact-tier requirements."""
     schema = load_json(repository_root / "packages/research-schema/research-package.schema.json")
     Draft202012Validator(schema).validate(package)
-    if package["company"]["is_mock"] is not True or package["status"] != "verified":
-        raise SemanticValidationError("mock packages must stop at verified")
     _assert_references(package)
     section_ids = [section["section_id"] for section in package["sections"]]
     if len(section_ids) != 12 or len(set(section_ids)) != 12:
@@ -34,13 +34,49 @@ def validate_package(repository_root: Path, package: dict[str, Any]) -> None:
     }
     for claim in package["claims"]:
         if claim["type"] == "fact" and any(
-            source_tiers[source_id] not in {"primary", "secondary"}
+            source_tiers.get(source_id) not in {"primary", "secondary"}
             for source_id in claim["source_ids"]
         ):
             raise SemanticValidationError("facts require primary or secondary evidence")
+
+
+def validate_package(repository_root: Path, package: dict[str, Any]) -> None:
+    """Mock-slice gate: fixture packages must stay mock, stop at verified, and
+    pass every automated QC check."""
+    if package["company"]["is_mock"] is not True or package["status"] != "verified":
+        raise SemanticValidationError("mock packages must stop at verified")
+    _validate_structure(repository_root, package)
     checks = {check["check_id"]: check["result"] for check in package["quality"]["checks"]}
     if any(checks.get(f"QC-{index:02d}") != "pass" for index in range(1, 11)):
         raise SemanticValidationError("existing bilingual and research QC checks must pass")
+
+
+def validate_renderable_package(repository_root: Path, package: dict[str, Any]) -> None:
+    """Render-time gate: structural completeness plus the one status rule that
+    must hold everywhere — a mock package can never be approved."""
+    if package["company"]["is_mock"] is True and package["status"] == "approved":
+        raise SemanticValidationError("mock packages can never be approved")
+    _validate_structure(repository_root, package)
+
+
+def validate_real_package(repository_root: Path, package: dict[str, Any]) -> None:
+    """Real-run gate for a freshly assembled draft: structurally complete, honest
+    about being unreviewed. QC checks may be needs_human/not_run/warning (that is
+    what human review is for) but a hard QC fail blocks even the draft."""
+    if package["company"]["is_mock"] is not False:
+        raise SemanticValidationError("real packages must set company.is_mock to false")
+    if package["status"] != "draft":
+        raise SemanticValidationError(
+            "a freshly generated real package must be a draft until human review"
+        )
+    _validate_structure(repository_root, package)
+    failed = [
+        check["check_id"]
+        for check in package["quality"]["checks"]
+        if check["result"] == "fail"
+    ]
+    if failed:
+        raise SemanticValidationError(f"quality checks failed: {failed}")
 
 
 def validate_decks(
