@@ -2,9 +2,17 @@ from __future__ import annotations
 
 from collections.abc import Awaitable, Callable, Mapping
 from datetime import UTC, date, datetime
-from typing import Literal, TypeVar
+from typing import Annotated, Literal, TypeVar
 
-from pydantic import BaseModel, SecretStr, ValidationError
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    SecretStr,
+    StrictFloat,
+    StrictInt,
+    ValidationError,
+)
 
 from jacaranda_api.market_data.contracts import MarketDataResult
 from jacaranda_api.market_data.errors import (
@@ -136,6 +144,76 @@ def build_result(
         capability=request.capability,
         metrics=(metric,),
         missing=(),
+        source_registry=registration.registry,
+    )
+
+
+class MetricDraft(BaseModel):
+    """One candidate metric from a multi-metric capability; value None becomes MissingData."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    field: Annotated[str, Field(min_length=1)]
+    name: LocalizedText
+    value: StrictFloat | StrictInt | None
+    unit: Annotated[str, Field(min_length=1)]
+    currency: Currency | None
+    period: Annotated[
+        str,
+        Field(pattern=r"^(FY[0-9]{4}|[0-9]{4}(H1|H2|Q[1-4])|TTM[0-9]{4}Q[1-4]|PIT)$"),
+    ]
+    as_of_date: date
+
+
+def build_metrics_result(
+    *,
+    provider: ProviderName,
+    request: ProviderRequest,
+    registry: SourceRegistry,
+    source: SourceDraft,
+    drafts: tuple[MetricDraft, ...],
+) -> MarketDataResult:
+    """Build a result for capabilities that return several metrics against one source.
+
+    Mirrors build_result's contract: the source is registered exactly once, absent
+    values are reported as MissingData (never zeroed), and metric identifiers are
+    allocated sequentially from the request's metric_id_start.
+    """
+    registration = registry.register(source)
+    metrics: list[CanonicalMetric] = []
+    missing: list[MissingData] = []
+    offset = 0
+    for draft in drafts:
+        if draft.value is None:
+            missing.append(
+                MissingData(field=draft.field, reason="not_reported", provider=provider)
+            )
+            continue
+        try:
+            metrics.append(
+                CanonicalMetric(
+                    metric_id=request.metric_id(offset),
+                    name=draft.name,
+                    value=draft.value,
+                    unit=draft.unit,
+                    currency=draft.currency,
+                    period=draft.period,
+                    as_of_date=draft.as_of_date,
+                    source_id=registration.source.source_id,
+                    source_url_or_document=registration.source.url_or_document,
+                    retrieved_at=source.retrieved_at,
+                    computed_by="provider",
+                )
+            )
+        except (ValidationError, ValueError):
+            raise MalformedProviderResponseError(provider.value) from None
+        offset += 1
+    return MarketDataResult(
+        provider=provider,
+        symbol=request.symbol,
+        capability=request.capability,
+        metrics=tuple(metrics),
+        missing=tuple(missing),
         source_registry=registration.registry,
     )
 
