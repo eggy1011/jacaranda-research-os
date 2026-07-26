@@ -6,18 +6,22 @@ This repository is the shared workspace for a bilingual, source-grounded equity 
 
 ## Current stage
 
-Phase 1 engineering baseline: Next.js web, FastAPI, PostgreSQL/pgvector, Redis, Docker Compose,
-automated checks, and secret scanning. Market-data, LLM, research, and presentation integrations are
-not enabled yet.
+The offline technical foundation is complete and merged (PR #27): research/slide schemas, the
+versioned prompt catalogue (S1–S7), market-data and LLM provider libraries, the purple bilingual
+PPTX template system, and a credential-free end-to-end mock vertical slice with per-stage
+checkpoints and audit records. The deployable product (real A-share data, uploads, persistence,
+full web flow, PDF export, auth, deployment) is being built now — see `docs/TASK_BOARD.md` for the
+phase tracker.
 
 ## Development principles
 
 - A-share MVP with a provider architecture that also supports US equities.
 - Chinese and English reports generated from the same structured research package.
-- Development LLM calls use OpenRouter free routing only.
+- LLM calls go through OpenRouter with an explicit ordered model list; paid models require an
+  explicit opt-in and a silent paid fallback is never allowed.
 - API keys are loaded from local/deployment secrets and never committed.
 - AI-generated research requires source attribution and human approval.
-- Codex owns engineering and integration; Claude Code owns research schemas, prompts, and presentation design.
+- The project is maintained by a single owner; AI assistants execute, the owner reviews and approves.
 
 Read `PROJECT_BRIEF.md`, `AGENTS.md`, `CLAUDE.md`, and the files under `docs/` before starting work.
 
@@ -107,7 +111,7 @@ The mock package stops at `verified`; this workflow never performs human `approv
 
 - `apps/web/`: browser application and a same-origin health proxy.
 - `apps/api/`: server-only API and configuration.
-- `packages/`: research, prompt, and presentation contracts owned by Claude Code.
+- `packages/`: research, prompt, and presentation contracts.
 
 The backend health endpoint is intentionally a liveness check. Database and Redis readiness are
 reported by their Docker Compose health checks until application persistence is implemented.

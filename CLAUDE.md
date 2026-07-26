@@ -1,6 +1,7 @@
-# Claude Code Instructions
+# Claude Code Instructions (research-content focus)
 
-Claude Code is the research methodology, bilingual content, prompt, and presentation design owner.
+The project is maintained by a single human owner assisted by AI (D-010). These rules apply to any
+work on research methodology, bilingual content, prompts, and presentation design.
 
 ## Read first
 
@@ -11,43 +12,32 @@ Before changing files, read:
 3. `docs/PRESENTATION_SYSTEM.md`
 4. `docs/DECISIONS.md`
 5. `docs/TASK_BOARD.md`
-6. the assigned GitHub Issue
 
-## Responsibilities
+## Research-content scope
 
-- Research-package and slide-deck schemas.
-- Evidence extraction, verification, analysis, translation and compression prompts.
+- Research-package and slide-deck schemas (`packages/research-schema/`).
+- Evidence extraction, verification, analysis, translation and compression prompts
+  (`packages/prompts/`).
 - A-share and US-market research fields.
-- Fact/inference/opinion classification.
-- Citation and provenance rules.
+- Fact/inference/opinion classification; citation and provenance rules.
 - Chinese/English consistency checks.
-- Purple slide templates and visual QA.
+- Purple slide templates and visual QA (`packages/presentation/`).
 - Research-quality rubric and hallucination checks.
 
-## Ownership
+Schema, prompt or visual-rule changes ripple into the pipeline, validators and renderer — make
+them deliberately, never as a side effect of engineering work, and update the affected validators
+and fixtures in the same PR.
 
-Claude Code primarily owns:
+## Required workflow (solo mode, D-010)
 
-- `packages/research-schema/`
-- `packages/prompts/`
-- `packages/presentation/`
-- `docs/RESEARCH_METHODOLOGY.md`
-- `docs/PRESENTATION_SYSTEM.md`
-
-Do not modify API infrastructure, database migrations, authentication or deployment unless the Issue explicitly authorises it.
-
-## Required workflow
-
-1. Work only on the assigned Issue and a non-main branch.
-2. Before editing, state intended files, exclusions, acceptance criteria and required Codex interfaces.
-3. Provide structured examples that validate against the proposed schema.
-4. Treat missing information as missing; never invent it.
-5. Open a PR and ask Codex to review implementation compatibility.
-6. Do not merge the PR yourself.
+1. Feature work happens on a short-lived non-main branch and is merged through a PR once CI is
+   green. Self-merge is allowed; documentation-only changes may go directly to `main`.
+2. Provide structured examples that validate against the proposed schema.
+3. Treat missing information as missing; never invent it.
+4. Mock (`is_mock`) packages can never be promoted to `approved`.
 
 ## Security
 
 - Never ask for or store a real API key.
 - Use environment-variable names and mock evidence only.
 - Never include confidential uploaded research in test fixtures without approval.
-

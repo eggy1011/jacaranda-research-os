@@ -1,6 +1,7 @@
-# Codex Instructions
+# Agent Instructions (engineering focus)
 
-Codex is the engineering and integration owner for Jacaranda Research OS.
+The project is maintained by a single human owner assisted by AI (D-010). Any AI agent doing
+engineering work in this repository follows these rules.
 
 ## Read first
 
@@ -10,42 +11,26 @@ Before changing code, read:
 2. `docs/ARCHITECTURE.md`
 3. `docs/DECISIONS.md`
 4. `docs/TASK_BOARD.md`
-5. the assigned GitHub Issue
 
-## Responsibilities
+## Engineering scope
 
 - Monorepo, Next.js, FastAPI, database, storage, jobs, Docker and CI.
 - `MarketDataProvider`, `DocumentProvider`, `LLMProvider` and `PresentationProvider`.
-- AKShare, SEC, FMP and Finnhub adapters.
+- AKShare, SEC, FMP and Finnhub adapters and their live clients.
 - OpenRouter client, schema validation, retries, checkpoints and audit metadata.
 - Frontend/backend integration, security, tests and deployment.
 
-## Ownership
+Research-content contracts live in `packages/research-schema`, `packages/prompts` and
+`packages/presentation` (see `CLAUDE.md`). Do not change research semantics or visual rules as a
+side effect of engineering work; make such changes deliberately and state them in the PR.
 
-Codex primarily owns:
+## Required workflow (solo mode, D-010)
 
-- `apps/web/`
-- `apps/api/`
-- `packages/providers/`
-- infrastructure and CI files
-
-Claude Code primarily owns:
-
-- `packages/research-schema/`
-- `packages/prompts/`
-- `packages/presentation/`
-- research and presentation methodology documents
-
-Do not change research semantics or visual rules without an Issue and review.
-
-## Required workflow
-
-1. Work only on the assigned Issue and a non-main branch.
-2. Before implementation, state the intended files, exclusions, acceptance criteria and risks.
-3. Keep changes small and reviewable.
-4. Add tests for new behaviour.
-5. Run tests, type checks and secret scanning.
-6. Open a PR; do not merge it yourself.
+1. Feature work happens on a short-lived non-main branch and is merged through a PR once CI is
+   green. Self-merge is allowed; documentation-only changes may go directly to `main`.
+2. Keep changes small and reviewable; each PR states its intent and acceptance criteria.
+3. Add tests for new behaviour. The API coverage gate is 90%; mypy strict must pass.
+4. Never mark work done without its verification step from `docs/TASK_BOARD.md`.
 
 ## Security
 
@@ -53,5 +38,4 @@ Do not change research semantics or visual rules without an Issue and review.
 - The browser must never receive provider keys.
 - Keep only empty placeholders in `.env.example`.
 - CI tests use mocks/fixtures, not live paid or secret-bearing requests.
-- Development model configuration must not silently select a paid model.
-
+- Paid LLM models require the explicit configuration opt-in from D-008; never a silent selection.

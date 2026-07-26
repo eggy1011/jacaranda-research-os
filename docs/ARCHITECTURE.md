@@ -1,15 +1,19 @@
 # Architecture
 
-## Proposed stack
+## Stack
 
-- Web: Next.js, TypeScript, Tailwind and shadcn/ui.
+- Web: Next.js, TypeScript, Tailwind; shadcn/ui adopted in the web-flow phase (Phase 4), with
+  next-intl for zh/en and TanStack Query for data fetching.
 - API: FastAPI, Python and Pydantic.
-- Data: PostgreSQL with pgvector.
-- Jobs/cache: Redis with a background worker; MVP may begin with a simpler job runner.
-- Charts: ECharts.
-- Documents: Docling.
-- Presentations: Presenton, with PptxGenJS for template-specific gaps.
-- Deployment: Docker Compose for development and a small managed/container deployment for MVP.
+- Data: PostgreSQL with pgvector (SQLAlchemy 2 async + Alembic; thin relational spine, package and
+  checkpoint documents stored as JSONB).
+- Jobs/cache: Redis with an arq background worker; runs resume from per-stage checkpoints.
+- Documents: pypdf, python-docx and openpyxl with page/paragraph/cell source locators (Docling
+  deferred unless scanned-PDF tables become a blocker).
+- Presentations: the bespoke `packages/presentation` python-pptx renderer (D-007); PDF via
+  headless LibreOffice in the worker image.
+- Deployment: Docker Compose for development and local acceptance first (D-011); a single
+  VPS + Caddy afterwards.
 
 ## Core flow
 
@@ -66,9 +70,10 @@ the prompt version and registry-bound schema without modifying Claude-owned file
 schema references are bundled into one self-contained object before a structured-output request,
 and every response is parsed strictly and validated again locally.
 
-The OpenRouter implementation is globally locked to `openrouter/free`, requests strict JSON Schema
-output with `require_parameters: true`, and records the actual returned model verbatim. It never
-uses `openrouter/auto`, a named paid model or a paid fallback. Invalid JSON, schema-invalid output
+The OpenRouter implementation requests strict JSON Schema output with `require_parameters: true`
+and records the actual returned model verbatim. Model selection follows D-008: an ordered candidate
+list, free models first, paid candidates only behind an explicit opt-in; it never uses
+`openrouter/auto` or a silent paid fallback. Invalid JSON, schema-invalid output
 and truncated completions receive at most three total attempts with structured validator feedback;
 transport, authentication and rate-limit failures are classified and returned to the future
 scheduler without an internal retry loop. Tests inject an offline HTTP boundary and block sockets.

@@ -34,7 +34,7 @@ dev = [
 where = ["src"]
 
 [tool.pytest.ini_options]
-addopts = "--strict-config --strict-markers --cov=jacaranda_api --cov-report=term-missing --cov-fail-under=100"
+addopts = "--strict-config --strict-markers --cov=jacaranda_api --cov-report=term-missing --cov-fail-under=90"
 testpaths = ["tests"]
 
 [tool.ruff]

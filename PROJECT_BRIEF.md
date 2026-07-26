@@ -37,16 +37,19 @@ Build a low-maintenance, bilingual AI equity research platform for Jacaranda Sto
 
 - A-shares: AKShare behind an internal provider interface.
 - US equities: SEC EDGAR, FMP and Finnhub adapters.
-- Documents: Docling.
-- Presentations: Presenton first; PptxGenJS only for gaps.
+- Documents: pypdf, python-docx and openpyxl with source locators (Docling deferred; revisit only
+  if scanned-PDF tables become a blocker).
+- Presentations: the bespoke `packages/presentation` python-pptx renderer (supersedes the original
+  "Presenton first" preference — see D-007 in `docs/DECISIONS.md`).
 - Research workflow inspiration: FinRobot and TradingAgents.
 - go-stock is reference material only until its GPL implications are reviewed.
 
 ## LLM policy during development
 
 - Provider: OpenRouter OpenAI-compatible API.
-- Default model: `openrouter/free`.
-- Never silently fall back to a paid model.
+- An ordered candidate model list, free models first; inexpensive paid models may be enabled with
+  an explicit configuration opt-in and a small approved budget (see D-008).
+- Never silently fall back to or upgrade into a paid model; record the model actually used.
 - Validate important output against JSON Schema/Pydantic.
 - Record the actual returned model and task metadata, never secrets.
 - Free-model failure must produce an explicit retryable state.
