@@ -58,16 +58,46 @@ def _error_payload(error: Exception) -> dict[str, Any]:
 
 
 async def _upsert_stage(
-    session: AsyncSession, run_id: str, key: str, status: str
+    session: AsyncSession,
+    run_id: str,
+    key: str,
+    status: str,
+    detail: dict[str, Any] | None = None,
 ) -> None:
     stage = await session.scalar(
         select(RunStage).where(RunStage.run_id == run_id, RunStage.key == key)
     )
     if stage is None:
-        session.add(RunStage(run_id=run_id, key=key, status=status))
+        session.add(RunStage(run_id=run_id, key=key, status=status, detail=detail))
     else:
         stage.status = status
+        if detail is not None:
+            stage.detail = detail
         stage.updated_at = utc_now()
+
+
+def _llm_usage(document: dict[str, Any]) -> dict[str, Any] | None:
+    """Aggregate the pipeline's recorded llm_calls into a per-run usage summary
+    (D-008 cost visibility: which model served, how many tokens it spent)."""
+    calls = document.get("generation_metadata", {}).get("llm_calls")
+    if not isinstance(calls, list) or not calls:
+        return None
+    models: dict[str, int] = {}
+    input_tokens = 0
+    output_tokens = 0
+    for call in calls:
+        if not isinstance(call, dict):
+            continue
+        model = str(call.get("returned_model", "unknown"))
+        models[model] = models.get(model, 0) + 1
+        input_tokens += int(call.get("input_tokens") or 0)
+        output_tokens += int(call.get("output_tokens") or 0)
+    return {
+        "calls": len(calls),
+        "input_tokens": input_tokens,
+        "output_tokens": output_tokens,
+        "models": models,
+    }
 
 
 async def _record_success(
@@ -254,6 +284,15 @@ async def execute_run(ctx: dict[str, Any], run_id: str) -> str:
         run = await session.get(Run, run_id)
         if run is not None:
             await _record_success(session, run, artifacts)
+            document = cast(
+                dict[str, Any],
+                json.loads(artifacts.research_package.read_text(encoding="utf-8")),
+            )
+            usage = _llm_usage(document)
+            if usage is not None:
+                await _upsert_stage(
+                    session, run.id, "09-llm-usage", "completed", detail=usage
+                )
             for edition, pdf_path in pdf_paths.items():
                 existing_pdf = await session.scalar(
                     select(Artifact).where(

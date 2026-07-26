@@ -220,6 +220,24 @@ class StubOrchestrator:
                     "package_id": "RPK-600519-2026-001",
                     "status": "draft",
                     "company": {"is_mock": False},
+                    "generation_metadata": {
+                        "llm_calls": [
+                            {
+                                "task": "extraction",
+                                "requested_model": "a/m:free",
+                                "returned_model": "a/m:free",
+                                "input_tokens": 100,
+                                "output_tokens": 40,
+                            },
+                            {
+                                "task": "translation",
+                                "requested_model": "a/m:free",
+                                "returned_model": "b/m:free",
+                                "input_tokens": 50,
+                                "output_tokens": 20,
+                            },
+                        ]
+                    },
                 }
             ),
             encoding="utf-8",
@@ -304,12 +322,23 @@ async def test_worker_success_records_package_stages_artifacts(
         assert run.status == "succeeded"
         assert run.finished_at is not None
         stages = {
-            stage.key: stage.status
+            stage.key: stage
             for stage in await session.scalars(
                 select(RunStage).where(RunStage.run_id == run_id)
             )
         }
-        assert stages == {"01-extraction": "completed", "08-pdf-export": "completed"}
+        assert {key: stage.status for key, stage in stages.items()} == {
+            "01-extraction": "completed",
+            "08-pdf-export": "completed",
+            "09-llm-usage": "completed",
+        }
+        usage = stages["09-llm-usage"].detail
+        assert usage == {
+            "calls": 2,
+            "input_tokens": 150,
+            "output_tokens": 60,
+            "models": {"a/m:free": 1, "b/m:free": 1},
+        }
         package = await session.scalar(
             select(ResearchPackage).where(ResearchPackage.run_id == run_id)
         )
