@@ -1,0 +1,166 @@
+#!/usr/bin/env python3
+"""Offline tests for the 9:16 knowledge-card renderer (plain asserts, fictional data only).
+
+Run standalone:  python3 packages/presentation/cards/tests/run_tests.py
+Also invoked by packages/presentation/tests/run_tests.py so CI exercises it.
+"""
+
+from __future__ import annotations
+
+import json
+import sys
+import tempfile
+from pathlib import Path
+
+PRES = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(PRES.parent))  # so `presentation.cards` imports
+
+from presentation.cards import (  # noqa: E402
+    CARD_H,
+    CARD_W,
+    format_number,
+    render_series,
+)
+from presentation.cards.render import (  # noqa: E402
+    ROLE_ORDER,
+    CardRenderError,
+    find_rasteriser,
+    qa_report,
+    rasterise,
+    resolve_numbers,
+)
+from presentation.cards.svg import NO_LINE_START, wrap_cjk  # noqa: E402
+
+SCHEMA_EX = PRES.parent / "research-schema" / "examples"
+SERIES = json.loads((SCHEMA_EX / "example-social-card-series.zh-CN.json").read_text("utf-8"))
+# In production the series is compiled FROM this package, so ids match by construction; the
+# committed fixtures were built in separate PRs (series cites the bilingual -001, the zh package
+# is -002), so align the id here. The zh package gives real Chinese metric names to render.
+PKG = json.loads((SCHEMA_EX / "example-research-package.zh.json").read_text("utf-8"))
+PKG["package_id"] = SERIES["package_id"]
+
+passed = 0
+
+
+def ok(name: str, condition: bool, detail: str = "") -> None:
+    global passed
+    assert condition, f"{name}: {detail}"
+    passed += 1
+    print("PASS", name)
+
+
+def _render(dir_name: str) -> dict:
+    out = Path(tempfile.mkdtemp(prefix=f"jac-cards-{dir_name}-"))
+    return render_series(SERIES, PKG, out), out
+
+
+# ---- structure ------------------------------------------------------------
+
+def test_seven_fixed_cards() -> None:
+    m, out = _render("struct")
+    ok("card: seven cards rendered", m["card_count"] == 7, str(m["card_count"]))
+    ok("card: fixed role order", [c["role"] for c in m["cards"]] == ROLE_ORDER)
+    ok("card: canvas is 9:16 1080x1920",
+       m["canvas"] == {"width": 1080, "height": 1920, "aspect": "9:16"})
+    for e in m["cards"]:
+        svg = (out / e["file"]).read_text("utf-8")
+        ok(f"card {e['card_no']}: svg dimensions",
+           f'width="{CARD_W}"' in svg and f'height="{CARD_H}"' in svg)
+
+
+# ---- determinism ----------------------------------------------------------
+
+def test_deterministic() -> None:
+    (m1, d1), (m2, d2) = _render("det-a"), _render("det-b")
+    ok("card: manifest hashes identical across runs",
+       [c["sha256"] for c in m1["cards"]] == [c["sha256"] for c in m2["cards"]])
+    for a, b in zip(m1["cards"], m2["cards"], strict=True):
+        ok(f"card {a['card_no']}: svg bytes identical",
+           (d1 / a["file"]).read_bytes() == (d2 / b["file"]).read_bytes())
+
+
+# ---- number binding -------------------------------------------------------
+
+def test_number_binding() -> None:
+    ok("format: yi transform", format_number(4_520_000_000, "yi", 1) == "45.2亿")
+    ok("format: percent transform", format_number(20.2, "percent", 1) == "20.2%")
+    ok("format: yi two decimals", format_number(512_000_000, "yi", 2) == "5.12亿")
+    ok("format: raw thousands separator", format_number(1361.76, "raw", 2) == "1,361.76")
+
+    metrics = {mm["metric_id"]: mm for mm in PKG["metrics"]}
+    full_year = next(c for c in SERIES["cards"] if c["role"] == "full_year")
+    nums = resolve_numbers(full_year, metrics)
+    texts = {n["text"] for n in nums}
+    ok("card: full_year resolves declared numbers",
+       {"45.2亿", "5.12亿", "20.2%"} <= texts, str(texts))
+
+    m, out = _render("nums")
+    svg2 = (out / "card-02-full-year.svg").read_text("utf-8")
+    ok("card: resolved number appears in svg", "45.2亿" in svg2 and "20.2%" in svg2)
+
+    bad = {"card_no": 1, "role": "cover", "hook": "x", "body": "y", "source_ids": ["SRC-001"],
+           "status": "preview_ready", "inline_numbers": [{"metric_id": "MET-404",
+                                                          "display_transform": "raw"}]}
+    try:
+        resolve_numbers(bad, metrics)
+        ok("card: unknown metric rejected", False, "no error raised")
+    except CardRenderError:
+        ok("card: unknown metric rejected", True)
+
+
+# ---- typography / QA ------------------------------------------------------
+
+def test_kinsoku_wrapping() -> None:
+    lines = wrap_cjk("全年营收 45.2 亿、净利 5.12 亿", max_chars=8, max_lines=3)
+    ok("wrap: no line starts with closing punctuation",
+       all(line[:1] not in NO_LINE_START for line in lines), str(lines))
+    filled = wrap_cjk("字" * 50, max_chars=8, max_lines=3)
+    ok("wrap: respects max_lines", len(filled) == 3)
+    ok("wrap: truncates with ellipsis", filled[-1].endswith("…"))
+
+
+def test_qa_gate() -> None:
+    _, out = _render("qa")  # a clean render must produce no QA issues (else render_series raises)
+    ok("qa: clean series renders without raising", (out / "manifest.json").exists())
+
+    good_svg = (out / "card-07-counter-conclusion.svg").read_text("utf-8")
+    ok("qa: closing card has stacked source union",
+       "SRC-001" in good_svg and "SRC-004" in good_svg and "不构成投资建议" in good_svg)
+
+    card = SERIES["cards"][0]
+    missing_footer = '<svg width="1080" height="1920"><text x="10" y="10">仅供学习研究</text></svg>'
+    issues = qa_report(missing_footer, card)
+    ok("qa: flags missing source line", any(i["code"] == "missing_source_line" for i in issues))
+    oob = '<svg><text x="20" y="9000">数据来源 仅供学习研究，不构成投资建议</text></svg>'
+    ok("qa: flags out-of-bounds text",
+       any(i["code"] == "out_of_bounds" for i in qa_report(oob, card)))
+    orphan = ('<svg><text x="20" y="20">，orphan</text>'
+              '<text x="20" y="40">数据来源 不构成投资建议</text></svg>')
+    ok("qa: flags orphaned line-start punctuation",
+       any(i["code"] == "orphan_punctuation" for i in qa_report(orphan, card)))
+
+
+# ---- rasteriser -----------------------------------------------------------
+
+def test_raster_optional() -> None:
+    if find_rasteriser() is None:
+        _, out = _render("raster")
+        got = rasterise(out / "card-01-cover.svg", out / "card-01-cover.png")
+        ok("raster: absent backend degrades gracefully", got is False)
+    else:
+        ok("raster: backend present (skipped negative check)", True)
+
+
+def main() -> int:
+    test_seven_fixed_cards()
+    test_deterministic()
+    test_number_binding()
+    test_kinsoku_wrapping()
+    test_qa_gate()
+    test_raster_optional()
+    print(f"\nALL {passed} card-renderer assertions passed")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

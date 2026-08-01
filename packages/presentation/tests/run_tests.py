@@ -157,7 +157,11 @@ def main() -> int:
     test_bilingual_summary_rejected()
     test_soffice_discovery()
     print(f"\nALL {passed} assertions passed")
-    return 0
+
+    # v2 knowledge-card renderer tests run under the same CI step.
+    from cards.tests import run_tests as card_tests  # noqa: E402
+    print()
+    return card_tests.main()
 
 
 if __name__ == "__main__":
