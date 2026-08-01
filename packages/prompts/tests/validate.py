@@ -25,7 +25,7 @@ SCHEMA_EXAMPLES = SCHEMA_DIR / "examples"
 PROMPT_FILES = [
     "extraction.md", "source-verification.md", "company-analysis.md", "industry-analysis.md",
     "financial-analysis.md", "competition.md", "valuation-narrative.md", "catalysts-risks.md",
-    "translation.md", "slide-compression.md", "glossary.md",
+    "translation.md", "slide-compression.md", "social-card.md", "glossary.md",
 ]
 REQUIRED_SECTIONS = [
     "## Purpose and non-goals", "## Required inputs", "## Required output", "## Schema reference",

@@ -123,6 +123,16 @@
       "output_schema": "../research-schema/slide-deck.schema.json#/$defs/slide",
       "assembly": "scheduler assembles slides in plan order and validates the full deck against ../research-schema/slide-deck.schema.json before rendering",
       "input_schema": "schemas/stage-envelopes.schema.json#/$defs/s7_slide_input"
+    },
+    {
+      "task_name": "social_card_plan",
+      "prompt_file": "social-card.md",
+      "prompt_version": "0.1.0",
+      "stage": "S8",
+      "input_shape": "social-card.md#required-inputs (verified package + series_id + locale + style_version)",
+      "output_schema": "../research-schema/social-card-series.schema.json",
+      "assembly": "scheduler validates the seven-card series against ../research-schema/social-card-series.schema.json and the QC-01 binding rule before any card is rendered; the code renderer produces the PNGs",
+      "retry_policy": "the only retryable model stage in the v2 card flow; free models only, waiting_for_model on unavailability, never a paid fallback"
     }
   ]
 }
