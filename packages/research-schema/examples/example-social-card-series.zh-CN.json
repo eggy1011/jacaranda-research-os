@@ -1,0 +1,96 @@
+{
+  "schema_version": "0.1.0",
+  "series_id": "SCS-600XXX-2026-001",
+  "package_id": "RPK-600XXX-2026-001",
+  "locale": "zh-CN",
+  "as_of_date": "2026-07-10",
+  "style_version": "jacaranda-brand-v1",
+  "cards": [
+    {
+      "card_no": 1,
+      "role": "cover",
+      "hook": "营收还在涨，市场却在担心什么？",
+      "body": "先看一个数字：全年营收同比 +20.2%，增长还在，但故事正在变。",
+      "claim_type": "fact",
+      "claim_refs": ["CLM-001"],
+      "metric_refs": ["MET-003"],
+      "inline_numbers": [{ "metric_id": "MET-003", "display_transform": "percent", "decimals": 1, "show_sign_colour": true }],
+      "source_ids": ["SRC-001"],
+      "status": "preview_ready"
+    },
+    {
+      "card_no": 2,
+      "role": "full_year",
+      "hook": "全年营收 45.2 亿、净利 5.12 亿",
+      "body": "营收同比 +20.2%，仍在增长通道内，盈利同步兑现。",
+      "claim_type": "fact",
+      "claim_refs": ["CLM-001"],
+      "metric_refs": ["MET-001", "MET-004", "MET-003"],
+      "inline_numbers": [
+        { "metric_id": "MET-001", "display_transform": "yi", "decimals": 1 },
+        { "metric_id": "MET-004", "display_transform": "yi", "decimals": 2 },
+        { "metric_id": "MET-003", "display_transform": "percent", "decimals": 1, "show_sign_colour": true }
+      ],
+      "source_ids": ["SRC-001"],
+      "status": "preview_ready"
+    },
+    {
+      "card_no": 3,
+      "role": "driver_1",
+      "hook": "增长的第一台发动机：主营放量",
+      "body": "主营业务收入延续增长趋势，是全年营收的主要拉动项（详见研究包）。",
+      "claim_type": "inference",
+      "claim_refs": ["CLM-005"],
+      "metric_refs": [],
+      "source_ids": ["SRC-004"],
+      "status": "preview_ready"
+    },
+    {
+      "card_no": 4,
+      "role": "driver_2",
+      "hook": "第二台发动机：结构在优化",
+      "body": "产品与客户结构持续改善，为盈利质量提供支撑（研究观察）。",
+      "claim_type": "inference",
+      "claim_refs": ["CLM-006"],
+      "metric_refs": [],
+      "source_ids": ["SRC-004"],
+      "status": "preview_ready"
+    },
+    {
+      "card_no": 5,
+      "role": "profit_quality",
+      "hook": "增速 20.2% 是算出来的",
+      "body": "口径：本年营收相对上年营收的增速，属计算值（deterministic_calc），非模型杜撰。",
+      "claim_type": "fact",
+      "claim_refs": ["CLM-001"],
+      "metric_refs": ["MET-003"],
+      "inline_numbers": [{ "metric_id": "MET-003", "display_transform": "percent", "decimals": 1 }],
+      "source_ids": ["SRC-001"],
+      "status": "preview_ready"
+    },
+    {
+      "card_no": 6,
+      "role": "latest_quarter",
+      "hook": "最新一期，还没到下结论的时候",
+      "body": "最新一期为初步经营数据，尚未经审计，口径以正式披露为准，不与全年数据混用。",
+      "claim_type": "inference",
+      "claim_refs": ["CLM-011"],
+      "metric_refs": [],
+      "audit_note": "未经审计（初步经营数据）",
+      "source_ids": ["SRC-001"],
+      "status": "preview_ready"
+    },
+    {
+      "card_no": 7,
+      "role": "counter_conclusion",
+      "hook": "结论：稳，但别忽略反面证据",
+      "body": "反面证据：多项估值依赖测算、区间偏宽；结论仅供研究，不作评级。",
+      "claim_type": "fact",
+      "claim_refs": ["CLM-002"],
+      "metric_refs": [],
+      "caveat": "仅供学习研究，不构成投资建议。",
+      "source_ids": ["SRC-001", "SRC-002", "SRC-003", "SRC-004"],
+      "status": "preview_ready"
+    }
+  ]
+}
