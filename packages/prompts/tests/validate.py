@@ -131,11 +131,13 @@ def make_validators():
     from referencing import Registry, Resource
 
     pkg_schema = load(SCHEMA_DIR / "research-package.schema.json")
+    zh_pkg_schema = load(SCHEMA_DIR / "research-package.zh.schema.json")
     deck_schema = load(SCHEMA_DIR / "slide-deck.schema.json")
     card_schema = load(SCHEMA_DIR / "social-card-series.schema.json")
     env_schema = load(PROMPTS / "schemas" / "stage-envelopes.schema.json")
     registry = Registry().with_resources([
         (pkg_schema["$id"], Resource.from_contents(pkg_schema)),
+        (zh_pkg_schema["$id"], Resource.from_contents(zh_pkg_schema)),
         (deck_schema["$id"], Resource.from_contents(deck_schema)),
         (card_schema["$id"], Resource.from_contents(card_schema)),
         (env_schema["$id"], Resource.from_contents(env_schema)),
@@ -145,7 +147,7 @@ def make_validators():
         schema = schema_doc if pointer is None else {"$ref": f"{schema_doc['$id']}#{pointer}"}
         return Draft202012Validator(schema, registry=registry)
 
-    return pkg_schema, deck_schema, card_schema, env_schema, validator_for
+    return pkg_schema, zh_pkg_schema, deck_schema, card_schema, env_schema, validator_for
 
 
 def check_schemas(validator_for, pkg_schema, deck_schema, env_schema) -> None:
@@ -601,6 +603,46 @@ def check_qc01_binding() -> None:
               "a bare metric reference must not bind a rescaled collapse of its value")
 
 
+# ---------- 6b. Chinese-monolingual research package (v2) ----------
+
+def check_zh_package(zh_pkg_schema: dict, validator_for) -> None:
+    zh = load(SCHEMA_EXAMPLES / "example-research-package.zh.json")
+    errs = sorted(validator_for(zh_pkg_schema).iter_errors(zh),
+                  key=lambda e: [str(p) for p in e.path])
+    for e in errs[:5]:
+        check(False, "schema_validation_failed",
+              f"zh-package/{'/'.join(str(p) for p in e.path)}", True, "assembly", e.message[:120])
+    check(not errs, "schema_validation_failed", "example-research-package.zh.json", True,
+          "assembly")
+    if errs:
+        return
+
+    check(zh.get("locale") == "zh-CN", "internal_contradiction", "zh-package/locale", True,
+          "assembly", "the monolingual package must declare locale zh-CN")
+
+    # the monolingual invariant: no bilingual envelope may survive anywhere in the document
+    def walk(node, path="$"):
+        if isinstance(node, dict):
+            if "en_AU" in node or "zh_CN" in node:
+                yield path
+            for k, v in node.items():
+                yield from walk(v, f"{path}.{k}")
+        elif isinstance(node, list):
+            for i, v in enumerate(node):
+                yield from walk(v, f"{path}[{i}]")
+
+    leftovers = list(walk(zh))
+    check(not leftovers, "internal_contradiction", "zh-package/no-bilingual-envelope", True,
+          "assembly", f"localizedText objects survived at {leftovers[:5]}")
+
+    # the bilingual package must NOT validate against the zh schema (and vice versa), so the
+    # two contracts can never be silently confused by a caller picking the wrong validator
+    bilingual = load(SCHEMA_EXAMPLES / "example-research-package.json")
+    check(bool(list(validator_for(zh_pkg_schema).iter_errors(bilingual))),
+          "internal_contradiction", "zh-package/rejects-bilingual", False, "assembly",
+          "the zh schema must reject a bilingual package")
+
+
 # ---------- 7. Social card series (v2 knowledge cards) ----------
 
 CARD_ROLES = ["cover", "full_year", "driver_1", "driver_2",
@@ -679,7 +721,8 @@ def check_card_series(pkg: dict, card_schema: dict, validator_for) -> None:
 def main() -> int:
     as_json = "--json" in sys.argv
     try:
-        pkg_schema, deck_schema, card_schema, env_schema, validator_for = make_validators()
+        (pkg_schema, zh_pkg_schema, deck_schema,
+         card_schema, env_schema, validator_for) = make_validators()
         pkg = load(SCHEMA_EXAMPLES / "example-research-package.json")
         check_catalogue()
         check_schemas(validator_for, pkg_schema, deck_schema, env_schema)
@@ -688,6 +731,7 @@ def main() -> int:
         check_bilingual(pkg)
         check_deck_numbers(pkg)
         check_qc01_binding()
+        check_zh_package(zh_pkg_schema, validator_for)
         check_card_series(pkg, card_schema, validator_for)
     except Exception as e:  # surface as structured error, never a bare traceback
         failures.append({"code": "validator_crash", "stage": "validator", "path": "-",
