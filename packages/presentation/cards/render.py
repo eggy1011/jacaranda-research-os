@@ -24,9 +24,8 @@ from pathlib import Path
 from . import graphics as g
 from .svg import NO_LINE_START, Canvas, est_width, wrap_cjk
 from .tokens import CARD_H, CARD_W, CardTokens, format_number, load_tokens
+from .validate import RENDERABLE_STATUS, validate_series
 
-ROLE_ORDER = ["cover", "full_year", "driver_1", "driver_2",
-              "profit_quality", "latest_quarter", "counter_conclusion"]
 ROLE_KICKER = {
     "cover": "研究问题",
     "full_year": "完整年度",
@@ -68,34 +67,49 @@ def resolve_numbers(card: dict, metrics: dict) -> list[dict]:
 
 # --------------------------------------------------------------------------- chrome
 
-def _footer_lines(source_ids: list[str], as_of: str, *, size: int = 24,
-                  width: int = 936) -> tuple[list[str], int]:
-    """Lay out the source line + disclaimer so they can never collide.
+def _wrap_by_width(segments: list[str], joiner: str, size: float, max_width: float) -> list[str]:
+    """Greedily pack joiner-separated segments into lines no wider than max_width."""
+    lines: list[str] = []
+    current = ""
+    for seg in segments:
+        candidate = seg if not current else f"{current}{joiner}{seg}"
+        if current and est_width(candidate, size) > max_width:
+            lines.append(current)
+            current = seg
+        else:
+            current = candidate
+    if current:
+        lines.append(current)
+    return lines
 
-    A card with many sources (the closing card carries the full union) produces a long source
-    line; side-by-side with the right-aligned disclaimer it would overlap. Measure first, then
-    stack onto two lines when the pair does not fit.
+
+def _footer_lines(source_ids: list[str], as_of: str, *, size: int, max_width: float) -> list[str]:
+    """Source line (wrapped across as many lines as needed) followed by the disclaimer.
+
+    The closing card carries the full source union, which can be wide; the source string is
+    wrapped on SRC boundaries so it never runs off the card or into the disclaimer.
     """
-    source = f"数据来源：{'、'.join(source_ids)} · 截止 {as_of}"
-    if est_width(source, size) + est_width(DISCLAIMER, size) + 40 <= width:
-        return [source], size  # fits side by side; caller draws the disclaimer right-aligned
-    return [source, DISCLAIMER], size
+    segments = [f"数据来源：{source_ids[0]}" if source_ids else "数据来源：—", *source_ids[1:]]
+    segments.append(f"截止 {as_of}")
+    lines = _wrap_by_width(segments, "、", size, max_width)
+    # repair the separator before the cutoff clause: it reads " · 截止", not "、截止"
+    lines = [ln.replace(f"、截止 {as_of}", f" · 截止 {as_of}") for ln in lines]
+    lines.append(DISCLAIMER)
+    return lines
 
 
-def _footer(c: Canvas, t: CardTokens, *, as_of: str, source_ids: list[str]) -> None:
-    lines, size = _footer_lines(source_ids, as_of, width=t.content_width)
-    y = CARD_H - 96
-    top = y - (44 if len(lines) == 1 else 78)
+def _footer(c: Canvas, t: CardTokens, *, as_of: str, source_ids: list[str],
+            muted: str | None = None, rule: str | None = None) -> None:
+    size = 24
+    fill = muted or t.muted
+    lines = _footer_lines(source_ids, as_of, size=size, max_width=t.content_width)
+    base_y = CARD_H - 96
+    top = base_y - (len(lines) - 1) * 34 - 44
     c.line(t.content_left, top, t.content_left + t.content_width, top,
-           t.light, width=2, dash="6 10")
-    if len(lines) == 1:
-        c.text(t.content_left, y, lines[0], fill=t.muted, size=size, font=t.font_body)
-        c.text(t.content_left + t.content_width, y, DISCLAIMER,
-               fill=t.muted, size=size, font=t.font_body, anchor="end")
-    else:
-        for i, line in enumerate(lines):
-            c.text(t.content_left, y - (len(lines) - 1 - i) * 34, line,
-                   fill=t.muted, size=size, font=t.font_body)
+           rule or t.light, width=2, dash="6 10")
+    for i, line in enumerate(lines):
+        c.text(t.content_left, base_y - (len(lines) - 1 - i) * 34, line,
+               fill=fill, size=size, font=t.font_body)
 
 
 def _header(c: Canvas, t: CardTokens, *, card_no: int, kicker: str, ticker: str) -> None:
@@ -181,15 +195,9 @@ def _render_card(card: dict, t: CardTokens, *, ticker: str, as_of: str,
                    fill=t.inverse, size=132, font=t.font_heading, weight="bold")
             c.text(t.content_left, CARD_H - 410, n["label"] or n["metric_id"],
                    fill=t.light, size=28, font=t.font_body)
-        c.text(t.content_left, CARD_H - 250, ticker, fill=t.inverse, size=40,
+        c.text(t.content_left, CARD_H - 300, ticker, fill=t.inverse, size=40,
                font=t.font_heading, weight="bold")
-        c.line(t.content_left, CARD_H - 140, t.content_left + t.content_width, CARD_H - 140,
-               t.mid, width=2)
-        c.text(t.content_left, CARD_H - 96,
-               f"数据来源：{'、'.join(card['source_ids'])} · 截止 {as_of}",
-               fill=t.light, size=24, font=t.font_body)
-        c.text(t.content_left + t.content_width, CARD_H - 96, DISCLAIMER,
-               fill=t.light, size=24, font=t.font_body, anchor="end")
+        _footer(c, t, as_of=as_of, source_ids=card["source_ids"], muted=t.light, rule=t.mid)
         return c.to_svg()
 
     _header(c, t, card_no=card["card_no"], kicker=ROLE_KICKER[role], ticker=ticker)
@@ -198,21 +206,16 @@ def _render_card(card: dict, t: CardTokens, *, ticker: str, as_of: str,
     if role in ("full_year", "profit_quality"):
         y = _draw_numbers_row(c, t, nums, y=y)
         if role == "profit_quality" and nums:
-            y = _chip(c, t, "计算值", x=t.content_left, y=y, fill=t.primary,
-                      colour=t.inverse) and y + 76
-    elif role in ("driver_1", "driver_2"):
-        g.bar_pair(c, t, 1.0, 0.62 if role == "driver_1" else 0.44,
-                   x=t.content_left, y=y, w=t.content_width, h=300)
-        y += 340
-        y = _draw_numbers_row(c, t, nums, y=y) if nums else y
-    elif role == "latest_quarter":
-        g.sparkline(c, t, [0.35, 0.5, 0.42, 0.68, 0.6, 0.82],
-                    x=t.content_left, y=y, w=t.content_width, h=300)
-        y += 348
-        y = _draw_numbers_row(c, t, nums, y=y) if nums else y
-    elif role == "counter_conclusion":
-        g.ring(c, t, 0.68, cx=CARD_W / 2, cy=y + 190, r=170)
-        y += 420
+            _chip(c, t, "计算值", x=t.content_left, y=y, fill=t.primary, colour=t.inverse)
+            y += 76
+    elif nums:
+        # any other role that declares figures shows them as bound KPI tiles
+        y = _draw_numbers_row(c, t, nums, y=y)
+    else:
+        # decorative brand band only — no data-like marks (see graphics.motif_band)
+        g.motif_band(c, t, x=t.content_left, y=y, w=t.content_width, h=280,
+                     variant=card["card_no"])
+        y += 320
 
     y = _body(c, t, card["body"], y=y + 16)
 
@@ -276,14 +279,20 @@ def qa_report(svg: str, card: dict) -> list[dict]:
     return issues
 
 
-def render_series(series: dict, package: dict, out_dir: Path) -> dict:
-    """Render all seven cards to SVG and return a manifest with per-card sha256."""
-    cards = series["cards"]
-    if [c["role"] for c in cards] != ROLE_ORDER:
-        raise CardRenderError(f"series must carry roles {ROLE_ORDER} in order")
-    if series["package_id"] != package["package_id"]:
-        raise CardRenderError("series/package id mismatch")
+def render_series(series: dict, package: dict, out_dir: Path, *,
+                  require_status: frozenset[str] | None = RENDERABLE_STATUS) -> dict:
+    """Render all seven cards to SVG and return a manifest with per-card sha256.
 
+    The series is validated against its package first (schema + semantic + lifecycle) and the
+    render is refused if anything fails — a fabricated figure, dangling id, wrong role order or a
+    non-renderable package status never reaches pixels.
+    """
+    problems = validate_series(series, package, require_status=require_status)
+    if problems:
+        raise CardRenderError(
+            "series failed validation (rendered nothing): " + "; ".join(problems[:8]))
+
+    cards = series["cards"]
     t = load_tokens()
     metrics = {m["metric_id"]: m for m in package["metrics"]}
     ticker = package["company"]["ticker"]
@@ -326,12 +335,24 @@ def render_series(series: dict, package: dict, out_dir: Path) -> dict:
     return manifest
 
 
+# Only these SVG->PNG backends may be invoked; each has a known, fixed argv below.
+ALLOWED_RASTERISERS = ("resvg", "rsvg-convert", "cairosvg", "inkscape")
+
+
 def find_rasteriser() -> str | None:
-    """Locate an optional SVG->PNG backend. Absent is fine: SVG remains the contract artifact."""
+    """Locate an optional SVG->PNG backend from a fixed whitelist. Absent is fine.
+
+    An operator may point ``JACARANDA_SVG_RASTERISER`` at a specific install, but only if its
+    basename is one of the whitelisted tools — an arbitrary executable is never run.
+    """
     override = os.environ.get("JACARANDA_SVG_RASTERISER")
     if override:
-        return override if Path(override).exists() or shutil.which(override) else None
-    for candidate in ("resvg", "rsvg-convert", "cairosvg", "inkscape"):
+        if Path(override).name not in ALLOWED_RASTERISERS:
+            return None
+        if Path(override).is_file():
+            return override
+        return shutil.which(override)
+    for candidate in ALLOWED_RASTERISERS:
         found = shutil.which(candidate)
         if found:
             return found

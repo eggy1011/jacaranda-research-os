@@ -645,75 +645,19 @@ def check_zh_package(zh_pkg_schema: dict, validator_for) -> None:
 
 # ---------- 7. Social card series (v2 knowledge cards) ----------
 
-CARD_ROLES = ["cover", "full_year", "driver_1", "driver_2",
-              "profit_quality", "latest_quarter", "counter_conclusion"]
-QUARTER_MARKERS = ("Q1", "Q2", "Q3", "Q4", "季度", "季报", "最新一期", "半年", "H1", "H2")
+def check_card_series() -> None:
+    # Delegate to the shipping runtime validator so the contract check, the renderer and the
+    # pipeline all enforce ONE rule set. The card series is validated against the Chinese
+    # monolingual package it is compiled from.
+    sys.path.insert(0, str(ROOT / "packages"))
+    from presentation.cards.validate import validate_series
 
-
-def check_card_series(pkg: dict, card_schema: dict, validator_for) -> None:
     series = load(SCHEMA_EXAMPLES / "example-social-card-series.zh-CN.json")
-    errs = sorted(validator_for(card_schema).iter_errors(series),
-                  key=lambda e: [str(p) for p in e.path])
-    for e in errs:
-        check(False, "schema_violation",
-              f"social-card/{'/'.join(str(p) for p in e.path)}", True, "S8", e.message)
-    if errs:
-        return
-
-    metric_by_id = {m["metric_id"]: m for m in pkg["metrics"]}
-    metrics = set(metric_by_id)
-    claims = {c["claim_id"] for c in pkg["claims"]}
-    sources = {s["source_id"] for s in pkg["sources"]}
-    ticker = pkg["company"]["ticker"]
-    cards = series["cards"]
-
-    check(series["package_id"] == pkg["package_id"], "dangling_reference",
-          "social-card/package_id", True, "S8", "series must cite its source package")
-    check([c["card_no"] for c in cards] == list(range(1, 8)), "internal_contradiction",
-          "social-card/card_no-sequence", True, "S8", "card_no must be 1..7 contiguous")
-    check([c["role"] for c in cards] == CARD_ROLES, "internal_contradiction",
-          "social-card/role-order", True, "S8", f"roles must be exactly {CARD_ROLES} in order")
-
-    for c in cards:
-        where = f"social-card/{c['role']}"
-        for cid in c.get("claim_refs", []):
-            check(cid in claims, "dangling_reference", f"{where}/{cid}", True, "S8")
-        for mid in c.get("metric_refs", []):
-            check(mid in metrics, "dangling_reference", f"{where}/{mid}", True, "S8")
-        for sid in c["source_ids"]:
-            check(sid in sources, "dangling_reference", f"{where}/{sid}", True, "S8")
-        for dn in c.get("inline_numbers", []):
-            check(dn["metric_id"] in metrics, "dangling_reference",
-                  f"{where}/inline/{dn['metric_id']}", True, "S8")
-        for field in ("claim_refs", "metric_refs", "source_ids"):
-            vals = c.get(field, [])
-            check(len(vals) == len(set(vals)), "internal_contradiction",
-                  f"{where}/duplicate-{field}", True, "S8", f"repeated {field}")
-        # no unbound numbers: every numeral in hook/body must resolve from an inline
-        # displayNumber (strict transform+decimals) or a bound metric_ref's own value.
-        allowed: set[float] = set()
-        for dn in c.get("inline_numbers", []):
-            allowed.add(round(metric_by_id[dn["metric_id"]]["value"]
-                              / TRANSFORM[dn["display_transform"]], dn.get("decimals", 1)))
-        for mid in c.get("metric_refs", []):
-            allowed |= metric_displays(metric_by_id[mid])
-        text = f"{c['hook']} {c['body']}".replace(ticker, " ")
-        unbound = {t for t in numeric_multiset(text, False)
-                   if not any(abs(t - a) < 1e-6 for a in allowed)}
-        check(not unbound, "dangling_reference", f"{where}/unbound-numbers", True, "S8",
-              f"{sorted(unbound)} in '{text[:40]}…'")
-
-    by_role = {c["role"]: c for c in cards}
-    lq = by_role["latest_quarter"]
-    check(any(m in f"{lq['hook']}{lq['body']}" for m in QUARTER_MARKERS),
-          "internal_contradiction", "social-card/latest_quarter/period", True, "S8",
-          "latest_quarter must name an explicit interim period, not a full year")
-    check(bool(lq.get("audit_note", "").strip()), "missing_required_block",
-          "social-card/latest_quarter/audit-note", True, "S8",
-          "latest_quarter must carry an audit-status marker")
-    check(set(by_role["counter_conclusion"]["source_ids"]) == sources,
-          "missing_required_block", "social-card/counter_conclusion/full-sources", True, "S8",
-          "the closing card must carry the full source union")
+    zh_pkg = load(SCHEMA_EXAMPLES / "example-research-package.zh.json")
+    for problem in validate_series(series, zh_pkg):
+        check(False, "schema_validation_failed", f"social-card/{problem[:60]}", True, "S8",
+              problem)
+    check(True, "ok", "social-card/validate_series-invoked", True, "S8")
 
 
 # ---------- main ----------
@@ -732,7 +676,7 @@ def main() -> int:
         check_deck_numbers(pkg)
         check_qc01_binding()
         check_zh_package(zh_pkg_schema, validator_for)
-        check_card_series(pkg, card_schema, validator_for)
+        check_card_series()
     except Exception as e:  # surface as structured error, never a bare traceback
         failures.append({"code": "validator_crash", "stage": "validator", "path": "-",
                          "retryable": False, "detail": f"{type(e).__name__}: {e}"})
