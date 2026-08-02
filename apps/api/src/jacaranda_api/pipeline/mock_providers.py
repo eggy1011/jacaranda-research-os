@@ -173,6 +173,10 @@ class ScriptedMockLLMProvider:
             stub = data["slide_stub"]
             deck = self._deck(str(context["edition"]))
             return copy.deepcopy(deck["slides"][int(stub["slide_no"]) - 1])
+        if task_name == "social_card_plan":
+            # The scripted seven-card plan for the mock package; semantic validation and rendering
+            # happen in the orchestrator, exactly as they would for a real model's output.
+            return copy.deepcopy(self._load("08-social-card-plan.json"))
         raise AssertionError(f"unhandled registered fixture task: {task_name}")
 
     def _deck(self, edition: str) -> dict[str, Any]:

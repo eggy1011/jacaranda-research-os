@@ -79,6 +79,11 @@ class PipelineArtifacts(BaseModel):
     overflow_reports: dict[str, Path]
     manifest: Path
     checkpoints: Path
+    # v2 social-card outputs, present only when the run produced cards (verified/approved package)
+    zh_package: Path | None = None
+    social_card_series: Path | None = None
+    card_manifest: Path | None = None
+    cards_dir: Path | None = None
 
 
 JsonDict = dict[str, Any]

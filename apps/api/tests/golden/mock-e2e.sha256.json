@@ -2,5 +2,8 @@
   "_comment": "Golden digests of the deterministic mock E2E outputs. A diff here means stage logic, schemas, prompts fixtures or assembly changed — verify it is intentional, rerun jacaranda-mock-e2e, and update these values in the same PR.",
   "research-package.json": "f082ac23d7c7992bceba593d9a6481ddffd2a4719d5fb74263add9f2cc543b15",
   "slide-deck.zh-CN.json": "2b645c35a9ebb2468448cb5ef7bede2c362a650712fd76ae0ca23d872467e062",
-  "slide-deck.en-AU.json": "20e0069e6420b6c99a7f33be45b767f94516fb2d16b353f8bf08a71a34cae2ba"
+  "slide-deck.en-AU.json": "20e0069e6420b6c99a7f33be45b767f94516fb2d16b353f8bf08a71a34cae2ba",
+  "research-package.zh.json": "76bdea3541017554a958fae3be2d6ff0a8d5ae6237c6ba1bb2958df63027bf90",
+  "social-card-series.json": "7aa28dcd34129d68152d31b39be593bda76dea18e81e29864cd29b5f93f8ae31",
+  "cards/manifest.json": "05c0f63c6240174789d5af85e6430a0040d18eb158f69d7853df7ea993fc0cd9"
 }
