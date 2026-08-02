@@ -1,0 +1,99 @@
+{
+  "schema_version": "0.1.0",
+  "series_id": "SCS-600XXX-2026-002",
+  "package_id": "RPK-600XXX-2026-002",
+  "locale": "zh-CN",
+  "as_of_date": "2026-07-10",
+  "style_version": "jacaranda-brand-v1",
+  "cards": [
+    {
+      "card_no": 1,
+      "role": "cover",
+      "hook": "营收还在涨，市场却在担心什么？",
+      "body": "先看一个数字：全年增速仍是两位数，但结构在变。",
+      "claim_type": "fact",
+      "claim_refs": ["CLM-001"],
+      "metric_refs": ["MET-009"],
+      "inline_numbers": [{ "metric_id": "MET-009", "display_transform": "percent", "decimals": 1, "show_sign_colour": true }],
+      "source_ids": ["SRC-001"],
+      "status": "planning"
+    },
+    {
+      "card_no": 2,
+      "role": "full_year",
+      "hook": "全年营收与净利双升",
+      "body": "增长仍在延续，盈利同步兑现，基本盘稳固。",
+      "claim_type": "fact",
+      "claim_refs": ["CLM-001"],
+      "metric_refs": ["MET-004", "MET-008", "MET-009"],
+      "inline_numbers": [
+        { "metric_id": "MET-004", "display_transform": "yi", "decimals": 1 },
+        { "metric_id": "MET-008", "display_transform": "yi", "decimals": 2 },
+        { "metric_id": "MET-009", "display_transform": "percent", "decimals": 1, "show_sign_colour": true }
+      ],
+      "source_ids": ["SRC-001"],
+      "status": "planning"
+    },
+    {
+      "card_no": 3,
+      "role": "driver_1",
+      "hook": "政策东风：国产替代打开空间",
+      "body": "产业指导意见支持智能制造装备国产替代，利好需求侧。",
+      "claim_type": "fact",
+      "claim_refs": ["CLM-002"],
+      "metric_refs": [],
+      "source_ids": ["SRC-003"],
+      "status": "planning"
+    },
+    {
+      "card_no": 4,
+      "role": "driver_2",
+      "hook": "增长引擎：新一代控制系统在路上",
+      "body": "公司预计 2026Q4 发布新一代控制系统，有望打开增量。",
+      "claim_type": "inference",
+      "claim_refs": ["CLM-011"],
+      "metric_refs": [],
+      "source_ids": ["SRC-001"],
+      "status": "planning"
+    },
+    {
+      "card_no": 5,
+      "role": "profit_quality",
+      "hook": "盈利质量：净利率稳中有升",
+      "body": "净利率与营收增速均为计算值，口径可追溯，非模型杜撰。",
+      "claim_type": "fact",
+      "claim_refs": ["CLM-001"],
+      "metric_refs": ["MET-010", "MET-009"],
+      "inline_numbers": [
+        { "metric_id": "MET-010", "display_transform": "percent", "decimals": 1 },
+        { "metric_id": "MET-009", "display_transform": "percent", "decimals": 1 }
+      ],
+      "source_ids": ["SRC-001"],
+      "status": "planning"
+    },
+    {
+      "card_no": 6,
+      "role": "latest_disclosure",
+      "hook": "最新披露：FY2025 年报",
+      "body": "FY2025 全年营收与利润双升，为最新已披露的完整财报。",
+      "claim_type": "fact",
+      "claim_refs": ["CLM-001"],
+      "metric_refs": [],
+      "audit_note": "已审计（FY2025 年报）",
+      "source_ids": ["SRC-001"],
+      "status": "planning"
+    },
+    {
+      "card_no": 7,
+      "role": "counter_conclusion",
+      "hook": "别忽略反面：产能扩张的风险",
+      "body": "行业产能扩张较快，若下游资本开支放缓，增速可能低于预测。",
+      "claim_type": "inference",
+      "claim_refs": ["CLM-005"],
+      "metric_refs": [],
+      "caveat": "仅供学习研究，不构成投资建议。",
+      "source_ids": ["SRC-001", "SRC-002", "SRC-003", "SRC-004", "SRC-005"],
+      "status": "planning"
+    }
+  ]
+}

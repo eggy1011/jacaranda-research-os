@@ -41,9 +41,10 @@ from jacaranda_api.pipeline.presentation import (
     PresentationProvider,
     TemplatePresentationProvider,
 )
+from jacaranda_api.pipeline.social_cards import render_social_cards
 from jacaranda_api.pipeline.validation import load_json, validate_decks, validate_package
 
-_STAGES = ("S1", "S2", "S3a", "S3b", "S3c", "S3d", "S4", "S5", "S6", "S7")
+_STAGES = ("S1", "S2", "S3a", "S3b", "S3c", "S3d", "S4", "S5", "S6", "S7", "S8")
 
 
 class StageOrchestrator:
@@ -79,6 +80,23 @@ class StageOrchestrator:
         if len(tasks) != 1:
             raise ValueError(f"stage {stage} must bind exactly one registered task")
         return tasks[0].task_name
+
+    async def _social_card_plan(self, package: JsonDict) -> JsonDict:
+        """S8: the only card-flow model stage. Plans the seven-card series from a verified package.
+
+        The plan is structurally validated against the social-card-series schema here; semantic
+        validation (references, number binding, provenance) and rendering happen at write time.
+        """
+        series_id = "SCS-" + package["package_id"].removeprefix("RPK-")
+        return await self._execute(
+            self._one_task("S8"),
+            {
+                "verified_package": package,
+                "series_id": series_id,
+                "locale": "zh-CN",
+                "style_version": "jacaranda-brand-v1",
+            },
+        )
 
     async def _execute(self, task_name: str, structured_input: JsonDict) -> JsonDict:
         task = self._catalog.resolve(task_name)
@@ -409,7 +427,12 @@ class StageOrchestrator:
         return excerpt
 
     def _write_artifacts(
-        self, root: Path, package: JsonDict, decks: dict[str, JsonDict]
+        self,
+        root: Path,
+        package: JsonDict,
+        decks: dict[str, JsonDict],
+        *,
+        card_series: JsonDict | None = None,
     ) -> PipelineArtifacts:
         audit = root / "audit"
         audit.mkdir(parents=True, exist_ok=True)
@@ -428,13 +451,30 @@ class StageOrchestrator:
             result = self._presentation.render(deck, package, pptx_paths[edition])
             reports[edition] = result.overflow_report
             self._write_json(report_paths[edition], reports[edition])
+
+        # S8 social cards: only from a verified/approved package, deterministically rendered.
+        zh_path = series_path = card_manifest_path = cards_dir = None
+        card_paths: list[Path] = []
+        if card_series is not None and package["status"] in ("verified", "approved"):
+            cards_dir = root / "cards"
+            manifest_data, zh_package = render_social_cards(
+                self._root, card_series, package, cards_dir
+            )
+            zh_path = root / "research-package.zh.json"
+            self._write_json(zh_path, zh_package)
+            series_path = root / "social-card-series.json"
+            self._write_json(series_path, card_series)
+            card_manifest_path = cards_dir / "manifest.json"  # written by the card renderer
+            card_paths = [zh_path, series_path, card_manifest_path]
+
         checkpoint_path = audit / "checkpoints.json"
         self._write_json(
             checkpoint_path,
             {"checkpoints": [item.model_dump(mode="json") for item in self._checkpoints]},
         )
         manifest_path = root / "manifest.json"
-        json_paths = [package_path, *deck_paths.values(), *report_paths.values(), checkpoint_path]
+        json_paths = [package_path, *deck_paths.values(), *report_paths.values(),
+                      *card_paths, checkpoint_path]
         manifest = {
             "run_id": self.run_id,
             "network": self.network_label,
@@ -460,6 +500,10 @@ class StageOrchestrator:
             overflow_reports=report_paths,
             manifest=manifest_path,
             checkpoints=checkpoint_path,
+            zh_package=zh_path,
+            social_card_series=series_path,
+            card_manifest=card_manifest_path,
+            cards_dir=cards_dir,
         )
 
     @staticmethod
@@ -551,7 +595,10 @@ class MockResearchOrchestrator(StageOrchestrator):
             edition: await self._deck(package, edition) for edition in request.editions
         }
         validate_decks(self._root, package, decks)
-        return self._write_artifacts(output_dir.resolve(), package, decks)
+        card_series = await self._social_card_plan(package)
+        return self._write_artifacts(
+            output_dir.resolve(), package, decks, card_series=card_series
+        )
 
     def _deck_id(self, edition: str) -> str:
         return f"DCK-600XXX-2026-002-{'ZH' if edition == 'zh-CN' else 'EN'}"

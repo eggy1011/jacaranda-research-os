@@ -104,12 +104,16 @@ def _metric_period_end(metric: dict) -> str | None:
 
 
 def _newest_disclosed_period(package: dict, cutoff: str) -> str | None:
-    """End date of the most recent *reporting-period* metric not after the data cutoff.
+    """End date of the most recent DISCLOSED reporting period not after the data cutoff.
 
-    Point-in-time market data (period == "PIT", e.g. a closing price) is not a reporting-period
-    disclosure and is excluded, so a fresh price quote never makes the latest annual look stale.
+    Only ``computed_by == "provider"`` metrics anchor a disclosed period — those are figures the
+    company actually reported. Deterministic-calc metrics (derived ratios, and forecasts that may
+    carry a future-ish period code) do not define what was disclosed, and point-in-time market
+    data (period == "PIT", e.g. a closing price) is not a reporting disclosure. Excluding both
+    keeps a forecast or a fresh price quote from making the latest reported period look stale.
     """
-    ends = [e for m in package.get("metrics", []) if m.get("period") != "PIT"
+    ends = [e for m in package.get("metrics", [])
+            if m.get("computed_by") == "provider" and m.get("period") != "PIT"
             and (e := _metric_period_end(m)) and (not cutoff or e <= cutoff)]
     return max(ends) if ends else None
 
