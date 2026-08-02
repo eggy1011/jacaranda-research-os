@@ -61,7 +61,7 @@
       "required": ["card_no", "role", "hook", "body", "source_ids", "status"],
       "properties": {
         "card_no": { "type": "integer", "minimum": 1, "maximum": 7 },
-        "role": { "enum": ["cover", "full_year", "driver_1", "driver_2", "profit_quality", "latest_quarter", "counter_conclusion"] },
+        "role": { "enum": ["cover", "full_year", "driver_1", "driver_2", "profit_quality", "latest_disclosure", "counter_conclusion"] },
         "hook": { "$ref": "#/$defs/text", "description": "Card headline / hook." },
         "body": { "$ref": "#/$defs/text" },
         "claim_type": { "enum": ["fact", "inference", "opinion"], "description": "Dominant claim role shown as a 事实/推断/观点 chip." },
@@ -69,12 +69,12 @@
         "metric_refs": { "type": "array", "items": { "type": "string", "pattern": "^MET-[0-9]{3}$" } },
         "inline_numbers": { "type": "array", "items": { "$ref": "#/$defs/displayNumber" }, "description": "Every number rendered on the card is declared here; the validator rejects any literal numeral in hook/body not backed by one of these (or by a metric_ref at its own value)." },
         "caveat": { "$ref": "#/$defs/text", "description": "Optional口径/风险 caveat; required on counter_conclusion." },
-        "audit_note": { "type": "string", "minLength": 1, "description": "Audit-status marker; required on latest_quarter (e.g. 未经审计)." },
+        "audit_note": { "type": "string", "minLength": 1, "description": "Audit-status marker; required on latest_disclosure (e.g. 已审计 / 未经审计)." },
         "source_ids": { "$ref": "#/$defs/sourceLine" },
         "status": { "enum": ["planning", "waiting_for_model", "preview_ready", "approved_for_render", "rendered", "failed"] }
       },
       "allOf": [
-        { "if": { "properties": { "role": { "const": "latest_quarter" } } }, "then": { "required": ["audit_note"] } },
+        { "if": { "properties": { "role": { "const": "latest_disclosure" } } }, "then": { "required": ["audit_note"] } },
         { "if": { "properties": { "role": { "const": "counter_conclusion" } } }, "then": { "required": ["caveat"] } }
       ]
     }

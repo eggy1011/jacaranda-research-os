@@ -165,8 +165,11 @@ def test_runtime_validation() -> None:
         "fabricated number": lambda s, p: s["cards"][1].update(body="全年营收 999 亿元。"),
         "sign flip": lambda s, p: s["cards"][1].update(body="营收同比 -20.2%。"),
         "unit swap": lambda s, p: s["cards"][4].update(hook="增速 20.2 倍是算出来的"),
-        "vague latest_quarter period": lambda s, p: s["cards"][5].update(
+        "undated latest_disclosure": lambda s, p: s["cards"][5].update(
             hook="回顾一下", body="经营稳健。"),
+        "stale latest_disclosure period": lambda s, p: s["cards"][5].update(
+            hook="最新披露 2024Q1", body="平稳。", audit_note="未审计"),
+        "text decimals mismatch": lambda s, p: s["cards"][4].update(hook="增速 20.20% 是算出来的"),
         "closing not counterevidence": lambda s, p: (
             s["cards"][6].update(claim_refs=["CLM-002"], claim_type="fact")),
         "closing missing full sources": lambda s, p: s["cards"][6].update(source_ids=["SRC-001"]),
@@ -178,7 +181,7 @@ def test_runtime_validation() -> None:
         "duplicate source": lambda s, p: s["cards"][0].update(source_ids=["SRC-001", "SRC-001"]),
         "wrong role order": lambda s, p: s["cards"].reverse(),
         # second Codex review: semantic boundaries reachable by real input
-        "future latest_quarter period": lambda s, p: s["cards"][5].update(
+        "future latest_disclosure period": lambda s, p: s["cards"][5].update(
             hook="展望 2027Q4", body="新品放量。", audit_note="预告"),
         "amount metric as percent": lambda s, p: s["cards"][1]["inline_numbers"].append(
             {"metric_id": "MET-001", "display_transform": "percent", "decimals": 1}),

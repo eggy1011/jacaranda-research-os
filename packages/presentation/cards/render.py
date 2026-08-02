@@ -32,7 +32,7 @@ ROLE_KICKER = {
     "driver_1": "核心驱动 ①",
     "driver_2": "核心驱动 ②",
     "profit_quality": "盈利与质量",
-    "latest_quarter": "最新季度信号",
+    "latest_disclosure": "最新披露信号",
     "counter_conclusion": "反面证据与结论",
 }
 CLAIM_CHIP = {"fact": "事实", "inference": "推断", "opinion": "观点"}

@@ -19,7 +19,7 @@ CARD_H = 1920
 
 # The seven fixed card roles, in canonical order.
 ROLE_ORDER = ["cover", "full_year", "driver_1", "driver_2",
-              "profit_quality", "latest_quarter", "counter_conclusion"]
+              "profit_quality", "latest_disclosure", "counter_conclusion"]
 
 # Per-role character caps, shared by the renderer's wrapper and the validator's overflow check so
 # over-limit copy is a planning failure rather than a silent ellipsis. Values are chars = the

@@ -70,7 +70,7 @@
     },
     {
       "card_no": 6,
-      "role": "latest_quarter",
+      "role": "latest_disclosure",
       "hook": "最新披露：FY2025 年报",
       "body": "FY2025 全年营收与利润双升，为截至报告期最新已披露的完整财报。",
       "claim_type": "fact",

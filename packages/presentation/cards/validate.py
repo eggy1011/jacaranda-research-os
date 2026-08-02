@@ -34,14 +34,17 @@ _SCALE_TRANSFORMS = frozenset({"raw", "thousand", "wan", "million", "yi", "billi
 def _transform_ok(unit: str, transform: str) -> bool:
     """A display transform must be compatible with the metric's canonical unit.
 
-    A CNY revenue may be shown raw/万/亿/…, never as a percentage or a multiple; a "%" metric may
-    only be shown as percent, and an "x" metric only as a multiple. Without this a model could
-    label an amount metric `percent` and print a nonsense "%" value that still "binds".
+    A CNY total may be shown raw/万/亿/…, never as a percentage or a multiple; a "%" metric may
+    only be shown as percent; an "x" metric only as a multiple; and a per-share price (CNY/share)
+    must be shown raw — scaling a 28.4 元/股 price to "0.0亿" is meaningless. Without this a model
+    could label an amount metric `percent` and print a nonsense value that still "binds".
     """
     if unit == "%":
         return transform == "percent"
     if unit == "x":
         return transform == "multiple"
+    if unit.endswith("/share"):
+        return transform == "raw"
     if unit in _MONETARY:
         return transform in _SCALE_TRANSFORMS
     return transform in _SCALE_TRANSFORMS  # counts/shares/etc. scale but are not percent/multiple
@@ -80,17 +83,49 @@ def _latest_period_end(text: str) -> str | None:
     return max(ends) if ends else None
 
 
+# Research-package metric period codes (see research-package.schema): FY2025, 2025Q3, 2025H1,
+# TTM2025Q3, PIT. Mapped to an end date so the newest DISCLOSED period can be found.
+_METRIC_PERIOD = re.compile(r"^(?:FY(\d{4})|(\d{4})(H[12]|Q[1-4])|TTM(\d{4})(Q[1-4])|PIT)$")
+
+
+def _metric_period_end(metric: dict) -> str | None:
+    m = _METRIC_PERIOD.match(str(metric.get("period", "")))
+    if not m:
+        return metric.get("as_of_date") if metric.get("period") == "PIT" else None
+    if m.group(1):  # FY####
+        return _period_end(int(m.group(1)), 12)
+    if m.group(2):  # ####Q# / ####H#
+        tag = m.group(3)
+        month = {"H1": 6, "H2": 12, "Q1": 3, "Q2": 6, "Q3": 9, "Q4": 12}[tag]
+        return _period_end(int(m.group(2)), month)
+    if m.group(4):  # TTM####Q#
+        return _period_end(int(m.group(4)), {"Q1": 3, "Q2": 6, "Q3": 9, "Q4": 12}[m.group(5)])
+    return metric.get("as_of_date")  # PIT
+
+
+def _newest_disclosed_period(package: dict, cutoff: str) -> str | None:
+    """End date of the most recent *reporting-period* metric not after the data cutoff.
+
+    Point-in-time market data (period == "PIT", e.g. a closing price) is not a reporting-period
+    disclosure and is excluded, so a fresh price quote never makes the latest annual look stale.
+    """
+    ends = [e for m in package.get("metrics", []) if m.get("period") != "PIT"
+            and (e := _metric_period_end(m)) and (not cutoff or e <= cutoff)]
+    return max(ends) if ends else None
+
+
 def _sign(value: float) -> int:
     return (value > 0) - (value < 0)
 
 
-def _formatted_allowed(card: dict, metrics: dict) -> list[tuple[float, str, int]]:
-    """Allowed (magnitude, unit-suffix, value-sign) triples from the card's declared numbers.
+def _formatted_allowed(card: dict, metrics: dict) -> list[tuple[str, str, int]]:
+    """Allowed (canonical-number-string, unit-suffix, value-sign) triples for the card's figures.
 
-    Only inline displayNumbers justify a narrative numeral — a bare metric_ref is provenance, not
-    a licence to print an arbitrary figure. This mirrors format_number exactly.
+    The number string carries the DECLARED precision (e.g. "20.2", not "20.20"), so the narrative
+    must match the exact display, not merely the value. Only inline displayNumbers justify a
+    narrative numeral — a bare metric_ref is provenance, not a licence to print a figure.
     """
-    out: list[tuple[float, str, int]] = []
+    out: list[tuple[str, str, int]] = []
     for dn in card.get("inline_numbers", []):
         metric = metrics.get(dn.get("metric_id"))
         if metric is None:
@@ -100,32 +135,27 @@ def _formatted_allowed(card: dict, metrics: dict) -> list[tuple[float, str, int]
             continue
         if not _transform_ok(metric.get("unit", ""), transform):
             continue  # unit-incompatible transform is reported separately
-        scaled = metric["value"] / TRANSFORM_DIVISOR[transform]
-        mag = round(abs(scaled), dn.get("decimals", 1))
-        out.append((mag, TRANSFORM_SUFFIX[transform], _sign(metric["value"])))
+        decimals = dn.get("decimals", 1)
+        scaled = abs(metric["value"]) / TRANSFORM_DIVISOR[transform]
+        numstr = f"{round(scaled, decimals):.{decimals}f}"
+        out.append((numstr, TRANSFORM_SUFFIX[transform], _sign(metric["value"])))
     return out
 
 
-def _unbound_numbers(text: str, allowed: list[tuple[float, str, int]]) -> list[str]:
+def _unbound_numbers(text: str, allowed: list[tuple[str, str, int]]) -> list[str]:
     bad: list[str] = []
     cleaned = _DATE_EXEMPT.sub(" ", text)
     for sign_char, num, suffix in _NUM_TOKEN.findall(cleaned):
         if not num:
             continue
-        mag = abs(float(num.replace(",", "")))
+        numstr = num.replace(",", "")  # exact digits/decimals as written, commas normalised away
         unit = _SUFFIX_SYNONYM.get(suffix, suffix)
-        matched = False
-        for a_mag, a_suffix, a_sign in allowed:
-            if abs(mag - a_mag) > 1e-6:
-                continue
-            if unit != a_suffix:
-                continue  # unit must match the declared transform
-            if sign_char == "-" and a_sign >= 0:
-                continue  # a positive metric may not be shown negative
-            if sign_char == "+" and a_sign < 0:
-                continue
-            matched = True
-            break
+        matched = any(
+            numstr == a_num and unit == a_suffix
+            and not (sign_char == "-" and a_sign >= 0)
+            and not (sign_char == "+" and a_sign < 0)
+            for a_num, a_suffix, a_sign in allowed
+        )
         if not matched:
             bad.append(f"{sign_char}{num}{suffix}")
     return bad
@@ -254,15 +284,21 @@ def validate_series(series: dict, package: dict, *,
 
     by_role = {c.get("role"): c for c in cards}
 
-    lq = by_role.get("latest_quarter", {})
-    lq_period = _latest_period_end(f"{lq.get('hook', '')} {lq.get('body', '')}")
-    if lq_period is None:
-        bad("latest_quarter: must name a datable reporting period (e.g. 2026Q1 or FY2025)")
-    elif as_of and lq_period > as_of:
-        bad(f"latest_quarter: period ends {lq_period}, after the data cutoff {as_of} — a future "
-            f"period is a forward catalyst, not the latest disclosed period")
-    if not (lq.get("audit_note") or "").strip():
-        bad("latest_quarter: must carry an audit_note")
+    # latest_disclosure names the package's newest actually-disclosed reporting period (a quarter,
+    # half-year or annual — whatever the company last reported), never a future or stale one.
+    ld = by_role.get("latest_disclosure", {})
+    ld_period = _latest_period_end(f"{ld.get('hook', '')} {ld.get('body', '')}")
+    newest = _newest_disclosed_period(package, as_of)
+    if ld_period is None:
+        bad("latest_disclosure: must name a datable reporting period (e.g. 2026Q1 or FY2025)")
+    elif as_of and ld_period > as_of:
+        bad(f"latest_disclosure: period ends {ld_period}, after the data cutoff {as_of} — a future "
+            f"period is a forward catalyst, not a disclosed period")
+    elif newest and ld_period != newest:
+        bad(f"latest_disclosure: names a period ending {ld_period}, but the package's newest "
+            f"disclosed period ends {newest} (stale — must be the latest disclosed period)")
+    if not (ld.get("audit_note") or "").strip():
+        bad("latest_disclosure: must carry an audit_note")
 
     concl = by_role.get("counter_conclusion", {})
     if not (concl.get("caveat") or "").strip():
