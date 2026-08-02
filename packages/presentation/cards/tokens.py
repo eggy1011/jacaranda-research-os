@@ -17,6 +17,18 @@ TOKENS_PATH = Path(__file__).resolve().parents[1] / "design-tokens.json"
 CARD_W = 1080
 CARD_H = 1920
 
+# The seven fixed card roles, in canonical order.
+ROLE_ORDER = ["cover", "full_year", "driver_1", "driver_2",
+              "profit_quality", "latest_disclosure", "counter_conclusion"]
+
+# Per-role character caps, shared by the renderer's wrapper and the validator's overflow check so
+# over-limit copy is a planning failure rather than a silent ellipsis. Values are chars = the
+# wrap width × the line budget for that field.
+CARD_TEXT_CAPS = {
+    "default": {"hook": 33, "body": 80, "caveat": 44},   # 11×3, 20×4, 22×2
+    "cover": {"hook": 27, "body": 60, "caveat": 44},     # 9×3, 20×3
+}
+
 # Display transforms shared with the schemas. Values mirror slide-deck / social-card-series
 # `display_transform` enums; the divisor converts a stored metric value into display units.
 TRANSFORM_DIVISOR = {

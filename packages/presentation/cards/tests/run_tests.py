@@ -7,6 +7,7 @@ Also invoked by packages/presentation/tests/run_tests.py so CI exercises it.
 
 from __future__ import annotations
 
+import copy
 import json
 import sys
 import tempfile
@@ -22,7 +23,6 @@ from presentation.cards import (  # noqa: E402
     render_series,
 )
 from presentation.cards.render import (  # noqa: E402
-    ROLE_ORDER,
     CardRenderError,
     find_rasteriser,
     qa_report,
@@ -30,14 +30,14 @@ from presentation.cards.render import (  # noqa: E402
     resolve_numbers,
 )
 from presentation.cards.svg import NO_LINE_START, wrap_cjk  # noqa: E402
+from presentation.cards.tokens import ROLE_ORDER  # noqa: E402
+from presentation.cards.validate import validate_series  # noqa: E402
 
 SCHEMA_EX = PRES.parent / "research-schema" / "examples"
 SERIES = json.loads((SCHEMA_EX / "example-social-card-series.zh-CN.json").read_text("utf-8"))
-# In production the series is compiled FROM this package, so ids match by construction; the
-# committed fixtures were built in separate PRs (series cites the bilingual -001, the zh package
-# is -002), so align the id here. The zh package gives real Chinese metric names to render.
+# The series is compiled from the Chinese-monolingual package and cites it directly (ids match);
+# no in-memory alignment is needed.
 PKG = json.loads((SCHEMA_EX / "example-research-package.zh.json").read_text("utf-8"))
-PKG["package_id"] = SERIES["package_id"]
 
 passed = 0
 
@@ -151,6 +151,80 @@ def test_raster_optional() -> None:
         ok("raster: backend present (skipped negative check)", True)
 
 
+def _mutate(fn):
+    s = copy.deepcopy(SERIES)
+    p = copy.deepcopy(PKG)
+    fn(s, p)
+    return validate_series(s, p)
+
+
+def test_runtime_validation() -> None:
+    ok("validate: clean series passes", validate_series(SERIES, PKG) == [])
+
+    cases = {
+        "fabricated number": lambda s, p: s["cards"][1].update(body="全年营收 999 亿元。"),
+        "sign flip": lambda s, p: s["cards"][1].update(body="营收同比 -20.2%。"),
+        "unit swap": lambda s, p: s["cards"][4].update(hook="增速 20.2 倍是算出来的"),
+        "undated latest_disclosure": lambda s, p: s["cards"][5].update(
+            hook="回顾一下", body="经营稳健。"),
+        "stale latest_disclosure period": lambda s, p: s["cards"][5].update(
+            hook="最新披露 2024Q1", body="平稳。", audit_note="未审计"),
+        "text decimals mismatch": lambda s, p: s["cards"][4].update(hook="增速 20.20% 是算出来的"),
+        "closing not counterevidence": lambda s, p: (
+            s["cards"][6].update(claim_refs=["CLM-002"], claim_type="fact")),
+        "closing missing full sources": lambda s, p: s["cards"][6].update(source_ids=["SRC-001"]),
+        "draft package not renderable": lambda s, p: p.update(status="draft"),
+        "mock never approved": lambda s, p: p.update(status="approved"),
+        "over-long hook truncates": lambda s, p: s["cards"][1].update(hook="字" * 40),
+        "dangling metric": lambda s, p: s["cards"][0]["inline_numbers"].append(
+            {"metric_id": "MET-404", "display_transform": "raw"}),
+        "duplicate source": lambda s, p: s["cards"][0].update(source_ids=["SRC-001", "SRC-001"]),
+        "wrong role order": lambda s, p: s["cards"].reverse(),
+        # second Codex review: semantic boundaries reachable by real input
+        "future latest_disclosure period": lambda s, p: s["cards"][5].update(
+            hook="展望 2027Q4", body="新品放量。", audit_note="预告"),
+        "amount metric as percent": lambda s, p: s["cards"][1]["inline_numbers"].append(
+            {"metric_id": "MET-001", "display_transform": "percent", "decimals": 1}),
+        "driver with no refs": lambda s, p: s["cards"][2].update(claim_refs=[], metric_refs=[]),
+        "cover with no refs": lambda s, p: s["cards"][0].update(claim_refs=[], metric_refs=[]),
+        "package not zh locale": lambda s, p: p.update(locale="en-AU"),
+        "series as_of mismatch": lambda s, p: s.update(as_of_date="2025-01-01"),
+    }
+    for name, fn in cases.items():
+        ok(f"validate: rejects {name}", bool(_mutate(fn)))
+
+    # a positive sign on a positive metric is allowed (must not be a false positive)
+    ok("validate: '+' on positive value allowed",
+       _mutate(lambda s, p: s["cards"][1].update(body="营收同比 +20.2%，稳。")) == [])
+
+
+def test_render_fail_closed() -> None:
+    s = copy.deepcopy(SERIES)
+    s["cards"][1]["body"] = "全年营收 999 亿元。"
+    try:
+        render_series(s, PKG, Path(tempfile.mkdtemp()))
+        ok("render: refuses a fabricated series", False, "rendered anyway")
+    except CardRenderError:
+        ok("render: refuses a fabricated series", True)
+
+
+def test_rasteriser_whitelist() -> None:
+    import os
+
+    from presentation.cards.render import find_rasteriser
+    saved = os.environ.get("JACARANDA_SVG_RASTERISER")
+    try:
+        os.environ["JACARANDA_SVG_RASTERISER"] = "some/path/resvg"  # a path override is rejected
+        ok("raster: path override rejected", find_rasteriser() is None)
+        os.environ["JACARANDA_SVG_RASTERISER"] = "definitely-not-a-tool"
+        ok("raster: non-whitelisted name rejected", find_rasteriser() is None)
+    finally:
+        if saved is None:
+            os.environ.pop("JACARANDA_SVG_RASTERISER", None)
+        else:
+            os.environ["JACARANDA_SVG_RASTERISER"] = saved
+
+
 def main() -> int:
     test_seven_fixed_cards()
     test_deterministic()
@@ -158,6 +232,9 @@ def main() -> int:
     test_kinsoku_wrapping()
     test_qa_gate()
     test_raster_optional()
+    test_rasteriser_whitelist()
+    test_runtime_validation()
+    test_render_fail_closed()
     print(f"\nALL {passed} card-renderer assertions passed")
     return 0
 

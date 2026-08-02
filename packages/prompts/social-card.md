@@ -12,7 +12,7 @@ produces: social-card-series JSON (seven fixed-role knowledge cards)
 
 Compile a verified or approved research package into a `social-card-series`: seven fixed-role
 9:16 knowledge cards (`cover`, `full_year`, `driver_1`, `driver_2`, `profit_quality`,
-`latest_quarter`, `counter_conclusion`) that a deterministic code renderer turns into
+`latest_disclosure`, `counter_conclusion`) that a deterministic code renderer turns into
 1080×1920 PNGs. The model selects which claims and metrics each card carries and writes short
 Chinese copy; it does not write new analysis, invent numbers, choose styling (design tokens own
 that), or render anything (the renderer's job). This stage is the only retryable model stage in
@@ -60,9 +60,9 @@ QC-01 binding rule before any card is rendered — assembly and rendering are co
 - **No unbound numbers**: any digit sequence in `hook` or `body` must be the rendered form of a
   metric declared in that card's `inline_numbers`, at the same value and displayed precision.
   Years, quarter labels and card numbers are exempt.
-- **`latest_quarter`** must name an explicit interim period (e.g. `2026Q1`) and carry an
-  `audit_note` stating the data is unaudited; it must never present an interim figure as a
-  full-year result.
+- **`latest_disclosure`** must name the package's newest actually-disclosed reporting period
+  (a quarter, half-year or annual — whatever the company last reported, e.g. `2026Q1` or
+  `FY2025`), never a future or a stale one, and carry an `audit_note` stating its audit status.
 - **`counter_conclusion`** must carry a `caveat` and the full source union of the series, and must
   surface at least one genuine counterevidence claim — never a reassuring paraphrase.
 - **`profit_quality`** figures that are `computed_by = deterministic_calc` are shown with the
@@ -113,22 +113,23 @@ Every digit in `hook`/`body` resolves to a bound metric at the stated precision.
 
 ```json
 {
-  "card_no": 6, "role": "latest_quarter",
-  "hook": "全年营收 60 亿创新高",
+  "card_no": 6, "role": "latest_disclosure",
+  "hook": "展望 2027Q4：营收 60 亿创新高",
   "body": "最新一期延续强势。",
-  "claim_type": "fact", "metric_refs": [],
+  "claim_type": "fact", "claim_refs": [], "metric_refs": [],
   "source_ids": ["SRC-001"], "status": "planning"
 }
 ```
 
-Four breaches: `60` is unbound (no such metric); an interim card presents a **full-year** figure;
-no `audit_note` marks it unaudited; and 「创新高」is a new claim the package never makes. The
-scheduler rejects the series and the plan is retried.
+Five breaches: `60` is unbound (no such metric); `2027Q4` is a future period, not a disclosed one;
+no `audit_note`; no `claim_refs` (an unsupported assertion); and 「创新高」is a new claim the
+package never makes. The scheduler rejects the series and the plan is retried.
 
 ## Acceptance notes
 
 Machine checks: series validates against `social-card-series.schema.json`; seven cards with
 contiguous `card_no` and the exact role order; every reference resolves and none is duplicated;
-every numeric token in `hook`/`body` matches a bound metric's displayed value (QC-01);
-`latest_quarter` names a period and carries an `audit_note`; `counter_conclusion` carries a
-`caveat` and the full source union. These mirror `check_card_series` in the validator.
+every numeric token in `hook`/`body` matches a bound metric's displayed value at the declared
+precision (QC-01); `latest_disclosure` names the package's newest disclosed period and carries an
+`audit_note`; `counter_conclusion` carries a `caveat`, a genuine counterevidence claim and the
+full source union. These mirror `validate_series` in the renderer package.
