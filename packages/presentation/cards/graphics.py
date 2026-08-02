@@ -29,7 +29,7 @@ def accent_rule(c: Canvas, t: CardTokens, *, x: float, y: float, w: float = 96) 
 
 def motif_band(c: Canvas, t: CardTokens, *, x: float, y: float, w: float, h: float,
                variant: int = 0) -> None:
-    """A decorative brand band for cards without KPI figures (drivers, latest_quarter, closing).
+    """A decorative brand band for cards without KPI figures (drivers, latest_disclosure, closing).
 
     Intentionally symmetric and quantity-free: overlapping translucent rounded shapes, no axis, no
     data points, no proportional lengths. It fills the composition without implying a measurement.
