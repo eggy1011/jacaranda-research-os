@@ -177,6 +177,15 @@ def test_runtime_validation() -> None:
             {"metric_id": "MET-404", "display_transform": "raw"}),
         "duplicate source": lambda s, p: s["cards"][0].update(source_ids=["SRC-001", "SRC-001"]),
         "wrong role order": lambda s, p: s["cards"].reverse(),
+        # second Codex review: semantic boundaries reachable by real input
+        "future latest_quarter period": lambda s, p: s["cards"][5].update(
+            hook="展望 2027Q4", body="新品放量。", audit_note="预告"),
+        "amount metric as percent": lambda s, p: s["cards"][1]["inline_numbers"].append(
+            {"metric_id": "MET-001", "display_transform": "percent", "decimals": 1}),
+        "driver with no refs": lambda s, p: s["cards"][2].update(claim_refs=[], metric_refs=[]),
+        "cover with no refs": lambda s, p: s["cards"][0].update(claim_refs=[], metric_refs=[]),
+        "package not zh locale": lambda s, p: p.update(locale="en-AU"),
+        "series as_of mismatch": lambda s, p: s.update(as_of_date="2025-01-01"),
     }
     for name, fn in cases.items():
         ok(f"validate: rejects {name}", bool(_mutate(fn)))
@@ -196,6 +205,23 @@ def test_render_fail_closed() -> None:
         ok("render: refuses a fabricated series", True)
 
 
+def test_rasteriser_whitelist() -> None:
+    import os
+
+    from presentation.cards.render import find_rasteriser
+    saved = os.environ.get("JACARANDA_SVG_RASTERISER")
+    try:
+        os.environ["JACARANDA_SVG_RASTERISER"] = "some/path/resvg"  # a path override is rejected
+        ok("raster: path override rejected", find_rasteriser() is None)
+        os.environ["JACARANDA_SVG_RASTERISER"] = "definitely-not-a-tool"
+        ok("raster: non-whitelisted name rejected", find_rasteriser() is None)
+    finally:
+        if saved is None:
+            os.environ.pop("JACARANDA_SVG_RASTERISER", None)
+        else:
+            os.environ["JACARANDA_SVG_RASTERISER"] = saved
+
+
 def main() -> int:
     test_seven_fixed_cards()
     test_deterministic()
@@ -203,6 +229,7 @@ def main() -> int:
     test_kinsoku_wrapping()
     test_qa_gate()
     test_raster_optional()
+    test_rasteriser_whitelist()
     test_runtime_validation()
     test_render_fail_closed()
     print(f"\nALL {passed} card-renderer assertions passed")

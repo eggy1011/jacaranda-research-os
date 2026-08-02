@@ -25,17 +25,59 @@ SCHEMA_PATH = (Path(__file__).resolve().parents[2]
                / "research-schema" / "social-card-series.schema.json")
 
 RENDERABLE_STATUS = frozenset({"verified", "approved"})
+LOCALE = "zh-CN"
 
-# Tokens exempt from number binding: years, quarters, half-years, fiscal-year and section markers.
-# Compound period forms (2026Q4, 2026H1) must be matched before the bare four-digit year, since
-# "2026Q4" has no word boundary between the year and the quarter.
+_MONETARY = frozenset({"CNY", "USD", "HKD", "AUD", "EUR", "JPY", "GBP"})
+_SCALE_TRANSFORMS = frozenset({"raw", "thousand", "wan", "million", "yi", "billion"})
+
+
+def _transform_ok(unit: str, transform: str) -> bool:
+    """A display transform must be compatible with the metric's canonical unit.
+
+    A CNY revenue may be shown raw/万/亿/…, never as a percentage or a multiple; a "%" metric may
+    only be shown as percent, and an "x" metric only as a multiple. Without this a model could
+    label an amount metric `percent` and print a nonsense "%" value that still "binds".
+    """
+    if unit == "%":
+        return transform == "percent"
+    if unit == "x":
+        return transform == "multiple"
+    if unit in _MONETARY:
+        return transform in _SCALE_TRANSFORMS
+    return transform in _SCALE_TRANSFORMS  # counts/shares/etc. scale but are not percent/multiple
+
+
+# Tokens exempt from number binding: ISO dates, years, quarters, half-years, fiscal years.
+# Compound period forms (2026Q4, 2026H1) are matched before the bare year, since "2026Q4" has no
+# word boundary between the year and the quarter.
 _DATE_EXEMPT = re.compile(
-    r"\bFY\d{4}\b|\d{4}Q[1-4]|\d{4}H[12]|\b\d{4}\b|Q[1-4]|H[12]|[一二三四]季度|上半年|下半年")
+    r"\d{4}-\d{2}-\d{2}|\bFY\d{4}\b|\d{4}Q[1-4]|\d{4}H[12]|\b\d{4}\b|Q[1-4]|H[12]"
+    r"|[一二三四]季度|上半年|下半年")
 # A numeric token with its immediate sign and unit — sign and unit are validated, not just value.
 _NUM_TOKEN = re.compile(r"([+\-]?)(\d[\d,]*(?:\.\d+)?)\s*(%|倍|亿元|亿|万元|万|千|百万|十亿|x)?")
-# An interim period must be named on the latest_quarter card (never a full-year figure).
-_INTERIM = re.compile(r"Q[1-4]|[一二三四]季度|H[12]|上半年|下半年|中报")
 _SUFFIX_SYNONYM = {"亿元": "亿", "万元": "万", "倍": "x"}
+
+# Datable reporting periods, used to reject a "latest quarter" that is actually in the future.
+_PERIOD_PATTERNS = (
+    (re.compile(r"(\d{4})Q([1-4])"), lambda y, q: _period_end(y, {1: 3, 2: 6, 3: 9, 4: 12}[q])),
+    (re.compile(r"(\d{4})H([12])"), lambda y, h: _period_end(y, 6 if h == 1 else 12)),
+    (re.compile(r"FY(\d{4})|(\d{4})\s*财年|(\d{4})\s*年报"), lambda y, *_: _period_end(y, 12)),
+)
+
+
+def _period_end(year: int, month: int) -> str:
+    last = {3: 31, 6: 30, 9: 30, 12: 31}[month]
+    return f"{year:04d}-{month:02d}-{last:02d}"
+
+
+def _latest_period_end(text: str) -> str | None:
+    """The end date of the newest datable reporting period named in the text, or None."""
+    ends: list[str] = []
+    for pattern, to_end in _PERIOD_PATTERNS:
+        for m in pattern.finditer(text):
+            groups = [g for g in m.groups() if g]
+            ends.append(to_end(int(groups[0]), *(int(g) for g in groups[1:])))
+    return max(ends) if ends else None
 
 
 def _sign(value: float) -> int:
@@ -56,6 +98,8 @@ def _formatted_allowed(card: dict, metrics: dict) -> list[tuple[float, str, int]
         transform = dn.get("display_transform")
         if transform not in TRANSFORM_DIVISOR:
             continue
+        if not _transform_ok(metric.get("unit", ""), transform):
+            continue  # unit-incompatible transform is reported separately
         scaled = metric["value"] / TRANSFORM_DIVISOR[transform]
         mag = round(abs(scaled), dn.get("decimals", 1))
         out.append((mag, TRANSFORM_SUFFIX[transform], _sign(metric["value"])))
@@ -123,7 +167,7 @@ def validate_series(series: dict, package: dict, *,
     if [c.get("role") for c in cards] != ROLE_ORDER:
         bad(f"cards: roles must be exactly {ROLE_ORDER} in order")
 
-    # -- lifecycle gate -------------------------------------------------------
+    # -- lifecycle + identity gate -------------------------------------------
     status = package.get("status")
     is_mock = package.get("company", {}).get("is_mock", False)
     if require_status is not None and status not in require_status:
@@ -132,6 +176,12 @@ def validate_series(series: dict, package: dict, *,
         bad("mock package must never be rendered as approved")
     if series.get("package_id") != package.get("package_id"):
         bad("series/package id mismatch")
+    if series.get("locale") != LOCALE or package.get("locale") != LOCALE:
+        bad(f"series and package must both declare locale {LOCALE!r} "
+            f"(series={series.get('locale')!r}, package={package.get('locale')!r})")
+    if series.get("as_of_date") != package.get("as_of_date"):
+        bad("series as_of_date must equal the package as_of_date")
+    as_of = package.get("as_of_date", "")
 
     metrics = {m["metric_id"]: m for m in package.get("metrics", [])}
     claims = {c["claim_id"]: c for c in package.get("claims", [])}
@@ -153,12 +203,24 @@ def validate_series(series: dict, package: dict, *,
             if sid not in sources:
                 bad(f"{where}: dangling source {sid}")
         for dn in card.get("inline_numbers", []):
-            if dn.get("metric_id") not in metrics:
-                bad(f"{where}: inline number cites unknown metric {dn.get('metric_id')}")
+            mid = dn.get("metric_id")
+            if mid not in metrics:
+                bad(f"{where}: inline number cites unknown metric {mid}")
+            elif not _transform_ok(metrics[mid].get("unit", ""), dn.get("display_transform", "")):
+                bad(f"{where}: transform {dn.get('display_transform')!r} is incompatible with "
+                    f"{mid} unit {metrics[mid].get('unit')!r}")
         for field in ("claim_refs", "metric_refs", "source_ids"):
             vals = card.get(field, [])
             if len(vals) != len(set(vals)):
                 bad(f"{where}: duplicate {field}")
+
+        # every card must carry provenance: a non-cover card needs at least one claim reference;
+        # the cover may lead with a metric instead. A card with no refs is an unsupported assertion.
+        if not card.get("claim_refs"):
+            if role != "cover":
+                bad(f"{where}: must reference at least one claim (no unsupported assertions)")
+            elif not card.get("metric_refs"):
+                bad(f"{where}: cover must reference at least one claim or metric")
 
         # number binding (value + unit + sign), the anti-fabrication core
         allowed = _formatted_allowed(card, metrics)
@@ -193,8 +255,12 @@ def validate_series(series: dict, package: dict, *,
     by_role = {c.get("role"): c for c in cards}
 
     lq = by_role.get("latest_quarter", {})
-    if not _INTERIM.search(f"{lq.get('hook', '')} {lq.get('body', '')}"):
-        bad("latest_quarter: must name an explicit interim period (e.g. 2026Q4), not a full year")
+    lq_period = _latest_period_end(f"{lq.get('hook', '')} {lq.get('body', '')}")
+    if lq_period is None:
+        bad("latest_quarter: must name a datable reporting period (e.g. 2026Q1 or FY2025)")
+    elif as_of and lq_period > as_of:
+        bad(f"latest_quarter: period ends {lq_period}, after the data cutoff {as_of} — a future "
+            f"period is a forward catalyst, not the latest disclosed period")
     if not (lq.get("audit_note") or "").strip():
         bad("latest_quarter: must carry an audit_note")
 

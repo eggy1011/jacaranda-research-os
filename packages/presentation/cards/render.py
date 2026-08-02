@@ -61,6 +61,8 @@ def resolve_numbers(card: dict, metrics: dict) -> list[dict]:
             "label": metric.get("name") if isinstance(metric.get("name"), str) else "",
             "signed": dn.get("show_sign_colour", False),
             "transform": dn["display_transform"],
+            # 计算值 is a property of the metric's provenance, not of the card's role
+            "computed": metric.get("computed_by") == "deterministic_calc",
         })
     return out
 
@@ -167,6 +169,10 @@ def _draw_numbers_row(c: Canvas, t: CardTokens, nums: list[dict], *, y: float) -
         label = wrap_cjk(n["label"] or n["metric_id"], max_chars=10, max_lines=1)[0]
         c.text(x + w / 2, y + 210, label, fill=t.muted, size=26,
                font=t.font_body, anchor="middle")
+        if n["computed"]:  # tag deterministic_calc figures wherever they appear
+            c.rect(x + w / 2 - 48, y + h - 44, 96, 32, t.primary, radius=16)
+            c.text(x + w / 2, y + h - 21, "计算值", fill=t.inverse, size=20,
+                   font=t.font_body, anchor="middle")
     return y + h + 40
 
 
@@ -204,10 +210,8 @@ def _render_card(card: dict, t: CardTokens, *, ticker: str, as_of: str,
     y = _hook(c, t, card["hook"], y=280)
 
     if role in ("full_year", "profit_quality"):
+        # 计算值 tags are now drawn per-tile by provenance inside _draw_numbers_row
         y = _draw_numbers_row(c, t, nums, y=y)
-        if role == "profit_quality" and nums:
-            _chip(c, t, "计算值", x=t.content_left, y=y, fill=t.primary, colour=t.inverse)
-            y += 76
     elif nums:
         # any other role that declares figures shows them as bound KPI tiles
         y = _draw_numbers_row(c, t, nums, y=y)
@@ -342,16 +346,15 @@ ALLOWED_RASTERISERS = ("resvg", "rsvg-convert", "cairosvg", "inkscape")
 def find_rasteriser() -> str | None:
     """Locate an optional SVG->PNG backend from a fixed whitelist. Absent is fine.
 
-    An operator may point ``JACARANDA_SVG_RASTERISER`` at a specific install, but only if its
-    basename is one of the whitelisted tools — an arbitrary executable is never run.
+    ``JACARANDA_SVG_RASTERISER`` may select WHICH whitelisted tool to prefer, but only by bare
+    name resolved on PATH — an arbitrary path (e.g. /tmp/resvg) is never run, so a same-named
+    file dropped anywhere cannot hijack rasterisation.
     """
     override = os.environ.get("JACARANDA_SVG_RASTERISER")
     if override:
-        if Path(override).name not in ALLOWED_RASTERISERS:
-            return None
-        if Path(override).is_file():
-            return override
-        return shutil.which(override)
+        if os.sep in override or (os.altsep and os.altsep in override):
+            return None  # a path override is rejected outright
+        return shutil.which(override) if override in ALLOWED_RASTERISERS else None
     for candidate in ALLOWED_RASTERISERS:
         found = shutil.which(candidate)
         if found:

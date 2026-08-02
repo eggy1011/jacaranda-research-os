@@ -48,10 +48,10 @@
     {
       "card_no": 4,
       "role": "driver_2",
-      "hook": "份额有望向龙头集中",
-      "body": "在政策与高增长背景下，公司有望继续扩大国内市场份额。",
+      "hook": "增长引擎：新一代控制系统在路上",
+      "body": "公司预计 2026Q4 发布新一代控制系统，有望打开增量空间（前瞻）。",
       "claim_type": "inference",
-      "claim_refs": ["CLM-003"],
+      "claim_refs": ["CLM-011"],
       "metric_refs": [],
       "source_ids": ["SRC-001"],
       "status": "planning"
@@ -71,12 +71,12 @@
     {
       "card_no": 6,
       "role": "latest_quarter",
-      "hook": "2026Q4 有个新产品要落地",
-      "body": "公司预计 2026Q4 发布新一代控制系统；前瞻信息，尚未落地。",
-      "claim_type": "inference",
-      "claim_refs": ["CLM-011"],
+      "hook": "最新披露：FY2025 年报",
+      "body": "FY2025 全年营收与利润双升，为截至报告期最新已披露的完整财报。",
+      "claim_type": "fact",
+      "claim_refs": ["CLM-001"],
       "metric_refs": [],
-      "audit_note": "未经审计（前瞻信息）",
+      "audit_note": "已审计（FY2025 年报）",
       "source_ids": ["SRC-001"],
       "status": "planning"
     },
