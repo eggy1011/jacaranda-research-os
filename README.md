@@ -1,6 +1,6 @@
 # Jacaranda Research OS
 
-蓝楹会 AI 股票研究平台 / Jacaranda AI Equity Research Platform
+Jacaranda AI Equity Research Platform
 
 This repository is the shared workspace for a bilingual, source-grounded equity research platform covering A-shares first and US equities next.
 
