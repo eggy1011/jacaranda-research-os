@@ -6,7 +6,7 @@ is designed to be executable from a clean machine with Docker and this repositor
 ## 1. Local acceptance stack (default, D-011)
 
 ```bash
-(test -f .env || (umask 077 && printf 'POSTGRES_PASSWORD=%s\n' "$(openssl rand -hex 24)" > .env)) && docker compose up --build
+(umask 077; touch .env; grep -q '^POSTGRES_PASSWORD=.' .env || printf 'POSTGRES_PASSWORD=%s\n' "$(openssl rand -hex 24)" >> .env) && docker compose up --build
 ```
 
 Then add to the ignored `.env` (see `.env.example`):
