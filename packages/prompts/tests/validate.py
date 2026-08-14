@@ -483,11 +483,15 @@ TRANSFORM = {"raw": 1, "percent": 1, "multiple": 1, "wan": 1e4, "yi": 1e8,
 
 
 def metric_displays(metric: dict) -> set[float]:
-    out = set()
-    for scale in TRANSFORM.values():
-        for d in range(5):
-            out.add(round(metric["value"] / scale, d))
-    return out
+    # A bare metric reference justifies ONLY the metric's own stored value, rounded to a display
+    # precision — never an arbitrary 万/亿/thousand/million/billion rescaling of it. A scaled
+    # display must be declared explicitly via an inline displayNumber (transform + decimals),
+    # which check_deck_numbers() verifies against that exact transform. The previous version swept
+    # every TRANSFORM scale here, so a metric ÷1e8/1e9 collapsed to spurious values like
+    # 0.0 / 0.1 / 1.0 / 1.5 that then "bound" unrelated, fabricated narrative numbers — the QC-01
+    # loophole (a metric worth 1,464.99 silently justified "1.5倍" or "0.1"). See check_qc01_binding.
+    value = metric["value"]
+    return {round(value, d) for d in range(5)}
 
 
 # Block types whose free text is checked, plus structurally-numeric types where every number is
@@ -579,6 +583,22 @@ def narrative_units(block: dict, cover_metric_ids: list):
                 yield cm[key], implicit, []
 
 
+# ---------- 6. QC-01 binding invariant (regression guard) ----------
+
+def check_qc01_binding() -> None:
+    # Guard the QC-01 loophole closed for good: a bare metric reference must justify its own
+    # value (and roundings) but must NOT bind a rescaled collapse of it. Runs every CI invocation
+    # so a future re-introduction of the scale sweep in metric_displays() fails immediately.
+    displays = metric_displays({"value": 1464.99})
+    check(round(1464.99, 2) in displays, "internal_contradiction",
+          "qc01/self-test/true-value-bound", False, "validator",
+          "a metric reference must justify the metric's own value")
+    for spurious in (0.0, 0.1, 1.0, 1.5, 1465.0 / 1000):
+        check(spurious not in displays, "dangling_reference",
+              f"qc01/self-test/rescale-leak/{spurious}", False, "validator",
+              "a bare metric reference must not bind a rescaled collapse of its value")
+
+
 # ---------- main ----------
 
 def main() -> int:
@@ -592,6 +612,7 @@ def main() -> int:
         check_slide_plan(pkg)
         check_bilingual(pkg)
         check_deck_numbers(pkg)
+        check_qc01_binding()
     except Exception as e:  # surface as structured error, never a bare traceback
         failures.append({"code": "validator_crash", "stage": "validator", "path": "-",
                          "retryable": False, "detail": f"{type(e).__name__}: {e}"})
