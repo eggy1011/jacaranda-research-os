@@ -127,7 +127,24 @@ class AkshareLiveClient:
         return {"records": records}
 
     def _profile_sync(self, symbol: str) -> Mapping[str, object]:
-        frame = self._call(self._ak.stock_profile_cninfo, symbol=symbol)
+        try:
+            frame = self._call(self._ak.stock_profile_cninfo, symbol=symbol)
+        except ExternalClientFailure:
+            frame = None
+        if (frame is None or len(frame) == 0) and symbol.startswith("6"):
+            board = "科创板" if symbol.startswith("688") else "主板A股"
+            listing = self._call(self._ak.stock_info_sh_name_code, symbol=board)
+            frame = listing[listing["证券代码"].astype(str) == symbol]
+            if frame is not None and len(frame) != 0:
+                row = frame.iloc[0]
+                name = _as_text(row.get("公司全称")) or _as_text(row.get("证券全称"))
+                if name is not None:
+                    return {
+                        "name_zh": name,
+                        "name_en": None,
+                        "industry": None,
+                        "listing_date": _as_date(row.get("上市日期")),
+                    }
         if frame is None or len(frame) == 0:
             raise ExternalClientFailure(kind=ClientFailureKind.UNAVAILABLE)
         row = frame.iloc[0]
