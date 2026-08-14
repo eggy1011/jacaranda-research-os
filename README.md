@@ -39,13 +39,14 @@ the committed `.env.example` intentionally contains empty values only.
 From the repository root, run the single documented startup command:
 
 ```bash
-(test -f .env || (umask 077 && printf 'POSTGRES_PASSWORD=%s\n' "$(openssl rand -hex 24)" > .env)) && docker compose up --build
+(umask 077; touch .env; grep -q '^POSTGRES_PASSWORD=.' .env || printf 'POSTGRES_PASSWORD=%s\n' "$(openssl rand -hex 24)" >> .env) && docker compose up --build
 ```
 
-On first run, this creates an ignored, owner-readable `.env` with a random local PostgreSQL
-password. Later runs reuse the same password so it continues to match the existing PostgreSQL data
-volume. Do not commit `.env`. To rotate the local password, first remove the development volume with
-`docker compose down --volumes`, then replace the password in `.env` before starting again.
+If `.env` is new or does not already contain a non-empty `POSTGRES_PASSWORD`, this adds a random
+local password while preserving settings such as `OPENROUTER_API_KEY`. Later runs reuse the same
+password so it continues to match the existing PostgreSQL data volume. Do not commit `.env`. To
+rotate the local password, first remove the development volume with `docker compose down --volumes`,
+then replace the password in `.env` before starting again.
 
 Then open:
 
