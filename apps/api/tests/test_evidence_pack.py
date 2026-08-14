@@ -148,13 +148,17 @@ class FakeAkshareModule:
         daily: pd.DataFrame | None = None,
         abstract: pd.DataFrame | None = None,
         info: pd.DataFrame | None = None,
+        sh_info: pd.DataFrame | None = None,
         error: Exception | None = None,
+        profile_error: Exception | None = None,
     ) -> None:
         self._hist = hist
         self._daily = daily
         self._abstract = abstract
         self._info = info
+        self._sh_info = sh_info
         self._error = error
+        self._profile_error = profile_error
 
     def stock_zh_a_hist(self, **kwargs: Any) -> pd.DataFrame:
         if self._error is not None:
@@ -176,8 +180,15 @@ class FakeAkshareModule:
 
     def stock_profile_cninfo(self, **kwargs: Any) -> pd.DataFrame:
         assert kwargs["symbol"] == "600519"
+        if self._profile_error is not None:
+            raise self._profile_error
         assert self._info is not None
         return self._info
+
+    def stock_info_sh_name_code(self, **kwargs: Any) -> pd.DataFrame:
+        assert kwargs["symbol"] == "主板A股"
+        assert self._sh_info is not None
+        return self._sh_info
 
 
 def _hist_frame() -> pd.DataFrame:
@@ -206,6 +217,19 @@ def _info_frame() -> pd.DataFrame:
             "所属行业": ["酒、饮料和精制茶制造业"],
             "上市日期": ["2001-08-27"],
             "法人代表": ["某人"],
+        }
+    )
+
+
+def _sh_info_frame() -> pd.DataFrame:
+    return pd.DataFrame(
+        {
+            "证券代码": ["600000", "600519"],
+            "证券简称": ["浦发银行", "贵州茅台"],
+            "证券全称": ["上海浦东发展银行", "贵州茅台"],
+            "公司简称": ["浦发银行", "贵州茅台"],
+            "公司全称": ["上海浦东发展银行股份有限公司", "贵州茅台酒股份有限公司"],
+            "上市日期": [date(1999, 11, 10), date(2001, 8, 27)],
         }
     )
 
@@ -271,6 +295,22 @@ class TestLiveClientParsing:
         assert payload["name_en"] == "Kweichow Moutai Co., Ltd."
         assert payload["industry"] == "酒、饮料和精制茶制造业"
         assert payload["listing_date"] == date(2001, 8, 27)
+
+    @pytest.mark.anyio
+    async def test_profile_falls_back_to_official_sse_listing(self) -> None:
+        client = AkshareLiveClient(
+            FakeAkshareModule(
+                profile_error=ValueError("CNInfo returned non-JSON"),
+                sh_info=_sh_info_frame(),
+            )
+        )
+        payload = await client.fetch_company_profile("600519")
+        assert payload == {
+            "name_zh": "贵州茅台酒股份有限公司",
+            "name_en": None,
+            "industry": None,
+            "listing_date": date(2001, 8, 27),
+        }
 
 
 class TestFinancialsAdapter:
