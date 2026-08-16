@@ -146,16 +146,17 @@ class RealResearchOrchestrator(StageOrchestrator):
 
         claims: list[JsonDict] = list(fact_claims)
         s3: dict[str, JsonDict] = {}
-        for stage, next_id in (("S3a", 20), ("S3b", 30), ("S3c", 40), ("S3d", 50)):
+        for stage in ("S3a", "S3b", "S3c", "S3d"):
             stage_input: JsonDict = {
                 "company": company,
                 "verified_metrics": metrics,
                 "verified_fact_claims": fact_claims,
-                "next_claim_id": f"CLM-{next_id:03d}",
+                "next_claim_id": self._next_claim_id(claims),
             }
             output = await self._cached(
                 f"03-{stage}", partial(self._execute, self._one_task(stage), stage_input)
             )
+            output = self._rebase_stage_claims(output, "claims", claims)
             s3[stage] = output
             self._merge_claims(claims, cast(list[JsonDict], output["claims"]))
 
@@ -175,10 +176,11 @@ class RealResearchOrchestrator(StageOrchestrator):
                     ],
                     "scenario_metrics": calc["scenario_metrics"],
                     "prior_claims": claims,
-                    "next_claim_id": "CLM-060",
+                    "next_claim_id": self._next_claim_id(claims),
                 },
             ),
         )
+        s4 = self._rebase_stage_claims(s4, "claims", claims)
         self._merge_claims(claims, cast(list[JsonDict], s4["claims"]))
         self._flag_counterevidence(claims, cast(list[str], s4["counterevidence_claim_ids"]))
 
@@ -190,10 +192,15 @@ class RealResearchOrchestrator(StageOrchestrator):
                     "as_of_date": as_of_date,
                     "prior_claims": claims,
                     "verified_metrics": metrics,
-                    "next_ids": {"claim": "CLM-070", "catalyst": "CAT-001", "risk": "RSK-001"},
+                    "next_ids": {
+                        "claim": self._next_claim_id(claims),
+                        "catalyst": "CAT-001",
+                        "risk": "RSK-001",
+                    },
                 },
             ),
         )
+        s5 = self._rebase_stage_claims(s5, "supporting_claims", claims)
         self._merge_claims(claims, cast(list[JsonDict], s5["supporting_claims"]))
 
         valuation = self._build_valuation(calc, s4)
@@ -328,6 +335,53 @@ class RealResearchOrchestrator(StageOrchestrator):
                 }
             )
         return sources
+
+    @staticmethod
+    def _next_claim_number(claims: list[JsonDict]) -> int:
+        numbers = [
+            int(str(claim["claim_id"])[4:])
+            for claim in claims
+            if str(claim.get("claim_id", "")).startswith("CLM-")
+        ]
+        return (max(numbers) + 1) if numbers else 1
+
+    @classmethod
+    def _next_claim_id(cls, claims: list[JsonDict]) -> str:
+        """Running counter for the next free CLM- id, handed to a stage as its
+        numbering hint. Each stage was previously handed a fixed 10-id block
+        (S3a=020, S3b=030, …), but a live model sizes a stage's claims to the
+        evidence, not to that block; deriving the hint from the ids already
+        assigned steers the model away from the next stage's range."""
+        return f"CLM-{cls._next_claim_number(claims):03d}"
+
+    @classmethod
+    def _remap_claim_ids(cls, value: object, mapping: dict[str, str]) -> object:
+        if isinstance(value, str):
+            return mapping.get(value, value)
+        if isinstance(value, list):
+            return [cls._remap_claim_ids(item, mapping) for item in value]
+        if isinstance(value, dict):
+            return {key: cls._remap_claim_ids(item, mapping) for key, item in value.items()}
+        return value
+
+    def _rebase_stage_claims(
+        self, output: JsonDict, claims_key: str, existing: list[JsonDict]
+    ) -> JsonDict:
+        """Enforce collision-free claim ids even when a live model ignores the
+        numbering hint. A hint steers the model but does not bind it, so a stage
+        can still emit an id already taken by an earlier stage. Only when that
+        happens are the stage's own claims rebased onto a fresh contiguous block
+        and every reference to them inside this stage's output remapped; the
+        collision-free happy path is returned untouched."""
+        stage_ids = [
+            str(claim["claim_id"]) for claim in cast(list[JsonDict], output.get(claims_key, []))
+        ]
+        existing_ids = {str(claim["claim_id"]) for claim in existing}
+        if not any(stage_id in existing_ids for stage_id in stage_ids):
+            return output
+        base = self._next_claim_number(existing)
+        mapping = {old: f"CLM-{base + offset:03d}" for offset, old in enumerate(stage_ids)}
+        return cast(JsonDict, self._remap_claim_ids(output, mapping))
 
     @staticmethod
     def _merge_claims(claims: list[JsonDict], new_claims: list[JsonDict]) -> None:
