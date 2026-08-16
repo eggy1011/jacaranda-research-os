@@ -40,6 +40,7 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in the ignored .env file}@postgres:5432/${POSTGRES_DB:-jacaranda}
       REDIS_URL: redis://redis:6379/0
       DATA_DIR: /data
+      REPOSITORY_ROOT: /app
     command:
       [
         "sh",
@@ -78,6 +79,7 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in the ignored .env file}@postgres:5432/${POSTGRES_DB:-jacaranda}
       REDIS_URL: redis://redis:6379/0
       DATA_DIR: /data
+      REPOSITORY_ROOT: /app
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
       OPENROUTER_MODELS: ${OPENROUTER_MODELS:-}
       ALLOW_PAID_MODELS: ${ALLOW_PAID_MODELS:-false}

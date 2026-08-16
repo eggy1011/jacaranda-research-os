@@ -83,6 +83,21 @@ All five milestones are completed and accepted against the local Docker Compose 
 deployment (single VPS + Caddy TLS, per `docs/RUNBOOK.md` once written) is executed afterwards as a
 documented, repeatable step. No budget is committed to hosting until the local acceptance passes.
 
+## D-012 — Explicit repository-root configuration across deployment forms
+
+Status: accepted (2026-08, project owner approval).
+
+Runtime resolution of the repository root (holding `PROJECT_BRIEF.md`, `packages/` and
+`assets/brand`) must be **explicitly configured**, never inferred from directory structure alone.
+In the development form the code and data share a source tree, so walking up from `__file__` finds
+the root; in the installed form (pip-installed into `site-packages`, data copied to `/app` in the
+Docker image) the two have no common ancestor and the upward search fails — which is why the worker
+container crash-looped while the source-tree test suite stayed green. `repository_root()` therefore
+honours a `REPOSITORY_ROOT` override (set to `/app` for the `api` and `worker` services), validates
+that the configured directory actually contains `PROJECT_BRIEF.md`, and raises a loud error on a
+misconfigured override rather than silently falling back to the upward search. The upward search is
+retained as the default when no override is set.
+
 ## Open decisions
 
 - Final hosting provider (deferred by D-011 until local acceptance passes).
