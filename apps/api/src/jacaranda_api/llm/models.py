@@ -19,6 +19,10 @@ class ValidationFeedback(BaseModel):
     path: Annotated[str, Field(min_length=1, max_length=512)]
     retryable: bool
     detail: Annotated[str, Field(min_length=1, max_length=512)]
+    # Schema-derived, instance-free correction guidance (e.g. the allowed enum
+    # values or a missing required property). Safe to forward to a retry because
+    # it never contains the offending instance value; see safe_feedback_payload.
+    hint: Annotated[str, Field(max_length=512)] | None = None
 
 
 class LLMAttemptMetadata(BaseModel):

@@ -199,9 +199,38 @@ def validate_instance(
                 path=pointer,
                 retryable=True,
                 detail=f"output failed {error.validator or 'schema'} validation",
+                hint=_schema_hint(error),
             )
         )
     return tuple(feedback)
+
+
+def _schema_hint(error: object) -> str | None:
+    """Correction guidance derived only from the schema, never the instance.
+
+    The failing value is deliberately excluded so this can be forwarded to a
+    retry without echoing (possibly confidential) model output back through the
+    request or the logs."""
+    validator = getattr(error, "validator", None)
+    value = getattr(error, "validator_value", None)
+    if validator == "enum" and isinstance(value, list):
+        return f"value must be one of {value}"[:512]
+    if validator == "required" and isinstance(value, list):
+        return f"these properties are required: {value}"[:512]
+    if validator == "type":
+        return f"expected type {value}"[:512]
+    if validator in {
+        "minItems",
+        "maxItems",
+        "minLength",
+        "maxLength",
+        "minimum",
+        "maximum",
+        "minContains",
+        "maxContains",
+    }:
+        return f"constraint {validator}={value}"[:512]
+    return None
 
 
 def normalise_json_object(value: Mapping[str, JsonValue]) -> JsonObject:
@@ -237,7 +266,10 @@ def safe_feedback_payload(
             "stage": item.stage,
             "path": item.path,
             "retryable": item.retryable,
+            # detail may carry instance-derived text from semantic validators, so
+            # it is scrubbed; hint is schema-derived and safe to forward as-is.
             "detail": "validator rejected the previous structured output",
+            "hint": item.hint,
         }
         for item in feedback[:MAX_VALIDATION_FEEDBACK]
     ]
