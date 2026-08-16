@@ -24,6 +24,7 @@ def _default_wiring(root: Path) -> tuple[LLMProvider, AkshareClient]:
     http_client = HttpxOpenRouterHTTPClient(
         httpx.AsyncClient(timeout=httpx.Timeout(180.0)),
         base_url=settings.openrouter_base_url,
+        timeout_seconds=180.0,
     )
     llm = build_llm_provider(settings, PromptCatalog(root), http_client)
     return llm, AkshareLiveClient()
