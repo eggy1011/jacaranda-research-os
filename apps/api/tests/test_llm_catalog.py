@@ -77,6 +77,13 @@ def test_schema_validation_feedback_is_bounded_and_does_not_echo_values() -> Non
 
     assert {item.path for item in feedback} == {"/", "/count", "/name"}
     assert all("secret-value" not in item.detail for item in feedback)
+    # The schema-derived hint must never echo the offending instance value...
+    assert all("secret-value" not in (item.hint or "") for item in feedback)
+    # ...but must still be actionable: the type constraints are surfaced.
+    hints = {item.path: item.hint for item in feedback}
+    assert hints["/count"] == "expected type integer"
+    assert hints["/name"] == "expected type string"
+
     safe = safe_feedback_payload(
         (
             ValidationFeedback(
@@ -85,10 +92,13 @@ def test_schema_validation_feedback_is_bounded_and_does_not_echo_values() -> Non
                 path="/claims/0/source_ids",
                 retryable=True,
                 detail="do not forward this raw secret",
+                hint="value must be one of ['a', 'b']",
             ),
         )
     )
+    # detail (may carry instance text) is scrubbed; the schema-derived hint rides along.
     assert safe[0]["detail"] == "validator rejected the previous structured output"
+    assert safe[0]["hint"] == "value must be one of ['a', 'b']"
 
 
 def test_json_normalisation_rejects_non_json_values() -> None:
