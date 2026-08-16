@@ -48,13 +48,6 @@ password so it continues to match the existing PostgreSQL data volume. Do not co
 rotate the local password, first remove the development volume with `docker compose down --volumes`,
 then replace the password in `.env` before starting again.
 
-Then open:
-
-- Web status page: <http://localhost:3000>
-- API liveness endpoint: <http://localhost:8000/health>
-- API Swagger UI (development only): <http://localhost:8000/docs>
-- API ReDoc (development only): <http://localhost:8000/redoc>
-
 PostgreSQL and Redis listen on localhost only. The web container reaches the API over the private
 Compose network, and provider credentials are never exposed through `NEXT_PUBLIC_` variables.
 
